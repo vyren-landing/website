@@ -48,26 +48,27 @@ export default function Docs() {
       aria-labelledby="documentation-heading"
     >
       <div className="max-w-5xl mx-auto">
+        {/* Section Heading */}
         <h2
           id="documentation-heading"
-          className="text-3xl md:text-4xl font-semibold mb-12"
+          className="text-2xl md:text-3xl font-medium mb-12 text-gray-200"
         >
-          Documentation
+          Optional Documentation
         </h2>
 
         <div className="grid md:grid-cols-2 gap-14">
           {/* Core Protocol Documents */}
           <div>
-            <h3 className="text-lg font-medium mb-6 text-gray-200">
+            <h3 className="text-sm font-medium mb-6 uppercase tracking-wide text-gray-400">
               Core Protocol Documents
             </h3>
 
-            <ul className="space-y-5">
+            <ul className="space-y-6">
               {coreDocs.map((doc) => (
                 <li key={doc.title}>
                   <div className="text-gray-300">
                     <p className="leading-snug">{doc.title}</p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 mt-1 leading-relaxed">
                       {doc.note}
                     </p>
                   </div>
@@ -78,16 +79,16 @@ export default function Docs() {
 
           {/* Economic & Founder Papers */}
           <div>
-            <h3 className="text-lg font-medium mb-6 text-gray-200">
+            <h3 className="text-sm font-medium mb-6 uppercase tracking-wide text-gray-400">
               Economic & Founder Papers
             </h3>
 
-            <ul className="space-y-5">
+            <ul className="space-y-6">
               {economicDocs.map((doc) => (
                 <li key={doc.title}>
                   <div className="text-gray-300">
                     <p className="leading-snug">{doc.title}</p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 mt-1 leading-relaxed">
                       {doc.note}
                     </p>
                   </div>
@@ -97,9 +98,11 @@ export default function Docs() {
           </div>
         </div>
 
-        <p className="text-xs text-gray-600 mt-16 max-w-3xl">
-          Public access to selected documents will be enabled progressively.
-          No participation, allocation, or financial action is requested or
+        {/* Disclosure Note */}
+        <p className="text-xs text-gray-600 mt-16 max-w-3xl leading-relaxed">
+          Documentation is provided to support independent evaluation. Public
+          access to selected materials will be enabled progressively. No
+          participation, allocation, or financial action is requested or
           facilitated at this stage.
         </p>
       </div>
