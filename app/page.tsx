@@ -80,4 +80,22 @@ export default function Home() {
           <p>Architecture: Final (Rev4.6)</p>
           <p>Documentation: Locked</p>
           <p>Participation: Enabled by design</p>
-          <p>Execut
+          <p>Execution: Not started</p>
+          <p className="text-xs text-gray-500 mt-2">
+            No component activates prematurely.
+          </p>
+        </section>
+
+        {/* FOOTER */}
+        <footer className="pt-24 text-xs text-gray-500">
+          Vyren Autonomous Protocol
+          <br />
+          Rev4.6 · Zero Governance · Deterministic Architecture
+          <br />
+          No social links. No subscriptions. No updates.
+        </footer>
+
+      </div>
+    </main>
+  );
+}
