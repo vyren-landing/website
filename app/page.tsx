@@ -20,7 +20,7 @@ const surfaces = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-6 pb-28 pt-36 md:px-10 md:pt-44">
+    <main id="main-content" className="min-h-screen scroll-mt-24 px-6 pb-28 pt-36 md:px-10 md:pt-44">
       <div className="mx-auto max-w-[1400px]">
         <section className="relative overflow-hidden rounded-[32px] border border-zinc-900 bg-[#080808] px-6 py-12 md:px-10 md:py-16">
           <div className="protocol-grid absolute inset-0 opacity-30" aria-hidden="true" />
