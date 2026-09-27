@@ -1,7 +1,14 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import BindingTable from "@/components/BindingTable";
 import BuildProof from "@/components/BuildProof";
 import SurfacePage from "@/components/SurfacePage";
 import { CANONICAL_IMPLEMENTATION, NETWORK_PROFILE, PROTOCOL_STATE } from "@/lib/site-state";
+
+export const metadata = publicPageMetadata({
+  title: "Verification",
+  description: "Verification chain from canonical source and reproducible build evidence to future live-instance bindings.",
+  path: "/verification",
+});
 
 const rows = [
   { label: "Canonical repository", value: CANONICAL_IMPLEMENTATION.repository },
