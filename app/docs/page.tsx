@@ -1,4 +1,11 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import SurfacePage from "@/components/SurfacePage";
+
+export const metadata = publicPageMetadata({
+  title: "Documentation",
+  description: "Public VYREN documentation is a controlled disclosure surface derived from canonical Rev4.6 material.",
+  path: "/docs",
+});
 
 const groups = [
   {
