@@ -22,6 +22,14 @@ export const metadata: Metadata = {
   description:
     "Vyren is a deterministic protocol architecture currently operating in PRE-GENESIS mode. Participation is not open.",
   metadataBase: new URL("https://vyren.io"),
+  icons: {
+    icon: [
+      {
+        url: "/vyren-favicon.jpg",
+        type: "image/jpeg",
+      },
+    ],
+  },
   alternates: {
     canonical: "/",
   },
