@@ -1,6 +1,13 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import BuildProof from "@/components/BuildProof";
 import EvidenceLegend from "@/components/EvidenceLegend";
 import SurfacePage from "@/components/SurfacePage";
+
+export const metadata = publicPageMetadata({
+  title: "Evidence",
+  description: "Implementation, deployment and live evidence are represented as separate states with freshness and invalidation rules.",
+  path: "/evidence",
+});
 
 export default function EvidencePage() {
   return (
