@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import SiteFooter from "@/components/SiteFooter";
+import SiteNav from "@/components/SiteNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,69 +15,51 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vyren — Deterministic Constitutional Protocol (Rev4.6)",
+  title: {
+    default: "Vyren — Deterministic Protocol",
+    template: "%s | Vyren",
+  },
   description:
-    "Vyren is a governance-free, deterministic protocol operating under a finalized constitutional architecture. Participation is not yet enabled.",
+    "Vyren is a deterministic protocol architecture currently operating in PRE-GENESIS mode. Participation is not open.",
   metadataBase: new URL("https://vyren.io"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Vyren — Deterministic Constitutional Protocol (Rev4.6)",
+    title: "Vyren — Deterministic Protocol",
     description:
-      "A constitutionally locked protocol architecture. Deterministic execution. No governance. No early participation.",
+      "Explicit rules, bounded authority, and verifiable state. Current mode: PRE-GENESIS.",
     url: "https://vyren.io",
     siteName: "Vyren",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vyren — Deterministic Protocol",
+    description:
+      "Explicit rules, bounded authority, and verifiable state. Current mode: PRE-GENESIS.",
   },
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-black text-zinc-100 antialiased`}
       >
-        {/* SIGNAL NAVIGATION — LOCKED BY DESIGN */}
-        <nav className="fixed top-0 left-0 w-full z-50 bg-black/85 backdrop-blur border-b border-gray-800">
-          <div className="max-w-7xl mx-auto px-6 md:px-16 py-6 flex justify-between items-center">
-            
-            {/* BRAND ANCHOR */}
-            <div className="text-sm font-semibold tracking-[0.25em] text-orange-400">
-              VYREN
-            </div>
-
-            {/* LOCKED NAV ITEMS */}
-            <ul className="flex gap-6 text-xs text-gray-400">
-              {[
-                "Architecture",
-                "Economics",
-                "Participation",
-                "Documentation",
-                "Status",
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="relative cursor-default group"
-                >
-                  <span className="hover:text-gray-200">
-                    {item}
-                  </span>
-
-                  <span className="absolute left-1/2 -translate-x-1/2 top-10 whitespace-nowrap text-[10px] text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Locked by design · Available after protocol activation
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
-
-        {/* PAGE CONTENT */}
-        <div className="pt-28">
-          {children}
-        </div>
+        <a
+          href="#main-content"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition focus:translate-y-0"
+        >
+          Skip to content
+        </a>
+        <SiteNav />
+        {children}
+        <SiteFooter />
       </body>
     </html>
   );
