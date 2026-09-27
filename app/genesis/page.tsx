@@ -1,7 +1,14 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import BindingTable from "@/components/BindingTable";
 import FlowStepper from "@/components/FlowStepper";
 import SurfacePage from "@/components/SurfacePage";
 import { GENESIS_PROFILE, SETTLEMENT_PROFILE } from "@/lib/site-state";
+
+export const metadata = publicPageMetadata({
+  title: "Genesis",
+  description: "Final-form Genesis information surface operating in PRE-GENESIS mode. Participation is closed.",
+  path: "/genesis",
+});
 
 const steps = [
   { index: "01", title: "Eligibility", detail: "Jurisdiction, disclosure and eligibility conditions must be current.", state: "BLOCKED" as const },
