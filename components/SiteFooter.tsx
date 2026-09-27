@@ -17,6 +17,12 @@ export default function SiteFooter() {
             state does not create deployment, participation, settlement, or
             activation authority.
           </p>
+          <p className="mt-4 max-w-xl text-xs leading-5 text-zinc-600">
+            Informational architecture material only. Nothing on this website is
+            an offer, solicitation, investment recommendation, legal opinion or
+            guarantee of price, liquidity, listing, regulatory outcome, security,
+            uptime or return.
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-xs text-zinc-500">
