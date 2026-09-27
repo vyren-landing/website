@@ -1,15 +1,29 @@
-import GatedPanel from "@/components/GatedPanel";
+import BindingTable from "@/components/BindingTable";
 import SurfacePage from "@/components/SurfacePage";
+import { NETWORK_PROFILE, SETTLEMENT_PROFILE } from "@/lib/site-state";
+
+const rows = [
+  { label: "Production chain", value: NETWORK_PROFILE.chain, state: NETWORK_PROFILE.state },
+  { label: "Chain ID", value: String(NETWORK_PROFILE.chainId), mono: true },
+  { label: "Canonical time", value: NETWORK_PROFILE.canonicalTime },
+  { label: "VYREN production address", value: "Pending deployment", state: "PENDING" as const },
+  { label: "Native USDC", value: SETTLEMENT_PROFILE.contract, mono: true },
+  { label: "Bridged USDbC", value: "Excluded from canonical Genesis settlement" },
+] as const;
 
 export default function NetworkPage() {
   return (
     <SurfacePage
       eyebrow="Network"
-      title="Live network bindings pending."
-      description="Production addresses, runtime equality, finality, and monitoring will appear here only after Base Mainnet deployment evidence is established."
+      title="Selected chain. Unbound production instance."
+      description="Base Mainnet is the selected production-chain profile, but the website does not publish a VYREN production address until deployment and runtime equality evidence exist."
       state="PENDING"
     >
-      <GatedPanel title="Production network" description="No production contract address set is published by this surface yet." />
+      <BindingTable rows={rows} />
+      <p className="mt-6 max-w-4xl text-xs leading-6 text-zinc-600">
+        Finality-sensitive lifecycle evidence becomes usable only after the
+        containing Base L2 block satisfies the frozen finality rule.
+      </p>
     </SurfacePage>
   );
 }
