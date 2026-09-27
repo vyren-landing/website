@@ -1,5 +1,12 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import ProtocolMap from "@/components/ProtocolMap";
 import SurfacePage from "@/components/SurfacePage";
+
+export const metadata = publicPageMetadata({
+  title: "Protocol",
+  description: "Rule boundaries, bounded authority, deterministic execution and public disclosure boundaries.",
+  path: "/protocol",
+});
 
 const principles = [
   ["Deterministic execution", "Critical behavior is specified before demand or market pressure appears."],
