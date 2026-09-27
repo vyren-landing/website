@@ -1,6 +1,13 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import BindingTable from "@/components/BindingTable";
 import SurfacePage from "@/components/SurfacePage";
 import { NETWORK_PROFILE, SETTLEMENT_PROFILE } from "@/lib/site-state";
+
+export const metadata = publicPageMetadata({
+  title: "Network",
+  description: "Selected Base Mainnet production profile and current deployment-binding state.",
+  path: "/network",
+});
 
 const rows = [
   { label: "Production chain", value: NETWORK_PROFILE.chain, state: NETWORK_PROFILE.state },
