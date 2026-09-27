@@ -3,7 +3,7 @@ import StateBadge from "@/components/StateBadge";
 
 export default function NotFound() {
   return (
-    <main className="min-h-[70vh] px-6 pb-24 pt-36 md:px-10">
+    <main id="main-content" className="min-h-[70vh] scroll-mt-24 px-6 pb-24 pt-36 md:px-10">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center gap-3">
           <p className="font-mono text-xs text-zinc-600">404</p>
