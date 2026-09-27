@@ -1,6 +1,13 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import BindingTable from "@/components/BindingTable";
 import SurfacePage from "@/components/SurfacePage";
 import { LIQUIDITY_PROFILE } from "@/lib/site-state";
+
+export const metadata = publicPageMetadata({
+  title: "Liquidity",
+  description: "Selected liquidity-readiness policy and current live-market evidence state.",
+  path: "/liquidity",
+});
 
 const rows = [
   { label: "Primary venue", value: `${LIQUIDITY_PROFILE.venue} on ${LIQUIDITY_PROFILE.network}` },
