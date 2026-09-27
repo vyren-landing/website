@@ -1,5 +1,12 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import LifecycleRail from "@/components/LifecycleRail";
 import SurfacePage from "@/components/SurfacePage";
+
+export const metadata = publicPageMetadata({
+  title: "Lifecycle",
+  description: "VYREN progresses by state and evidence rather than a marketing countdown or launch date.",
+  path: "/lifecycle",
+});
 
 export default function LifecyclePage() {
   return (
