@@ -1,15 +1,30 @@
-import GatedPanel from "@/components/GatedPanel";
+import type { Metadata } from "next";
+import BindingTable from "@/components/BindingTable";
 import SurfacePage from "@/components/SurfacePage";
+import { GENESIS_PROFILE } from "@/lib/site-state";
+
+export const metadata: Metadata = {
+  title: "Participant Position",
+  robots: { index: false, follow: false },
+};
+
+const rows = [
+  { label: "Entitlement", value: "No live entitlement", state: "NOT_ASSERTED" as const },
+  { label: "Vesting rule", value: GENESIS_PROFILE.vesting },
+  { label: "Cliff end", value: "Not available", state: "PENDING" as const },
+  { label: "Linear end", value: "Not available", state: "PENDING" as const },
+  { label: "Claimed / settled", value: "No participant record", state: "PENDING" as const },
+] as const;
 
 export default function PositionPage() {
   return (
     <SurfacePage
       eyebrow="Account / Position"
-      title="No live position."
-      description="Allocation, vesting, unlock, and settlement state will be shown only from live canonical data."
+      title="Position data will be evidence-bound."
+      description="The account position surface will show live entitlement and vesting state only when a real participant record exists."
       state="PENDING"
     >
-      <GatedPanel title="Position" description="No participant position is asserted." />
+      <BindingTable rows={rows} />
     </SurfacePage>
   );
 }
