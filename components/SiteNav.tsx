@@ -49,13 +49,13 @@ export default function SiteNav() {
         <button
           type="button"
           aria-label="Close mobile menu"
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       ) : null}
 
       <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-900 bg-black/92 backdrop-blur">
-        <div className="relative z-50 mx-auto flex max-w-[1400px] items-center gap-5 px-5 py-4 md:px-10">
+        <div className="relative z-50 mx-auto flex max-w-[1400px] items-center gap-5 px-5 py-4 lg:px-10">
         <Link
           href="/"
           className="shrink-0 text-sm font-semibold tracking-[0.28em]"
@@ -66,7 +66,7 @@ export default function SiteNav() {
 
         <nav
           aria-label="Primary navigation"
-          className="hidden min-w-0 flex-1 md:block"
+          className="hidden min-w-0 flex-1 lg:block"
         >
           <ul className="flex items-center gap-5 text-xs text-zinc-400">
             {links.map(([label, href]) => (
@@ -81,13 +81,13 @@ export default function SiteNav() {
 
         <Link
           href="/genesis"
-          className="ml-auto hidden shrink-0 items-center gap-2 md:flex"
+          className="ml-auto hidden shrink-0 items-center gap-2 lg:flex"
         >
           <span className="text-xs text-zinc-400">Genesis</span>
           <StateBadge state="PENDING" label="PRE-GENESIS" />
         </Link>
 
-        <div className="relative ml-auto md:hidden">
+        <div className="relative ml-auto lg:hidden">
           <button
             type="button"
             aria-expanded={mobileOpen}
