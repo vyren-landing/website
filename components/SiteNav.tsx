@@ -44,7 +44,7 @@ export default function SiteNav() {
   }, [mobileOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-900 bg-black/92 backdrop-blur">
+    <>
       {mobileOpen ? (
         <button
           type="button"
@@ -54,7 +54,8 @@ export default function SiteNav() {
         />
       ) : null}
 
-      <div className="relative z-50 mx-auto flex max-w-[1400px] items-center gap-5 px-5 py-4 md:px-10">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-900 bg-black/92 backdrop-blur">
+        <div className="relative z-50 mx-auto flex max-w-[1400px] items-center gap-5 px-5 py-4 md:px-10">
         <Link
           href="/"
           className="shrink-0 text-sm font-semibold tracking-[0.28em]"
@@ -130,7 +131,8 @@ export default function SiteNav() {
             </div>
           ) : null}
         </div>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 }
