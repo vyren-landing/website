@@ -1,7 +1,14 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import BuildProof from "@/components/BuildProof";
 import StateBadge from "@/components/StateBadge";
 import SurfacePage from "@/components/SurfacePage";
 import { PROTOCOL_STATE, protocolStateSummary } from "@/lib/site-state";
+
+export const metadata = publicPageMetadata({
+  title: "Status",
+  description: "Current VYREN lifecycle, implementation evidence and live-readiness boundaries. Current mode: PRE-GENESIS.",
+  path: "/status",
+});
 
 const pending = [
   "Production signer and public deployment identity binding",
