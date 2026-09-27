@@ -21,6 +21,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
         disallow: [
           "/internal/",
+          "/account",
           "/account/",
           "/genesis/eligibility",
           "/genesis/participate",
