@@ -1,5 +1,12 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import ProtocolMap from "@/components/ProtocolMap";
 import SurfacePage from "@/components/SurfacePage";
+
+export const metadata = publicPageMetadata({
+  title: "Architecture",
+  description: "VYREN architecture separates constitutional rules, economic execution, deployment, evidence, recovery and public disclosure.",
+  path: "/architecture",
+});
 
 const boundaries = [
   ["Constitutional core", "Defines frozen rule and authority boundaries."],
