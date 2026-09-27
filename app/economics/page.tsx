@@ -1,5 +1,12 @@
+import { publicPageMetadata } from "@/lib/site-metadata";
 import EconomicAnchors from "@/components/EconomicAnchors";
 import SurfacePage from "@/components/SurfacePage";
+
+export const metadata = publicPageMetadata({
+  title: "Economics",
+  description: "Locked Rev4.6 economic anchors and separate participant, founder and protocol economic domains.",
+  path: "/economics",
+});
 
 const flows = [
   { title: "Participant layer", text: "Genesis price, participation bounds, vesting and entitlement rules are predetermined. The current site exposes no transaction path." },
