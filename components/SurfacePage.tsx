@@ -18,10 +18,10 @@ export default function SurfacePage({
   children?: ReactNode;
 }) {
   return (
-    <main className="min-h-screen px-6 pb-24 pt-28 md:px-10">
+    <main id="main-content" className="min-h-screen scroll-mt-24 px-6 pb-24 pt-28 md:px-10">
       <div className="mx-auto max-w-[1200px]">
         <div className="max-w-3xl border-b border-zinc-900 pb-12">
-          <div className="mb-5 flex items-center gap-3">
+          <div className="mb-5 flex flex-wrap items-center gap-3">
             <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
               {eyebrow}
             </p>
