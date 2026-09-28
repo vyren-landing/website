@@ -68,6 +68,28 @@ export default function Home() {
           ))}
         </section>
 
+        <section className="mt-16 grid gap-8 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 md:grid-cols-[0.8fr_1.2fr] md:p-10">
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Current phase</p>
+            <h2 className="mt-4 text-3xl font-medium tracking-tight">
+              The architecture is defined. The remaining work is narrower.
+            </h2>
+          </div>
+          <div>
+            <p className="text-sm leading-7 text-zinc-400">
+              Vyren is now working through final pre-Genesis implementation,
+              evidence, legal-provider readiness and production-binding stages.
+              Public participation remains closed, production deployment is not
+              asserted, and activation remains state-dependent.
+            </p>
+            <p className="mt-4 text-sm leading-7 text-zinc-500">
+              Public updates are resuming because the system is now concrete
+              enough to show more of how its rules, boundaries and evidence model
+              behave under real constraints.
+            </p>
+          </div>
+        </section>
+
         <section className="mt-24 grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
             <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Protocol model</p>
@@ -119,6 +141,41 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border border-zinc-900 px-6 py-2">
             <LifecycleRail />
+          </div>
+        </section>
+
+        <section className="mt-24">
+          <div className="mb-8 max-w-2xl">
+            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Architecture fragments</p>
+            <h2 className="mt-4 text-3xl font-medium tracking-tight">
+              Small pieces of a much larger rule system.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-zinc-500">
+              Selected concepts can be public without collapsing the full
+              canonical architecture into a single disclosure surface.
+            </p>
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["Qualified Activation Days", "Activation readiness accumulates through qualified state, not a calendar countdown."],
+              ["PENDING_DELIVERY ≠ cancellation", "A delivery constraint does not rewrite a valid computed settlement."],
+              ["Economic right ≠ governance authority", "Economic entitlement does not create protocol control."],
+              ["Evidence can become DUE or STALE", "A past review does not remain current simply because it exists."],
+              ["Recovery ≠ rewriting history", "Canonical recovery restores valid execution rather than creating a discretionary reset."],
+            ].map(([title, text]) => (
+              <div key={title} className="bg-black p-7">
+                <p className="text-sm font-medium text-zinc-200">{title}</p>
+                <p className="mt-3 text-sm leading-6 text-zinc-500">{text}</p>
+              </div>
+            ))}
+            <div className="bg-[#080808] p-7">
+              <p className="text-sm font-medium text-zinc-300">More will become visible.</p>
+              <p className="mt-3 text-sm leading-6 text-zinc-500">
+                Additional architecture will be disclosed as final pre-Genesis
+                work advances and its release conditions are satisfied.
+              </p>
+            </div>
           </div>
         </section>
 

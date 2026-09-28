@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Vyren — Deterministic Protocol",
+    default: "Vyren | Deterministic Protocol",
     template: "%s | Vyren",
   },
   description:
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/vyren-favicon.jpg",
-        type: "image/jpeg",
+        url: "/vyren-favicon.svg",
+        type: "image/svg+xml",
       },
     ],
   },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Vyren — Deterministic Protocol",
+    title: "Vyren | Deterministic Protocol",
     description:
       "Explicit rules, bounded authority, and verifiable state. Current mode: PRE-GENESIS.",
     url: "https://vyren.io",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vyren — Deterministic Protocol",
+    title: "Vyren | Deterministic Protocol",
     description:
       "Explicit rules, bounded authority, and verifiable state. Current mode: PRE-GENESIS.",
   },

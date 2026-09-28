@@ -23,6 +23,9 @@ export default function SiteFooter() {
             guarantee of price, liquidity, listing, regulatory outcome, security,
             uptime or return.
           </p>
+          <p className="mt-5 text-xs text-zinc-500">
+            Public updates have resumed as Vyren enters its next phase.
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-xs text-zinc-500">
@@ -32,6 +35,7 @@ export default function SiteFooter() {
           <Link className="hover:text-white" href="/verification">Verification</Link>
           <a className="hover:text-white" href="https://x.com/vyrenio" target="_blank" rel="noreferrer">X</a>
           <a className="hover:text-white" href="https://www.linkedin.com/company/vyrenlabs" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a className="hover:text-white" href="https://medium.com/@vyren" target="_blank" rel="noreferrer">Medium</a>
         </div>
       </div>
     </footer>
