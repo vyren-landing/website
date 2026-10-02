@@ -8,6 +8,7 @@ import StateBadge from "@/components/StateBadge";
 const links = [
   ["Protocol", "/protocol"],
   ["Architecture", "/architecture"],
+  ["Ecosystem", "/ecosystem"],
   ["Economics", "/economics"],
   ["Lifecycle", "/lifecycle"],
   ["Evidence", "/evidence"],

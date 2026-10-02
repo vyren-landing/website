@@ -23,7 +23,9 @@ export const PROTOCOL_STATE = {
   productionProfilesCurrent: 0,
   productionProfilesTotal: 10,
   r2: "PENDING" as EvidenceState,
-  gateG: "BLOCKED" as EvidenceState,
+  gateGenesis: "PENDING" as EvidenceState,
+  gateActive: "NOT_ASSERTED" as EvidenceState,
+  gateMarket: "NOT_ASSERTED" as EvidenceState,
   activation: "NOT_ASSERTED" as EvidenceState,
 } as const;
 
@@ -98,8 +100,8 @@ export const protocolStateSummary = [
     state: "PENDING" as EvidenceState,
   },
   {
-    label: "Gate G",
-    value: "Blocked / not asserted",
-    state: "BLOCKED" as EvidenceState,
+    label: "G-GENESIS",
+    value: "External implementation evidence pending",
+    state: "PENDING" as EvidenceState,
   },
 ] as const;

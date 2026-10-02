@@ -24,16 +24,19 @@ export default function LifecyclePage() {
           <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Genesis</p>
           <h2 className="mt-3 text-lg font-medium">Not a countdown event.</h2>
           <p className="mt-3 text-sm leading-6 text-zinc-500">
-            Participation opens only after required deployment, legal,
-            settlement, monitoring and evidence conditions are current.
+            Participation opens only after the applicable G-GENESIS legal,
+            safeguarding, settlement, public-surface and minimum security
+            conditions are current. Production deployment is not treated as a
+            universal legal pre-Genesis requirement.
           </p>
         </div>
         <div className="rounded-2xl border border-zinc-900 p-6">
           <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Activation</p>
           <h2 className="mt-3 text-lg font-medium">Threshold-bound.</h2>
           <p className="mt-3 text-sm leading-6 text-zinc-500">
-            Rev4.6 activation uses protocol-defined thresholds, including the
-            QAD and clean-period framework, rather than a promotional date.
+            Rev4.6 activation uses protocol-defined thresholds including QAD,
+            clean / ABF handling, R2-ACTIVATION, G-ACTIVE, ASCF and F3 rather
+            than a promotional date. MARKET OPEN remains a separate path under P04 + G-MARKET.
           </p>
         </div>
       </section>

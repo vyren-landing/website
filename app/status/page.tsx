@@ -11,13 +11,13 @@ export const metadata = publicPageMetadata({
 });
 
 const pending = [
+  "Legal-person Offeror / selected implementation facts",
+  "Primary safeguarding-payment-refund provider binding",
   "Production signer and public deployment identity binding",
-  "Base Mainnet deployment and runtime equality",
-  "Finality and production-chain evidence",
-  "Live VYREN / native-USDC liquidity and market-depth evidence",
-  "Production monitoring and freshness evidence",
-  "Independent F2E assurance",
-  "Gate G live legal / entity / provider evidence",
+  "Base Mainnet deployment and runtime equality for QAD / ACTIVE evidence",
+  "Production finality, minimum recovery and monitoring evidence",
+  "P05 Founder / FOW settlement endpoint readiness",
+  "G-GENESIS / G-ACTIVE live-scope evidence as each gate becomes applicable",
 ] as const;
 
 export default function StatusPage() {
@@ -58,7 +58,7 @@ export default function StatusPage() {
       </div>
 
       <div className="mt-8 rounded-2xl border border-zinc-900 p-6 text-sm leading-7 text-zinc-500">
-        R2: {PROTOCOL_STATE.r2} · Gate G: {PROTOCOL_STATE.gateG} · Activation: {PROTOCOL_STATE.activation}
+        R2: {PROTOCOL_STATE.r2} · G-GENESIS: pending · G-ACTIVE: not asserted · G-MARKET: not asserted · Activation: {PROTOCOL_STATE.activation}
       </div>
     </SurfacePage>
   );

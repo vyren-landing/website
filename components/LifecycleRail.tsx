@@ -24,19 +24,19 @@ const steps: ReadonlyArray<{
     index: "03",
     title: "Production Deployment",
     state: "PENDING",
-    text: "Mainnet addresses and runtime equality are not yet bound.",
+    text: "Mainnet addresses and runtime equality are not yet bound. Deployment becomes hard where live evidence actually consumes it.",
   },
   {
     index: "04",
     title: "Genesis",
     state: "BLOCKED",
-    text: "Participation remains closed until deployment, legal and evidence gates pass.",
+    text: "Participation remains closed until the applicable G-GENESIS legal, safeguarding, settlement, security and public-surface conditions pass.",
   },
   {
     index: "05",
     title: "Activation",
     state: "NOT_ASSERTED",
-    text: "Activation follows protocol-defined thresholds, not a marketing date.",
+    text: "Activation follows QAD, clean-state, R2, G-ACTIVE, ASCF and F3 conditions rather than a marketing date.",
   },
 ];
 

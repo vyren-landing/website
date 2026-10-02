@@ -19,7 +19,9 @@ const rows = [
   { label: "Runtime equality", value: "Not yet bound on mainnet", state: "PENDING" as const },
   { label: "Production profiles", value: `${PROTOCOL_STATE.productionProfilesCurrent}/${PROTOCOL_STATE.productionProfilesTotal} CURRENT`, state: "PENDING" as const },
   { label: "R2", value: "Pending / not asserted", state: PROTOCOL_STATE.r2 },
-  { label: "Gate G", value: "Blocked / not asserted", state: PROTOCOL_STATE.gateG },
+  { label: "G-GENESIS", value: "External implementation evidence pending", state: PROTOCOL_STATE.gateGenesis },
+  { label: "G-ACTIVE", value: "Not asserted", state: PROTOCOL_STATE.gateActive },
+  { label: "G-MARKET", value: "Not asserted", state: PROTOCOL_STATE.gateMarket },
 ] as const;
 
 export default function VerificationPage() {

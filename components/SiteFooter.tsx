@@ -29,6 +29,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-xs text-zinc-500">
+          <Link className="hover:text-white" href="/ecosystem">Ecosystem</Link>
           <Link className="hover:text-white" href="/docs">Documentation</Link>
           <Link className="hover:text-white" href="/status">Status</Link>
           <Link className="hover:text-white" href="/genesis">Genesis</Link>

@@ -4,6 +4,7 @@ const publicRoutes = [
   "",
   "/protocol",
   "/architecture",
+  "/ecosystem",
   "/economics",
   "/lifecycle",
   "/evidence",

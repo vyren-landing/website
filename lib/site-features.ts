@@ -7,6 +7,7 @@ import { PROTOCOL_STATE } from "@/lib/site-state";
 export const SITE_FEATURES = {
   publicProtocolSurface: true,
   publicArchitectureSurface: true,
+  publicEcosystemSurface: true,
   publicEconomicsSurface: true,
   publicLifecycleSurface: true,
   publicEvidenceSurface: true,
