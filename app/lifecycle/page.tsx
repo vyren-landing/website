@@ -36,7 +36,7 @@ export default function LifecyclePage() {
           <p className="mt-3 text-sm leading-6 text-zinc-500">
             Rev4.6 activation uses protocol-defined thresholds including QAD,
             clean / ABF handling, R2-ACTIVATION, G-ACTIVE, ASCF and F3 rather
-            than a promotional date. MARKET OPEN remains a separate path.
+            than a promotional date. MARKET OPEN remains a separate path under P04 + G-MARKET.
           </p>
         </div>
       </section>
