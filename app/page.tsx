@@ -12,6 +12,7 @@ import {
 const surfaces = [
   { title: "Protocol", href: "/protocol", text: "Rule boundaries, authority separation and deterministic execution." },
   { title: "Architecture", href: "/architecture", text: "How constitutional, economic, execution, evidence and public layers remain distinct." },
+  { title: "Ecosystem", href: "/ecosystem", text: "DeFi, launchpad and economic-infrastructure capabilities without confusing design with live availability." },
   { title: "Economics", href: "/economics", text: "Locked numerical anchors and the separation of participant, founder and protocol flows." },
   { title: "Evidence", href: "/evidence", text: "Freshness, verification and the difference between implementation evidence and live production fact." },
   { title: "Documentation", href: "/docs", text: "Public disclosure derived from canonical material without replacing it." },
@@ -117,16 +118,50 @@ export default function Home() {
           <EconomicAnchors />
         </section>
 
+        <section className="mt-24 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 md:p-10">
+          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Ecosystem direction</p>
+              <h2 className="mt-4 text-3xl font-medium tracking-tight">
+                DeFi, launchpad and economic infrastructure — separated by state.
+              </h2>
+              <p className="mt-4 text-sm leading-7 text-zinc-500">
+                Phase-2 exposes what the broader VYREN ecosystem is intended to
+                support without presenting future capability as current product
+                availability.
+              </p>
+              <Link href="/ecosystem" className="mt-6 inline-block text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300">
+                Explore ecosystem
+              </Link>
+            </div>
+
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-3">
+              {[
+                ["DeFi", "State-aware financial and settlement capabilities."],
+                ["Launchpad", "Disclosure, eligibility and settlement surfaces for future project participation."],
+                ["Economic infrastructure", "Separated participant, Founder, Foundation/FOW, treasury and market lanes."],
+              ].map(([title, text]) => (
+                <div key={title} className="bg-black p-6">
+                  <p className="text-sm font-medium text-zinc-200">{title}</p>
+                  <p className="mt-3 text-sm leading-6 text-zinc-500">{text}</p>
+                  <p className="mt-5 text-[10px] tracking-[0.12em] text-zinc-700">CAPABILITY / NOT LIVE</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="mt-24 grid gap-8 lg:grid-cols-2">
           <BuildProof />
           <div className="rounded-2xl border border-zinc-900 bg-[#080808] p-6 md:p-8">
             <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Current boundary</p>
             <h2 className="mt-3 text-xl font-medium">Pre-live tooling is not live production evidence.</h2>
             <p className="mt-5 text-sm leading-7 text-zinc-500">
-              Production profiles remain 0/10 CURRENT. R2 is pending and Gate G
-              remains blocked / not asserted. Mainnet addresses, live market
-              formation, participant settlement and activation are not presented
-              as current.
+              Production maturity remains incomplete and R2 is pending.
+              G-GENESIS, G-ACTIVE and G-MARKET are evaluated separately at the
+              points where their evidence is actually required. Mainnet
+              addresses, participant settlement, live market formation and
+              activation are not presented as current.
             </p>
             <Link href="/status" className="mt-6 inline-block text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300">
               Inspect current status
