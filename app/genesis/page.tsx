@@ -11,12 +11,14 @@ export const metadata = publicPageMetadata({
 });
 
 const steps = [
-  { index: "01", title: "Eligibility", detail: "Jurisdiction, disclosure and eligibility conditions must be current.", state: "BLOCKED" as const },
-  { index: "02", title: "Wallet", detail: "A participant wallet may connect only after the Genesis transaction surface is released.", state: "PENDING" as const },
-  { index: "03", title: "Amount", detail: "Protocol bounds apply before any payment instruction can be produced.", state: "PENDING" as const },
-  { index: "04", title: "Settlement", detail: "Canonical settlement uses native USDC on Base Mainnet under the live approved scope.", state: "PENDING" as const },
-  { index: "05", title: "Finality", detail: "Settlement is usable only after the containing Base L2 block is finalized.", state: "PENDING" as const },
-  { index: "06", title: "Entitlement", detail: "A finalized valid settlement may create the protocol-defined Genesis entitlement.", state: "PENDING" as const },
+  { index: "01", title: "Eligibility", detail: "The actual jurisdiction, disclosure and eligibility scope must be current before intake.", state: "BLOCKED" as const },
+  { index: "02", title: "Wallet", detail: "A participant wallet may connect only after the Genesis transaction surface is explicitly released.", state: "PENDING" as const },
+  { index: "03", title: "Amount", detail: "Protocol minimum and cumulative maximum are checked before any payment instruction.", state: "PENDING" as const },
+  { index: "04", title: "Safeguarded payment", detail: "Participant consideration follows the live approved safeguarding/payment path; provider receipt alone does not create entitlement.", state: "PENDING" as const },
+  { index: "05", title: "Technical finality", detail: "The relevant Base payment evidence must reach the required finalized-chain boundary.", state: "PENDING" as const },
+  { index: "06", title: "Legal finality", detail: "Any applicable withdrawal, cancellation or refund boundary must be resolved under the actual legal route.", state: "PENDING" as const },
+  { index: "07", title: "Canonical entitlement", detail: "Only after the required technical and legal finality conditions pass may the deterministic Genesis entitlement be confirmed.", state: "PENDING" as const },
+  { index: "08", title: "GENESIS_LOCKED", detail: "The confirmed entitlement enters the canonical locked state under the controlling vesting rules.", state: "PENDING" as const },
 ] as const;
 
 const rows = [
@@ -32,7 +34,7 @@ export default function GenesisPage() {
     <SurfacePage
       eyebrow="Genesis"
       title="Final-form interface. PRE-GENESIS state."
-      description="The Genesis user journey is designed now so that the site does not need to be rebuilt later. Transactional functionality remains fail-closed until the required protocol, legal, settlement, monitoring and evidence gates are current."
+      description="The Genesis user journey is designed now so that the site does not need to be rebuilt later. Transactional functionality remains fail-closed until the applicable G-GENESIS, safeguarding, settlement, monitoring and public-disclosure conditions are current."
       state="BLOCKED"
       stateLabel="PARTICIPATION CLOSED"
     >
