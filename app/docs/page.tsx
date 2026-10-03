@@ -1,4 +1,4 @@
-import { publicPageMetadata } from "@/lib/site-metadata";
+import Link from "next/link";\nimport { publicPageMetadata } from "@/lib/site-metadata";
 import SurfacePage from "@/components/SurfacePage";
 
 export const metadata = publicPageMetadata({
@@ -58,6 +58,19 @@ export default function DocsPage() {
       </div>
 
       <section className="mt-12 max-w-4xl rounded-2xl border border-zinc-900 bg-[#080808] p-6 md:p-8">
+        <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Participation preparation</p>
+        <h2 className="mt-3 text-xl font-medium">Locked rules and pending live facts are separated.</h2>
+        <p className="mt-4 text-sm leading-7 text-zinc-500">
+          The pre-Genesis participation guide explains the intended eligibility,
+          safeguarded-payment, technical-finality, legal-finality and entitlement
+          sequence without presenting an open offer or inventing external facts.
+        </p>
+        <Link href="/docs/participation" className="mt-6 inline-block text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300">
+          Read participation preparation guide
+        </Link>
+      </section>
+
+      <section className="mt-6 max-w-4xl rounded-2xl border border-zinc-900 bg-[#080808] p-6 md:p-8">
         <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Release discipline</p>
         <p className="mt-4 text-sm leading-7 text-zinc-500">
           Internal implementation evidence, private continuity records, live
