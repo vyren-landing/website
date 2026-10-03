@@ -25,10 +25,10 @@ export const SITE_FEATURES = {
 } as const;
 
 export const PARTICIPATION_REQUIREMENTS = [
-  "Production deployment bound to canonical contracts",
-  "Required legal / eligibility gate current",
-  "Settlement rail current",
-  "Required monitoring and evidence current",
+  "G-GENESIS legal / eligibility scope current",
+  "Safeguarding, payment and refund path current",
+  "Required Genesis-facing monitoring and evidence current",
+  "Public terms / disclosures current for the actual route",
   "Protocol participation state open",
 ] as const;
 
