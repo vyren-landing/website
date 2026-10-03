@@ -8,7 +8,7 @@ const publicRoutes = [
   "/economics",
   "/lifecycle",
   "/evidence",
-  "/docs",\n  "/docs/participation",
+  "/docs",
   "/status",
   "/genesis",
   "/network",
