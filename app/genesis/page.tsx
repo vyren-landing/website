@@ -43,11 +43,19 @@ export default function GenesisPage() {
         <FlowStepper steps={steps} />
       </div>
 
-      <p className="mt-8 max-w-4xl text-xs leading-6 text-zinc-600">
-        These parameters describe frozen protocol rules. They do not represent
-        an open offering, an available transaction path, a participant balance
-        or a live entitlement.
-      </p>
+      <div className="mt-8 max-w-4xl">
+        <p className="text-xs leading-6 text-zinc-600">
+          These parameters describe frozen protocol rules. They do not represent
+          an open offering, an available transaction path, a participant balance
+          or a live entitlement.
+        </p>
+        <a
+          href="/docs/participation"
+          className="mt-5 inline-block text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+        >
+          Read the pre-Genesis participation preparation guide
+        </a>
+      </div>
     </SurfacePage>
   );
 }
