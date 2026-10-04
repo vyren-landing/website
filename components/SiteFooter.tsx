@@ -34,6 +34,7 @@ export default function SiteFooter() {
           <Link className="hover:text-white" href="/status">Status</Link>
           <Link className="hover:text-white" href="/genesis">Genesis</Link>
           <Link className="hover:text-white" href="/verification">Verification</Link>
+          <Link className="hover:text-white" href="/privacy/genesis-updates">Privacy</Link>
           <a className="hover:text-white" href="https://x.com/vyrenio" target="_blank" rel="noreferrer">X</a>
           <a className="hover:text-white" href="https://www.linkedin.com/company/vyrenlabs" target="_blank" rel="noreferrer">LinkedIn</a>
           <a className="hover:text-white" href="https://medium.com/@vyren" target="_blank" rel="noreferrer">Medium</a>
