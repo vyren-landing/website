@@ -15,8 +15,8 @@ export default function GenesisUpdatesPage() {
   const privacyEmail = process.env.GENESIS_INTEREST_PRIVACY_EMAIL;
   const formAction = process.env.GENESIS_INTEREST_FORM_ACTION;
   const formActionAllowed =
-    Boolean(formAction) &&
-    formAction?.startsWith("https://app.sendertr.com/f/");
+    typeof formAction === "string" &&
+    formAction.startsWith("https://app.sendertr.com/f/");
   const enabled =
     process.env.GENESIS_INTEREST_OPEN === "true" &&
     Boolean(controllerLabel) &&
