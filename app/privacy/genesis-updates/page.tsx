@@ -72,19 +72,17 @@ export default function GenesisUpdatesPrivacyPage() {
         <section>
           <h2 className="text-lg font-medium text-zinc-200">Recipients and infrastructure</h2>
           <p className="mt-3">
-            Data may be processed by hosting, private-storage, security and
-            communications service providers acting for the controller only to
-            operate the update-list function, and by competent public authorities
-            where disclosure is legally required. No update-list data is sold and
-            registration does not create a participant profile for unrelated
-            advertising purposes.
+            The public website may use separate hosting and analytics infrastructure,
+            but the Genesis update email list is not collected through the Vercel
+            application endpoint. When registration is enabled, the form will submit
+            directly from the visitor's browser to the selected Türkiye-local data
+            processor under a dedicated processing arrangement.
           </p>
           <p className="mt-3">
-            Automated collection remains disabled until the applicable processor
-            and international-transfer safeguards for the selected live
-            implementation are finalized. If a provider is replaced, the
-            processing purpose remains the same and this notice will be updated
-            where required.
+            Automated collection remains disabled until that Türkiye-local processor,
+            the exact form/consent record, retention controls and replacement/export
+            path are bound. If the processor is replaced, the processing purpose
+            remains the same and this notice will be updated where required.
           </p>
         </section>
 
@@ -123,8 +121,9 @@ export default function GenesisUpdatesPrivacyPage() {
           <p className="mt-3">
             VYREN remains PRE-GENESIS. Participation and payment intake are
             closed. Registration for project / Genesis updates is separate from
-            participation and, while the live data-transfer implementation is
-            being finalized, automated collection remains closed.
+            participation. Automated collection remains closed until a Türkiye-local
+            direct-capture processor is bound; no email address is accepted by the
+            current Vercel application endpoint.
           </p>
         </section>
 
