@@ -49,12 +49,20 @@ export default function GenesisPage() {
           an open offering, an available transaction path, a participant balance
           or a live entitlement.
         </p>
-        <a
-          href="/docs/participation"
-          className="mt-5 inline-block text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
-        >
-          Read the pre-Genesis participation preparation guide
-        </a>
+        <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
+          <a
+            href="/docs/participation"
+            className="text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+          >
+            Read the pre-Genesis participation preparation guide
+          </a>
+          <a
+            href="/genesis/updates"
+            className="text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+          >
+            Follow Genesis updates
+          </a>
+        </div>
       </div>
     </SurfacePage>
   );
