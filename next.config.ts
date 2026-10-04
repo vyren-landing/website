@@ -14,7 +14,7 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       "base-uri 'self'",
-      "form-action 'self'",
+      "form-action 'self' https://app.sendertr.com",
       "frame-ancestors 'none'",
       "img-src 'self' data:",
       "font-src 'self' data:",

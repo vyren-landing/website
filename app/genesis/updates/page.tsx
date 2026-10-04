@@ -13,10 +13,15 @@ export const metadata = publicPageMetadata({
 export default function GenesisUpdatesPage() {
   const controllerLabel = process.env.GENESIS_INTEREST_CONTROLLER_LABEL;
   const privacyEmail = process.env.GENESIS_INTEREST_PRIVACY_EMAIL;
+  const formAction = process.env.GENESIS_INTEREST_FORM_ACTION;
+  const formActionAllowed =
+    typeof formAction === "string" &&
+    formAction.startsWith("https://app.sendertr.com/f/");
   const enabled =
     process.env.GENESIS_INTEREST_OPEN === "true" &&
     Boolean(controllerLabel) &&
-    Boolean(privacyEmail);
+    Boolean(privacyEmail) &&
+    formActionAllowed;
 
   return (
     <SurfacePage
@@ -52,6 +57,7 @@ export default function GenesisUpdatesPage() {
             enabled={enabled}
             controllerLabel={controllerLabel}
             privacyEmail={privacyEmail}
+            formAction={formActionAllowed ? formAction : undefined}
           />
         </div>
 
