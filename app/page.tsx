@@ -25,48 +25,140 @@ export default function Home() {
       <div className="mx-auto max-w-[1400px]">
         <section className="relative overflow-hidden rounded-[32px] border border-zinc-900 bg-[#080808] px-6 py-12 md:px-10 md:py-16">
           <div className="protocol-grid absolute inset-0 opacity-30" aria-hidden="true" />
-          <div className="relative max-w-5xl">
+          <div className="relative max-w-5xl" id="c0-site-01-hero" data-content-id="C0-SITE-01-HERO">
             <div className="mb-6 flex flex-wrap items-center gap-3">
-              <StateBadge state="PENDING" label={PROTOCOL_STATE_LABEL} />
+              <StateBadge state="PENDING" label="PRE-GENESIS" />
               <span className="text-xs text-zinc-500">Participation closed</span>
             </div>
 
-            <h1 className="max-w-5xl text-5xl font-medium tracking-[-0.045em] md:text-7xl lg:text-8xl">
-              Explicit rules.
-              <br />
-              Bounded authority.
-              <br />
-              Verifiable state.
+            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">VYREN · PRE-GENESIS</p>
+
+            <h1 className="mt-5 max-w-5xl text-5xl font-medium tracking-[-0.045em] md:text-7xl lg:text-8xl">
+              Economic infrastructure should make state, rights and execution clear before action.
             </h1>
 
             <p className="mt-8 max-w-3xl text-base leading-8 text-zinc-400 md:text-lg">
-              Vyren is a deterministic protocol architecture designed so that
-              architecture, implementation, deployment, evidence, participation
-              and activation remain separate states. A later state is never
-              presented as current before its required conditions are satisfied.
+              VYREN is being built as a deterministic protocol architecture for
+              DeFi, launchpad and broader economic coordination — separating
+              participation, protocol activation and market access instead of
+              collapsing them into one promise.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link href="/protocol" className="rounded-full bg-zinc-100 px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white">
-                Explore protocol
+              <Link
+                href="/protocol"
+                data-content-id="C0-SITE-01-HERO"
+                data-cta-id="explore-vyren"
+                className="rounded-full bg-zinc-100 px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white"
+              >
+                Explore VYREN
               </Link>
-              <Link href="/status" className="rounded-full border border-zinc-800 px-5 py-2.5 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white">
+              <Link
+                href="/status"
+                data-content-id="C0-SITE-01-HERO"
+                data-cta-id="view-current-status"
+                className="rounded-full border border-zinc-800 px-5 py-2.5 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+              >
                 View current status
               </Link>
             </div>
+
+            <p className="mt-5 text-xs uppercase tracking-[0.14em] text-zinc-600">
+              PRE-GENESIS · Participation closed · Production deployment pending
+            </p>
           </div>
         </section>
 
-        <section className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-2 lg:grid-cols-4">
-          {protocolStateSummary.map((item) => (
-            <div key={item.label} className="bg-black p-6">
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-zinc-500">{item.label}</p>
-                <StateBadge state={item.state} />
-              </div>
-              <p className="mt-3 text-sm text-zinc-200">{item.value}</p>
+        <section className="mt-8" id="c0-site-01-proof" data-content-id="C0-SITE-01-PROOF">
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Reproducible implementation evidence</p>
+              <h2 className="mt-3 text-2xl font-medium tracking-tight md:text-3xl">
+                From thesis to verifiable state — without presenting pending work as live.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-zinc-500">
+                The core architecture and canonical build baseline can be verified today.
+                Production deployment, Genesis participation and activation remain separate pending states.
+              </p>
             </div>
-          ))}
+            <Link
+              href="/verification"
+              data-content-id="C0-SITE-01-PROOF"
+              data-cta-id="inspect-verification"
+              className="text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+            >
+              Inspect verification
+            </Link>
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-2 lg:grid-cols-4">
+            {protocolStateSummary.map((item) => (
+              <div key={item.label} className="bg-black p-6">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-zinc-500">{item.label}</p>
+                  <StateBadge state={item.state} />
+                </div>
+                <p className="mt-3 text-sm text-zinc-200">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section
+          className="mt-16 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 md:p-10"
+          id="c0-site-01-ecosystem"
+          data-content-id="C0-SITE-01-ECOSYSTEM"
+        >
+          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Why VYREN</p>
+              <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
+                One system. Distinct states. Fewer hidden assumptions.
+              </h2>
+              <p className="mt-5 text-sm leading-7 text-zinc-500">
+                Crypto products often blur architecture, participation, activation
+                and market access into a single narrative. VYREN is designed to
+                keep those states separate and evidence-bound.
+              </p>
+              <p className="mt-4 text-sm leading-7 text-zinc-500">
+                That separation matters because a public interface should not make
+                a pending capability look live, turn a provider into protocol
+                authority, or treat market availability as proof that the
+                underlying system is ready.
+              </p>
+              <Link
+                href="/ecosystem"
+                data-content-id="C0-SITE-01-ECOSYSTEM"
+                data-cta-id="see-how-vyren-works"
+                className="mt-6 inline-block text-sm text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+              >
+                See how VYREN works
+              </Link>
+            </div>
+
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-3">
+              {[
+                [
+                  "DeFi",
+                  "State-aware financial and settlement capabilities that become available only when their own deployment, evidence and market conditions are current.",
+                ],
+                [
+                  "Launchpad",
+                  "A future participation surface designed around disclosure, eligibility, settlement and evidence without giving the interface discretionary control over protocol rules or participant entitlements.",
+                ],
+                [
+                  "Economic infrastructure",
+                  "Separated participant, Founder/FOW, treasury and market lanes with clearer settlement, accounting and evidence boundaries.",
+                ],
+              ].map(([title, text]) => (
+                <div key={title} className="bg-black p-6">
+                  <p className="text-sm font-medium text-zinc-200">{title}</p>
+                  <p className="mt-3 text-sm leading-6 text-zinc-500">{text}</p>
+                  <p className="mt-5 text-[10px] tracking-[0.12em] text-zinc-700">CAPABILITY / NOT LIVE</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section className="mt-16 grid gap-8 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 md:grid-cols-[0.8fr_1.2fr] md:p-10">
