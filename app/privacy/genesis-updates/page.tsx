@@ -3,105 +3,142 @@ import SurfacePage from "@/components/SurfacePage";
 import { publicPageMetadata } from "@/lib/site-metadata";
 
 export const metadata = publicPageMetadata({
-  title: "Privacy — Genesis Updates",
+  title: "Genesis Updates Privacy Information",
   description:
-    "Privacy information for VYREN Genesis-status and participation-readiness update registration.",
+    "Privacy information for the non-binding VYREN Genesis updates and participation-readiness registration.",
   path: "/privacy/genesis-updates",
 });
 
 export default function GenesisUpdatesPrivacyPage() {
-  const controller =
-    process.env.GENESIS_INTEREST_CONTROLLER_LABEL ?? "VYREN Project";
+  const controllerLabel =
+    process.env.GENESIS_INTEREST_CONTROLLER_LABEL ?? "Özgür Dinç";
   const privacyEmail =
-    process.env.GENESIS_INTEREST_PRIVACY_EMAIL ?? "contact@vyren.io";
+    process.env.GENESIS_INTEREST_PRIVACY_EMAIL ?? "ozgur@vyren.io";
 
   return (
     <SurfacePage
       eyebrow="Privacy / Genesis Updates"
-      title="Privacy information for the non-binding update list."
-      description="This notice applies only to the VYREN project / Genesis-status and participation-readiness update registration. It does not create participation, allocation, priority, price rights or canonical entitlement."
+      title="Privacy information for the Genesis updates list."
+      description="This notice is limited to the non-binding VYREN project, Genesis-status and participation-readiness update registration. It does not create participation, allocation, priority, price rights or canonical entitlement."
       state="PENDING"
-      stateLabel="PRE-GENESIS"
+      stateLabel="COLLECTION CONTROLLED"
     >
-      <div className="max-w-3xl space-y-10 text-sm leading-7 text-zinc-500">
-        <section>
-          <h2 className="text-base font-medium text-zinc-200">Controller and contact</h2>
-          <p className="mt-3">
-            Current controller: <span className="text-zinc-300">{controller}</span>.
-            Privacy and consent requests:{" "}
-            <a className="text-zinc-200 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300" href={`mailto:${privacyEmail}`}>
+      <div className="max-w-4xl space-y-10 text-sm leading-7 text-zinc-500">
+        <section className="rounded-2xl border border-zinc-900 bg-[#080808] p-6 md:p-8">
+          <h2 className="text-lg font-medium text-zinc-200">Controller and contact</h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-[180px_1fr]">
+            <span className="text-zinc-600">Controller</span>
+            <span className="text-zinc-300">{controllerLabel}</span>
+            <span className="text-zinc-600">Project</span>
+            <span className="text-zinc-300">VYREN</span>
+            <span className="text-zinc-600">Privacy contact</span>
+            <a
+              className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+              href={`mailto:${privacyEmail}`}
+            >
               {privacyEmail}
-            </a>.
-          </p>
-          <p className="mt-3">
-            The planned Estonian OÜ is not presented here as the current controller before it
-            actually exists and assumes that role. If the controller changes, this notice and
-            the public registration surface must be updated before relying on the new identity.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-base font-medium text-zinc-200">Data and purpose</h2>
-          <p className="mt-3">
-            The registration stores the email address you submit, consent status, consent
-            version and timestamp, and a limited source tag used to understand which VYREN
-            surface led to the registration. The purpose is to send VYREN project,
-            Genesis-status and participation-readiness updates.
+            </a>
+          </div>
+          <p className="mt-5 text-xs leading-6 text-zinc-600">
+            If a future VYREN legal entity becomes the controller, affected users
+            will be informed as required before or when that controller transition
+            takes effect. A controller transition does not silently expand the
+            processing purpose.
           </p>
         </section>
 
         <section>
-          <h2 className="text-base font-medium text-zinc-200">Legal basis</h2>
+          <h2 className="text-lg font-medium text-zinc-200">Data and purpose</h2>
           <p className="mt-3">
-            The update list relies on your consent. Registration is optional. Withdrawing
-            consent does not affect the lawfulness of processing that occurred before
-            withdrawal.
+            When registration is enabled, the update list is designed to process
+            the email address you submit together with a consent record, consent
+            version and timestamp, and a limited source/campaign identifier. The
+            purpose is to send VYREN project progress, Genesis-status and
+            participation-readiness updates and to maintain evidence of the
+            consent associated with that registration.
           </p>
         </section>
 
         <section>
-          <h2 className="text-base font-medium text-zinc-200">Storage and recipients</h2>
+          <h2 className="text-lg font-medium text-zinc-200">Legal basis</h2>
           <p className="mt-3">
-            Registration records are stored in private infrastructure used by VYREN. The
-            current capture layer uses Vercel-hosted infrastructure and a private Vercel Blob
-            store. Service providers may process data only as needed to provide the relevant
-            hosting, storage or delivery service.
+            The intended processing basis for update-list registration is your
+            consent / explicit consent where applicable. Consent is optional.
+            Refusing or withdrawing it does not affect access to the public VYREN
+            website and does not affect any protocol state.
           </p>
         </section>
 
         <section>
-          <h2 className="text-base font-medium text-zinc-200">Retention</h2>
+          <h2 className="text-lg font-medium text-zinc-200">Recipients and infrastructure</h2>
           <p className="mt-3">
-            The registration is kept while the update purpose remains active or until consent
-            is withdrawn, subject to limited retention of consent evidence where reasonably
-            required to demonstrate compliance. Data that is no longer needed for the stated
-            purpose should be deleted or de-identified.
+            Data may be processed by hosting, private-storage, security and
+            communications service providers acting for the controller only to
+            operate the update-list function, and by competent public authorities
+            where disclosure is legally required. No update-list data is sold and
+            registration does not create a participant profile for unrelated
+            advertising purposes.
+          </p>
+          <p className="mt-3">
+            Automated collection remains disabled until the applicable processor
+            and international-transfer safeguards for the selected live
+            implementation are finalized. If a provider is replaced, the
+            processing purpose remains the same and this notice will be updated
+            where required.
           </p>
         </section>
 
         <section>
-          <h2 className="text-base font-medium text-zinc-200">Your choices and rights</h2>
+          <h2 className="text-lg font-medium text-zinc-200">Retention</h2>
           <p className="mt-3">
-            You may withdraw consent and may request access, correction, deletion, restriction
-            or portability where applicable. You may also raise a concern with the competent
-            data-protection supervisory authority applicable to your situation.
+            An active contact record is intended to be kept until you withdraw
+            consent, the update list is closed, or the record is no longer needed
+            for the stated purpose. After withdrawal, the address is removed from
+            active update use. A minimal record of consent or withdrawal may be
+            retained only where reasonably required to demonstrate compliance or
+            meet a legal obligation.
           </p>
         </section>
 
         <section>
-          <h2 className="text-base font-medium text-zinc-200">No participation effect</h2>
+          <h2 className="text-lg font-medium text-zinc-200">Your choices and rights</h2>
           <p className="mt-3">
-            Submitting an email does not reserve VYREN, create a queue position, fix a price,
-            guarantee eligibility, accept payment, open Genesis or create any protocol-side or
-            canonical entitlement.
+            You may withdraw consent at any time by contacting{" "}
+            <a
+              className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+              href={`mailto:${privacyEmail}`}
+            >
+              {privacyEmail}
+            </a>
+            . Depending on the law applicable to you, you may also have rights
+            to request access, correction, deletion, restriction, objection,
+            information about processing or transfers, and to make a complaint
+            to the competent data-protection authority. Withdrawal does not
+            affect the lawfulness of processing carried out before withdrawal.
           </p>
         </section>
 
-        <div className="flex flex-wrap gap-3 pt-2">
-          <Link href="/genesis/updates" className="rounded-full bg-zinc-100 px-5 py-2.5 text-sm font-medium text-black hover:bg-white">
-            Back to Genesis updates
+        <section className="rounded-2xl border border-zinc-900 p-6">
+          <h2 className="text-lg font-medium text-zinc-200">Current state</h2>
+          <p className="mt-3">
+            VYREN remains PRE-GENESIS. Participation and payment intake are
+            closed. Registration for project / Genesis updates is separate from
+            participation and, while the live data-transfer implementation is
+            being finalized, automated collection remains closed.
+          </p>
+        </section>
+
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/genesis/updates"
+            className="rounded-full bg-zinc-100 px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white"
+          >
+            Genesis updates
           </Link>
-          <Link href="/status" className="rounded-full border border-zinc-800 px-5 py-2.5 text-sm text-zinc-300 hover:border-zinc-600 hover:text-white">
+          <Link
+            href="/status"
+            className="rounded-full border border-zinc-800 px-5 py-2.5 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+          >
             Current status
           </Link>
         </div>
