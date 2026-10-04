@@ -25,7 +25,16 @@ const securityHeaders = [
   },
 ];
 
+const campaignRewrites = [
+  { source: "/c/c0-x-01", destination: "/" },
+  { source: "/c/c0-li-01", destination: "/" },
+  { source: "/c/c0-med-01", destination: "/" },
+] as const;
+
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [...campaignRewrites];
+  },
   async headers() {
     return [
       {

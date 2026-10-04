@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
@@ -68,6 +69,7 @@ export default function RootLayout({
         <SiteNav />
         {children}
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );
