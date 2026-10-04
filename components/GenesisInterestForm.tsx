@@ -83,7 +83,15 @@ export default function GenesisInterestForm({
             to send VYREN project, Genesis-status and participation-readiness updates. This
             registration is non-binding and does not reserve tokens, guarantee eligibility,
             create priority, fix a price or create any entitlement. I can withdraw this
-            consent by contacting {privacyEmail ?? "the published privacy contact"}.
+            consent by contacting {privacyEmail ?? "the published privacy contact"}.{" "}
+            <a
+              href="/privacy/genesis-updates"
+              className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Privacy information
+            </a>
           </span>
         </label>
 
