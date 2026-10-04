@@ -36,19 +36,29 @@ export default function GenesisInterestForm({
     if (response.ok) {
       event.currentTarget.reset();
       setState("done");
-      setMessage("Interest recorded. This is non-binding and does not create an allocation, entitlement, priority or participation guarantee.");
+      setMessage(
+        "Interest recorded. This is non-binding and does not create an allocation, entitlement, priority or participation guarantee.",
+      );
       return;
     }
 
     setState("error");
-    setMessage("The update list is not available right now. No participation action has been created.");
+    setMessage(
+      "The update list is not available right now. No participation action has been created.",
+    );
   }
 
   return (
-    <form onSubmit={submit} className="mt-8 rounded-2xl border border-zinc-800 bg-[#080808] p-6 md:p-8">
+    <form
+      onSubmit={submit}
+      className="mt-8 rounded-2xl border border-zinc-800 bg-[#080808] p-6 md:p-8"
+    >
       <div className="grid gap-5">
         <div>
-          <label htmlFor="genesis-email" className="text-sm font-medium text-zinc-200">
+          <label
+            htmlFor="genesis-email"
+            className="text-sm font-medium text-zinc-200"
+          >
             Email for VYREN / Genesis updates
           </label>
           <input
@@ -70,6 +80,30 @@ export default function GenesisInterestForm({
           </label>
         </div>
 
+        <p className="text-xs leading-6 text-zinc-500">
+          Before registering, review the{" "}
+          <a
+            href="/privacy/genesis-updates"
+            className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Genesis updates privacy information
+          </a>
+          . The current controller is{" "}
+          <span className="text-zinc-300">
+            {controllerLabel ?? "the current VYREN controller"}
+          </span>
+          . Privacy requests may be sent to{" "}
+          <a
+            href={`mailto:${privacyEmail ?? "ozgur@vyren.io"}`}
+            className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
+          >
+            {privacyEmail ?? "ozgur@vyren.io"}
+          </a>
+          .
+        </p>
+
         <label className="flex items-start gap-3 text-xs leading-6 text-zinc-500">
           <input
             name="consent"
@@ -79,19 +113,9 @@ export default function GenesisInterestForm({
             className="mt-1 h-4 w-4 rounded border-zinc-700 bg-black"
           />
           <span>
-            I agree that {controllerLabel ?? "the current VYREN controller"} may use my email
-            to send VYREN project, Genesis-status and participation-readiness updates. This
-            registration is non-binding and does not reserve tokens, guarantee eligibility,
-            create priority, fix a price or create any entitlement. I can withdraw this
-            consent by contacting {privacyEmail ?? "the published privacy contact"}.{" "}
-            <a
-              href="/privacy/genesis-updates"
-              className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:decoration-zinc-300"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Privacy information
-            </a>
+            I consent to receiving VYREN project, Genesis-status and
+            participation-readiness updates by email. I understand that this is
+            optional and non-binding, and that I can withdraw consent at any time.
           </span>
         </label>
 
@@ -105,8 +129,8 @@ export default function GenesisInterestForm({
 
         {!enabled ? (
           <p className="text-xs leading-5 text-amber-300/80">
-            Update registration is prepared but not open. Current controller/contact details
-            must be bound before public collection is enabled.
+            Update registration is prepared but not open. The live data-processing
+            and transfer safeguards must be bound before public collection is enabled.
           </p>
         ) : null}
 
