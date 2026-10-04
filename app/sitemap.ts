@@ -11,6 +11,8 @@ const publicRoutes = [
   "/docs",
   "/status",
   "/genesis",
+  "/genesis/updates",
+  "/privacy/genesis-updates",
   "/network",
   "/liquidity",
   "/verification",
