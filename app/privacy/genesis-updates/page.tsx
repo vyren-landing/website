@@ -50,12 +50,13 @@ export default function GenesisUpdatesPrivacyPage() {
         <section>
           <h2 className="text-lg font-medium text-zinc-200">Data and purpose</h2>
           <p className="mt-3">
-            When registration is enabled, the update list is designed to process
-            the email address you submit together with a consent record, consent
-            version and timestamp, and a limited source/campaign identifier. The
-            purpose is to send VYREN project progress, Genesis-status and
-            participation-readiness updates and to maintain evidence of the
-            consent associated with that registration.
+            When registration is enabled, the update list processes the first name,
+            last name and email address you submit, together with the form source and
+            opt-in request / confirmation events and timestamps maintained by the
+            selected list processor. Limited list or campaign metadata may also be
+            associated with the record. The purpose is to send VYREN project progress,
+            Genesis-status and participation-readiness updates and to maintain evidence
+            associated with that registration and its confirmation.
           </p>
         </section>
 
@@ -73,16 +74,17 @@ export default function GenesisUpdatesPrivacyPage() {
           <h2 className="text-lg font-medium text-zinc-200">Recipients and infrastructure</h2>
           <p className="mt-3">
             The public website may use separate hosting and analytics infrastructure,
-            but the Genesis update email list is not collected through the Vercel
-            application endpoint. When registration is enabled, the form will submit
-            directly from the visitor's browser to the selected Türkiye-local data
-            processor under a dedicated processing arrangement.
+            but the Genesis update list is not collected through the Vercel application
+            endpoint. When registration is enabled, the form submits directly from the
+            visitor&apos;s browser to the selected Türkiye-local data processor under a
+            dedicated processing arrangement.
           </p>
           <p className="mt-3">
-            Automated collection remains disabled until that Türkiye-local processor,
-            the exact form/consent record, retention controls and replacement/export
-            path are bound. If the processor is replaced, the processing purpose
-            remains the same and this notice will be updated where required.
+            Public collection remains disabled until the live site-to-processor form
+            binding and end-to-end activation checks pass, including confirmation flow,
+            unsubscribe, export/removal and replacement-path checks. If the processor is
+            replaced, the processing purpose remains the same and this notice will be
+            updated where required.
           </p>
         </section>
 
@@ -91,7 +93,7 @@ export default function GenesisUpdatesPrivacyPage() {
           <p className="mt-3">
             An active contact record is intended to be kept until you withdraw
             consent, the update list is closed, or the record is no longer needed
-            for the stated purpose. After withdrawal, the address is removed from
+            for the stated purpose. After withdrawal, the contact is removed from
             active update use. A minimal record of consent or withdrawal may be
             retained only where reasonably required to demonstrate compliance or
             meet a legal obligation.
@@ -121,9 +123,10 @@ export default function GenesisUpdatesPrivacyPage() {
           <p className="mt-3">
             VYREN remains PRE-GENESIS. Participation and payment intake are
             closed. Registration for project / Genesis updates is separate from
-            participation. Automated collection remains closed until a Türkiye-local
-            direct-capture processor is bound; no email address is accepted by the
-            current Vercel application endpoint.
+            participation. The Türkiye-local direct-capture form is bound and its
+            double opt-in flow has been verified, while public collection remains
+            closed until final site-to-processor activation testing is complete.
+            The current Vercel application endpoint does not accept the list submission.
           </p>
         </section>
 
