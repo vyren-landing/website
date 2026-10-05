@@ -6,9 +6,9 @@ export async function POST() {
   return NextResponse.json(
     {
       ok: false,
-      code: "LOCAL_CAPTURE_REQUIRED",
+      code: "EMAIL_CAPTURE_RETIRED",
       message:
-        "Genesis update registration is not accepted through Vercel. A Türkiye-local direct capture provider must be bound first.",
+        "Genesis update email registration is not in use. Follow VYREN through the official website and public channels.",
     },
     { status: 410 },
   );
