@@ -16,12 +16,52 @@ export default function GenesisInterestForm({
       className="mt-8 rounded-2xl border border-zinc-800 bg-[#080808] p-6 md:p-8"
     >
       <div className="grid gap-5">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="genesis-first-name"
+              className="text-sm font-medium text-zinc-200"
+            >
+              First Name
+            </label>
+            <input
+              id="genesis-first-name"
+              name="first_name"
+              type="text"
+              autoComplete="given-name"
+              required
+              disabled={!enabled}
+              className="mt-3 w-full rounded-xl border border-zinc-800 bg-black px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-700 focus:border-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="First name"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="genesis-last-name"
+              className="text-sm font-medium text-zinc-200"
+            >
+              Last Name
+            </label>
+            <input
+              id="genesis-last-name"
+              name="last_name"
+              type="text"
+              autoComplete="family-name"
+              required
+              disabled={!enabled}
+              className="mt-3 w-full rounded-xl border border-zinc-800 bg-black px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-700 focus:border-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Last name"
+            />
+          </div>
+        </div>
+
         <div>
           <label
             htmlFor="genesis-email"
             className="text-sm font-medium text-zinc-200"
           >
-            Email for VYREN / Genesis updates
+            Email
           </label>
           <input
             id="genesis-email"
@@ -83,14 +123,14 @@ export default function GenesisInterestForm({
 
         {!enabled ? (
           <p className="text-xs leading-5 text-amber-300/80">
-            Update registration is prepared but not open. The Türkiye-local direct
-            capture form must be bound before public collection is enabled.
+            Update registration is prepared but not open. The direct-capture form
+            remains fail-closed until final end-to-end activation testing passes.
           </p>
         ) : (
           <p className="text-xs leading-5 text-zinc-600">
-            On submission, your email is sent directly from your browser to the
-            Türkiye-local list processor. It does not pass through the VYREN
-            Vercel application endpoint.
+            On submission, your name and email are sent directly from your browser
+            to the Türkiye-local list processor. They do not pass through the
+            VYREN Vercel application endpoint.
           </p>
         )}
       </div>
