@@ -29,6 +29,10 @@ const campaignRewrites = [
   { source: "/c/c0-x-01", destination: "/" },
   { source: "/c/c0-li-01", destination: "/" },
   { source: "/c/c0-med-01", destination: "/" },
+  { source: "/c/c0-x-03", destination: "/" },
+  { source: "/c/c0-x-06", destination: "/" },
+  { source: "/c/c0-x-09", destination: "/" },
+  { source: "/c/c0-x-12", destination: "/" },
 ] as const;
 
 const nextConfig: NextConfig = {
