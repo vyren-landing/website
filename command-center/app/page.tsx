@@ -1,9 +1,10 @@
 "use client";
 import {useEffect,useState} from "react";
 import {localeLabel} from "./translations";
+import TaskDelivery, {type TaskSubmission} from "./task-delivery";
 type Person={id:string;name:string;position:string;role:"Founder"|"Contributor";kind:string;active:boolean};
 type Position={id:string;title:string;workstream:string;access:string};
-type Task={id:string;title:string;owner:string;stream:string;status:string;objective:string;output:string;authority:string;context:string};
+type Task={id:string;title:string;owner:string;stream:string;status:string;objective:string;output:string;authority:string;context:string;draft?:string;draftUrl?:string;submissions?:TaskSubmission[];feedback?:string;reviewedAt?:string};
 type Opportunity={id:string;name:string;type:string;stage:string;owner:string;next:string};
 type Store={people:Person[];positions:Position[];tasks:Task[];opps:Opportunity[];activity:string[]};
 const initial:Store={
@@ -36,7 +37,29 @@ export default function Page(){
  const founder=actor==="USR-001";const L=(value:string)=>localeLabel(value,founder);const current=store.people.find(p=>p.id===actor)??store.people[0];
  const mine=store.tasks.filter(t=>t.owner===actor);const visible=founder?store.tasks:mine;
  const update=(fn:(s:Store)=>Store,event:string)=>setStore(s=>{const x=fn(s);return {...x,activity:[event,...x.activity].slice(0,70)}});
- const status=(t:Task,next:string)=>{if(!founder && !(t.owner===actor && ((t.status==="BRIEFED" && next==="ACCEPTED")||(t.status==="ACCEPTED" && next==="IN PROGRESS")||(t.status==="IN PROGRESS"&&next==="FOUNDER REVIEW"))))return;update(s=>({...s,tasks:s.tasks.map(z=>z.id===t.id?{...z,status:next}:z)}),t.id+" moved to "+next)};
+ const status=(t:Task,next:string)=>{
+   if(t.owner!==actor||!((t.status==="BRIEFED"&&next==="ACCEPTED")||(t.status==="ACCEPTED"&&next==="IN PROGRESS")))return;
+   update(s=>({...s,tasks:s.tasks.map(z=>z.id===t.id?{...z,status:next}:z)}),t.id+" moved to "+next);
+ };
+ const saveDraft=(t:Task,body:string,url:string)=>{
+   if(t.owner!==actor||t.status!=="IN PROGRESS")return;
+   setStore(s=>({...s,tasks:s.tasks.map(z=>z.id===t.id?{...z,draft:body,draftUrl:url}:z)}));
+ };
+ const submitTask=(t:Task)=>{
+   if(t.owner!==actor||t.status!=="IN PROGRESS")return;
+   const body=t.draft?.trim()||"",url=t.draftUrl?.trim()||"";
+   if(body.length<30||(url&&!/^https:\/\//i.test(url)))return;
+   const submission:TaskSubmission={id:t.id+"-SUB-"+Date.now(),body,url:url||undefined,by:current.name,at:new Date().toISOString()};
+   update(s=>({...s,tasks:s.tasks.map(z=>z.id===t.id?{...z,status:"FOUNDER REVIEW",feedback:undefined,submissions:[...(z.submissions||[]),submission]}:z)}),t.id+" submitted a written deliverable for founder review");
+ };
+ const approveTask=(t:Task)=>{
+   if(!founder||t.status!=="FOUNDER REVIEW"||!(t.submissions?.length))return;
+   update(s=>({...s,tasks:s.tasks.map(z=>z.id===t.id?{...z,status:"COMPLETED",reviewedAt:new Date().toISOString()}:z)}),t.id+" deliverable accepted by founder");
+ };
+ const requestTaskRevision=(t:Task,reason:string)=>{
+   if(!founder||t.status!=="FOUNDER REVIEW"||reason.trim().length<10)return;
+   update(s=>({...s,tasks:s.tasks.map(z=>z.id===t.id?{...z,status:"IN PROGRESS",feedback:reason.trim()}:z)}),t.id+" revision requested with written feedback: "+reason.trim());
+ };
  const create=()=>{
   if(!founder||!name.trim())return;
   if(modal==="person"){const pos=store.positions.find(p=>p.id===pick)||store.positions[1];const id="USR-"+Date.now();update(s=>({...s,people:[...s.people,{id,name:name.trim(),position:pos.title,role:"Contributor",kind:"TEST ONLY / NOT INVITED",active:true}]}),"New simulated person: "+name)}
@@ -46,7 +69,7 @@ export default function Page(){
   setModal("");setName("");setPick("");setExtra("");
  };
  const launch=(m:string)=>{setName("");setExtra("");setPick(m==="position"?STREAMS[5]:m==="person"?store.positions[4]?.id:m==="opportunity"?"USR-003":"USR-TEST-001");setModal(m)};
- const taskcard=(t:Task)=><div key={t.id} className="card stack"><div className="row between"><b>{L(t.title)}</b><span className={"badge "+(t.status==="COMPLETED"?"good":t.status==="FOUNDER REVIEW"?"warn":"")}>{L(t.status)}</span></div><span className="small muted">{t.id} · {L(t.stream)} · {store.people.find(p=>p.id===t.owner)?.name}</span><p>{L(t.objective)}</p><p className="small muted">{L("Output")}: {L(t.output)}</p><p className="small muted">{L("Boundaries")}: {L(t.authority)}</p><div className="row"><button onClick={()=>setSelected(selected===t.id?"":t.id)}>{L(selected===t.id?"Hide details":"Details")}</button>{t.status==="BRIEFED"&&t.owner===actor&&<button onClick={()=>status(t,"ACCEPTED")}>{L("Accept")}</button>}{t.status==="ACCEPTED"&&t.owner===actor&&<button onClick={()=>status(t,"IN PROGRESS")}>{L("Start")}</button>}{t.status==="IN PROGRESS"&&t.owner===actor&&<button onClick={()=>status(t,"FOUNDER REVIEW")}>{L("Submit")}</button>}{founder&&t.status==="FOUNDER REVIEW"&&<><button onClick={()=>status(t,"COMPLETED")}>{L("Accept result")}</button><button onClick={()=>status(t,"IN PROGRESS")}>{L("Request revision")}</button></>}</div>{selected===t.id&&<div className="alert small">{L("Canonical context")}: {t.context}. {L("This demo cannot change lifecycle authority, economic rights or VDCP acceptance.")}</div>}</div>;
+ const taskcard=(t:Task)=><div key={t.id} className="card stack"><div className="row between"><b>{L(t.title)}</b><span className={"badge "+(t.status==="COMPLETED"?"good":t.status==="FOUNDER REVIEW"?"warn":"")}>{L(t.status)}</span></div><span className="small muted">{t.id} · {L(t.stream)} · {store.people.find(p=>p.id===t.owner)?.name}</span><p>{L(t.objective)}</p><p className="small muted">{L("Output")}: {L(t.output)}</p><p className="small muted">{L("Boundaries")}: {L(t.authority)}</p><div className="row"><button onClick={()=>setSelected(selected===t.id?"":t.id)}>{L(selected===t.id?"Hide details":"Details")}</button>{t.status==="BRIEFED"&&t.owner===actor&&<button onClick={()=>status(t,"ACCEPTED")}>{L("Accept")}</button>}{t.status==="ACCEPTED"&&t.owner===actor&&<button onClick={()=>status(t,"IN PROGRESS")}>{L("Start")}</button>}</div>{selected===t.id&&<><TaskDelivery task={t} isFounder={founder} isOwner={t.owner===actor} turkish={founder} onDraft={(body,url)=>saveDraft(t,body,url)} onSubmit={()=>submitTask(t)} onApprove={()=>approveTask(t)} onRevision={reason=>requestTaskRevision(t,reason)}/><div className="alert small">{L("Canonical context")}: {t.context}. {L("This demo cannot change lifecycle authority, economic rights or VDCP acceptance.")}</div></>}</div>;
  return <div className="shell"><aside className="side"><div className="brand">◈ VYREN</div><div className="small muted">{L("COMMAND CENTER · DEMO")}</div><nav className="nav">{NAV.filter(n=>founder||!["Reviews","Settings"].includes(n)).map(n=><button key={n} className={page===n?"active":""} onClick={()=>setPage(n)}>{L(n)}</button>)}</nav><div className="footer">{L("PREVIEW · LOCAL DEMO DATA")}<br/>{L("Not canonical · No real accounts")}</div></aside><main className="main"><header className="top"><div><h1>{L(page)}</h1><p className="muted small">{L("Execution workspace · v0.1 preview")}</p></div><div className="row"><label className="small muted">{L("View as")} <select value={actor} onChange={e=>{setActor(e.target.value);setPage(e.target.value==="USR-001"?"Home":"My Work")}}>{store.people.filter(p=>p.active).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label></div></header><div className="alert" style={{marginBottom:18}}>{L("SIMULATED USER VIEW. There is no authentication or server authorization here. Do not enter secrets or use this preview for real assignments.")}</div>
  {page==="Home"&&<><div className="grid">{[["Active Tasks",store.tasks.filter(t=>!["COMPLETED","CANCELLED","SUPERSEDED"].includes(t.status)).length],["Waiting External",store.tasks.filter(t=>t.status==="WAITING EXTERNAL").length],["Founder Review",store.tasks.filter(t=>t.status==="FOUNDER REVIEW").length],["Team Members",store.people.length]].map(([label,n])=><div className="panel" key={label}><p className="muted">{L(String(label))}</p><div className="metric">{n}</div></div>)}</div><div className="two"><section className="panel"><div className="sectionTitle"><h2>{L("Priority tasks")}</h2><button onClick={()=>setPage("My Work")}>{L("Open work")}</button></div><div className="list">{visible.map(taskcard)}</div></section><section className="panel"><h2>{L("Execution lanes")}</h2><div className="list">{STREAMS.map(x=><div className="item" key={x}>{L(x)}</div>)}</div></section></div></>}
  {page==="My Work"&&<section className="panel"><div className="sectionTitle"><h2>{L(founder?"All assigned work":"My assignments")}</h2>{founder&&<button className="primary" onClick={()=>launch("task")}>{L("+ New Task")}</button>}</div><div className="stack">{visible.length?visible.map(taskcard):<p className="muted">{L("No tasks assigned.")}</p>}</div></section>}
