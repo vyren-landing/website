@@ -2,6 +2,7 @@
 import {useCallback,useEffect,useState} from "react";
 import ArchivePanel from "./archive-panel";
 import AuditPanel from "./audit-panel";
+import SecurityPanel from "./security-panel";
 type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
@@ -46,6 +47,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  return <div className="stack">
   <div className="alert">Bu alan yalnızca operasyonel görevler içindir. Canonical lifecycle, FFA, ekonomi, treasury ve governance yetkisi taşımaz.</div>
   {error&&<div className="alert" role="alert">{error}</div>}
+  {!tr&&<SecurityPanel actorId={actor.id}/>}
   {tr&&<div className="row" style={{gap:8,flexWrap:"wrap"}}>
     <button className={view==="active"?"primary":undefined} disabled={view==="active"||busy} onClick={()=>{setView("active");void load()}}>Aktif Görevler</button>
     <button className={view==="archive"?"primary":undefined} disabled={view==="archive"||busy} onClick={()=>setView("archive")}>Görev Arşivi</button>
