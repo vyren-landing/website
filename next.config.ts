@@ -35,9 +35,15 @@ const campaignRewrites = [
   { source: "/c/c0-x-12", destination: "/" },
 ] as const;
 
+const cleanPublicRewrites = [
+  { source: "/recovery", destination: "/architecture" },
+  { source: "/state", destination: "/status" },
+  { source: "/verify", destination: "/verification" },
+] as const;
+
 const nextConfig: NextConfig = {
   async rewrites() {
-    return [...campaignRewrites];
+    return [...campaignRewrites, ...cleanPublicRewrites];
   },
   async headers() {
     return [
