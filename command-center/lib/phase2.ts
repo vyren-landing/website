@@ -5,9 +5,7 @@ import {headers} from "next/headers";
 
 export type MemberRole = "Founder"|"Contributor";
 export type Actor = {id:string;name:string;role:MemberRole};
-type CCAuth = ReturnType<typeof betterAuth>;
 let pool:Pool|undefined;
-let auth:CCAuth|undefined;
 
 export function phase2Configured(){
  return process.env.CC_LIVE_ENABLED==="true" && !!(process.env.DATABASE_URL&&process.env.BETTER_AUTH_SECRET&&process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET&&process.env.FOUNDER_GITHUB_ACCOUNT_ID);
@@ -17,10 +15,8 @@ export function database(){
  if(!pool)pool=new Pool({connectionString:process.env.DATABASE_URL,max:5,connectionTimeoutMillis:7000,idleTimeoutMillis:30000,ssl:process.env.NODE_ENV==="production"?{rejectUnauthorized:true}:undefined});
  return pool;
 }
-export function getAuth():CCAuth|null{
- if(!phase2Configured())return null;
- if(!auth){
-  auth=betterAuth({
+function createAuth(){
+ return betterAuth({
    database:database(),
    secret:process.env.BETTER_AUTH_SECRET!,
    emailAndPassword:{enabled:false},
@@ -28,7 +24,11 @@ export function getAuth():CCAuth|null{
    session:{cookieCache:{enabled:true,maxAge:5*60}},
    plugins:[nextCookies()]
   });
- }
+}
+let auth:ReturnType<typeof createAuth>|undefined;
+export function getAuth(){
+ if(!phase2Configured())return null;
+ if(!auth)auth=createAuth();
  return auth;
 }
 /** Fail-closed authorization by numeric GitHub OAuth account identity. */
