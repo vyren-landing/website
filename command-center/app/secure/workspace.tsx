@@ -4,13 +4,15 @@ type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
 type Review={decision:string;reason:string|null;createdAt:string};
-type Task={id:string;title:string;objective:string;expectedOutput:string;ownerId:string;ownerName:string;status:string;submissions:Submission[];reviews:Review[];createdAt:string};
-type Data={actor:Actor;members:Member[];tasks:Task[]};
+type Task={id:string;title:string;objective:string;expectedOutput:string;ownerId:string;ownerName:string;status:string;archivedAt:string|null;submissions:Submission[];reviews:Review[];createdAt:string};
+type AuditEvent={id:string;action:string;actorName:string;taskTitle:string;createdAt:string};
+type Data={actor:Actor;members:Member[];tasks:Task[];audit?:AuditEvent[];nextCursor?:string|null};
 const dictionary:Record<string,string>={"BRIEFED":"Tanımlandı","ACCEPTED":"Kabul Edildi","IN PROGRESS":"Devam Ediyor","FOUNDER REVIEW":"Kurucu İncelemesi","COMPLETED":"Tamamlandı"};
 export default function SecureWorkspace({actor}:{actor:Actor}){
  const tr=actor.role==="Founder";
  const label=(en:string,translated:string)=>tr?translated:en;
  const [data,setData]=useState<Data|null>(null);
+ const [view,setView]=useState<"active"|"archive"|"audit">("active");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
@@ -22,10 +24,10 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const [reasons,setReasons]=useState<Record<string,string>>({});
  const [open,setOpen]=useState<string|null>(null);
  const load=useCallback(async()=>{
-  try{const r=await fetch("/api/cc",{credentials:"same-origin",cache:"no-store"});
+  try{const r=await fetch(`/api/cc?view=${view}`,{credentials:"same-origin",cache:"no-store"});
    const x=await r.json();if(!r.ok)throw new Error(x.error||"Data unavailable");setData(x);setError("");
   }catch(e){setError(e instanceof Error?e.message:"Unable to load tasks");}
- },[]);
+ },[view]);
  useEffect(()=>{void load()},[load]);
  const action=async(operation:string,fields:Record<string,string>)=>{
   setBusy(true);setError("");
