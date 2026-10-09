@@ -90,7 +90,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
          <div className="field"><label>Revizyon Gerekçesi</label><textarea rows={3} value={reasons[t.id]||""} onChange={e=>setReasons(s=>({...s,[t.id]:e.target.value}))}/></div>
          <button disabled={busy||(reasons[t.id]||"").trim().length<10} onClick={()=>void action("revise",{id:t.id,reason:reasons[t.id]||""})}>Revizyon İste</button>
         </div>}
-        {tr&&t.status==="COMPLETED"&&<button disabled={busy} onClick={()=>{if(window.confirm("Tamamlanan görevi geçmişi korunarak arşivle?"))void action("archive",{id:t.id});}}>Kaldır / Arşivle</button>}
+        {tr&&t.status==="COMPLETED"&&<button disabled={busy} onClick={()=>{if(window.confirm("Tamamlanan görevi geçmişi korunarak arşivle?"))void action("archive",{id:t.id});}}>Arşivle (Silmeden)</button>}
        </div>}
       </article>;
     })}
