@@ -1,5 +1,7 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import ArchivePanel from "./archive-panel";
+import AuditPanel from "./audit-panel";
 type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
@@ -24,10 +26,10 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const [reasons,setReasons]=useState<Record<string,string>>({});
  const [open,setOpen]=useState<string|null>(null);
  const load=useCallback(async()=>{
-  try{const r=await fetch(`/api/cc?view=${view}`,{credentials:"same-origin",cache:"no-store"});
+  try{const r=await fetch("/api/cc?view=active",{credentials:"same-origin",cache:"no-store"});
    const x=await r.json();if(!r.ok)throw new Error(x.error||"Data unavailable");setData(x);setError("");
   }catch(e){setError(e instanceof Error?e.message:"Unable to load tasks");}
- },[view]);
+ },[]);
  useEffect(()=>{void load()},[load]);
  const action=async(operation:string,fields:Record<string,string>)=>{
   setBusy(true);setError("");
