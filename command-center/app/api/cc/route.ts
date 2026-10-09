@@ -1,6 +1,7 @@
 import {NextRequest} from "next/server";
 import {database,getActor,phase2Configured,type Actor} from "../../../lib/phase2";
 
+class ApiFailure extends Error {constructor(message:string,public status=400){super(message)}}
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 type Mutation={operation:string;id?:string;title?:string;objective?:string;expectedOutput?:string;ownerId?:string;body?:string;evidenceUrl?:string;reason?:string};
@@ -50,47 +51,47 @@ export async function POST(request:NextRequest){
    await client.query("BEGIN");
    let taskId="";
    if(input.operation==="create"){
-    if(actor.role!=="Founder")return reject("Yalnızca Kurucu görev oluşturabilir",403);
+    if(actor.role!=="Founder")throw new ApiFailure("Yalnızca Kurucu görev oluşturabilir",403);
     const title=(input.title||"").trim(),objective=(input.objective||"").trim();
     const expected=(input.expectedOutput||"").trim(),owner=input.ownerId||"";
-    if(title.length<2||title.length>200||objective.length<3||objective.length>4000||expected.length>2000)return reject("Görev alanları geçersiz");
+    if(title.length<2||title.length>200||objective.length<3||objective.length>4000||expected.length>2000)throw new ApiFailure("Görev alanları geçersiz");
     const ownerRow=await client.query('SELECT 1 FROM cc_members WHERE auth_user_id=$1 AND role=$2 AND active=TRUE',[owner,"Contributor"]);
-    if(!ownerRow.rowCount)return reject("Aktif Contributor bulunamadı");
+    if(!ownerRow.rowCount)throw new ApiFailure("Aktif Contributor bulunamadı");
     const made=await client.query<{id:string}>('INSERT INTO cc_tasks(title,objective,expected_output,owner_id,created_by) VALUES($1,$2,$3,$4,$5) RETURNING id',[title,objective,expected,owner,actor.id]);
     taskId=made.rows[0].id;
    }else{
-    if(!input.id||!/^[0-9a-f-]{36}$/i.test(input.id))return reject("Görev ID geçersiz");
+    if(!input.id||!/^[0-9a-f-]{36}$/i.test(input.id))throw new ApiFailure("Görev ID geçersiz");
     const res=await client.query<{id:string;owner_id:string;status:string;archived_at:string|null}>(
      'SELECT id,owner_id,status,archived_at FROM cc_tasks WHERE id=$1 FOR UPDATE',[input.id]);
-    if(!res.rowCount)return reject("Görev bulunamadı",404);
+    if(!res.rowCount)throw new ApiFailure("Görev bulunamadı",404);
     const t=res.rows[0];taskId=t.id;
-    if(t.archived_at)return reject("Arşivlenmiş görev değiştirilemez",409);
+    if(t.archived_at)throw new ApiFailure("Arşivlenmiş görev değiştirilemez",409);
     const own=t.owner_id===actor.id,founder=actor.role==="Founder";
     if(input.operation==="accept"&&own&&t.status==="BRIEFED")await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"ACCEPTED"]);
     else if(input.operation==="start"&&own&&t.status==="ACCEPTED")await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"IN PROGRESS"]);
     else if(input.operation==="submit"&&own&&t.status==="IN PROGRESS"){
      const body=(input.body||"").trim(),url=(input.evidenceUrl||"").trim();
-     if(body.length<30||body.length>10000||(url&&!validHttps(url)))return reject("En az 30 karakter rapor ve geçerli HTTPS bağlantısı gerekli");
+     if(body.length<30||body.length>10000||(url&&!validHttps(url)))throw new ApiFailure("En az 30 karakter rapor ve geçerli HTTPS bağlantısı gerekli");
      await client.query('INSERT INTO cc_deliverables(task_id,submitted_by,body,evidence_url) VALUES($1,$2,$3,$4)',[t.id,actor.id,body,url||null]);
      await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"FOUNDER REVIEW"]);
     }else if(input.operation==="approve"&&founder&&t.status==="FOUNDER REVIEW"){
      const latest=await client.query('SELECT 1 FROM cc_deliverables WHERE task_id=$1 LIMIT 1',[t.id]);
-     if(!latest.rowCount)return reject("Somut teslim olmadan onay verilemez",409);
+     if(!latest.rowCount)throw new ApiFailure("Somut teslim olmadan onay verilemez",409);
      await client.query('INSERT INTO cc_reviews(task_id,reviewed_by,decision) VALUES($1,$2,$3)',[t.id,actor.id,"APPROVE"]);
      await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"COMPLETED"]);
     }else if(input.operation==="revise"&&founder&&t.status==="FOUNDER REVIEW"){
      const reason=(input.reason||"").trim();
-     if(reason.length<10||reason.length>3000)return reject("En az 10 karakter revizyon gerekçesi gerekli");
+     if(reason.length<10||reason.length>3000)throw new ApiFailure("En az 10 karakter revizyon gerekçesi gerekli");
      await client.query('INSERT INTO cc_reviews(task_id,reviewed_by,decision,reason) VALUES($1,$2,$3,$4)',[t.id,actor.id,"REVISION",reason]);
      await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"IN PROGRESS"]);
     }else if(input.operation==="archive"&&founder&&t.status==="COMPLETED"){
      await client.query('UPDATE cc_tasks SET archived_at=now(),updated_at=now() WHERE id=$1',[t.id]);
-    }else return reject("Bu işlem bu rol veya görev durumu için yasak",403);
+    }else throw new ApiFailure("Bu işlem bu rol veya görev durumu için yasak",403);
    }
    await client.query('INSERT INTO cc_audit(actor_id,action,target_id,details) VALUES($1,$2,$3,$4)',[actor.id,input.operation,taskId,JSON.stringify({at:new Date().toISOString()})]);
    await client.query("COMMIT");
    return Response.json({ok:true,taskId},{headers:{"Cache-Control":"no-store"}});
   }catch(e){await client.query("ROLLBACK");throw e;}
   finally{client.release();}
- }catch{return reject("İşlem gerçekleştirilemedi; veri değişikliği geri alındı",500);}
+ }catch(e){return e instanceof ApiFailure?reject(e.message,e.status):reject("İşlem gerçekleştirilemedi; veri değişikliği geri alındı",500);}
 }
