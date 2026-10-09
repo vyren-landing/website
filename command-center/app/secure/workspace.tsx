@@ -46,7 +46,14 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  return <div className="stack">
   <div className="alert">Bu alan yalnızca operasyonel görevler içindir. Canonical lifecycle, FFA, ekonomi, treasury ve governance yetkisi taşımaz.</div>
   {error&&<div className="alert" role="alert">{error}</div>}
-  <button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>
+  {tr&&<div className="row" style={{gap:8,flexWrap:"wrap"}}>
+    <button className={view==="active"?"primary":undefined} disabled={view==="active"||busy} onClick={()=>{setView("active");void load()}}>Aktif Görevler</button>
+    <button className={view==="archive"?"primary":undefined} disabled={view==="archive"||busy} onClick={()=>setView("archive")}>Görev Arşivi</button>
+    <button className={view==="audit"?"primary":undefined} disabled={view==="audit"||busy} onClick={()=>setView("audit")}>İşlem Geçmişi</button>
+  </div>}
+  {view==="active"&&<button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>}
+  {tr&&view==="archive"&&<ArchivePanel onRestore={()=>{setView("active");void load()}}/>}
+  {tr&&view==="audit"&&<AuditPanel/>}
   {tr&&view==="active"&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
     <div className="field"><label>Amaç</label><textarea value={objective} rows={3} maxLength={4000} onChange={e=>setObjective(e.target.value)}/></div>
