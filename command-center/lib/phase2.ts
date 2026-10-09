@@ -20,7 +20,13 @@ function createAuth(){
    database:database(),
    secret:process.env.BETTER_AUTH_SECRET!,
    emailAndPassword:{enabled:false},
-   socialProviders:{github:{clientId:process.env.GITHUB_CLIENT_ID!,clientSecret:process.env.GITHUB_CLIENT_SECRET!}},
+   // A Google login sharing the Founder's email must not silently gain Github authority.
+   account:{accountLinking:{disableImplicitLinking:true}},
+   socialProviders:{
+     github:{clientId:process.env.GITHUB_CLIENT_ID!,clientSecret:process.env.GITHUB_CLIENT_SECRET!},
+     ...(process.env.GOOGLE_CLIENT_ID&&process.env.GOOGLE_CLIENT_SECRET?
+       {google:{clientId:process.env.GOOGLE_CLIENT_ID,clientSecret:process.env.GOOGLE_CLIENT_SECRET,prompt:"select_account" as const}}:{})
+   },
    session:{cookieCache:{enabled:true,maxAge:5*60}},
    plugins:[nextCookies()]
   });
@@ -31,22 +37,26 @@ export function getAuth(){
  if(!auth)auth=createAuth();
  return auth;
 }
-/** Fail-closed authorization by numeric GitHub OAuth account identity. */
+/** Fail-closed authorization: provider identity + explicit role allowlists, never OAuth alone. */
 export async function getActor():Promise<Actor|null>{
  const provider=getAuth();if(!provider)return null;
  const session=await provider.api.getSession({headers:await headers()});
  if(!session?.user?.id)return null;
  const uid=session.user.id;
- const accounts=await database().query<{accountId:string}>(
-  'SELECT "accountId" FROM account WHERE "userId"=$1 AND "providerId"=$2 LIMIT 1',
-  [uid,"github"]);
- const githubId=accounts.rows[0]?.accountId;
- if(!githubId)return null;
- const role:MemberRole|null=githubId===process.env.FOUNDER_GITHUB_ACCOUNT_ID?"Founder":(
-  process.env.TEST_GITHUB_ACCOUNT_ID&&githubId===process.env.TEST_GITHUB_ACCOUNT_ID&&githubId!==process.env.FOUNDER_GITHUB_ACCOUNT_ID?"Contributor":null
- );
+ const accounts=await database().query<{accountId:string;providerId:string}>(
+  'SELECT "accountId", "providerId" FROM account WHERE "userId"=$1 AND "providerId" IN ($2,$3)',
+  [uid,"github","google"]);
+ const githubId=accounts.rows.find(a=>a.providerId==="github")?.accountId;
+ const googleId=accounts.rows.find(a=>a.providerId==="google")?.accountId;
+ const founder=!!githubId&&githubId===process.env.FOUNDER_GITHUB_ACCOUNT_ID;
+ const githubTest=!!githubId&&!!process.env.TEST_GITHUB_ACCOUNT_ID&&githubId===process.env.TEST_GITHUB_ACCOUNT_ID&&!founder;
+ const approvedGoogleEmail=(process.env.TEST_GOOGLE_EMAIL||"").trim().toLowerCase();
+ const googleTest=!!googleId&&!!approvedGoogleEmail&&session.user.emailVerified===true&&
+  session.user.email.toLowerCase()===approvedGoogleEmail&&
+  (!process.env.TEST_GOOGLE_ACCOUNT_ID||googleId===process.env.TEST_GOOGLE_ACCOUNT_ID);
+ const role:MemberRole|null=founder?"Founder":(githubTest||googleTest?"Contributor":null);
  if(!role)return null;
- const name=(session.user.name||"Member").slice(0,150);
+ const name=(googleTest&&!founder?"VYREN Test Contributor":(session.user.name||"Member")).slice(0,150);
  await database().query(
   'INSERT INTO cc_members(auth_user_id,role,name,active) VALUES($1,$2,$3,TRUE) ON CONFLICT(auth_user_id) DO UPDATE SET role=EXCLUDED.role,name=EXCLUDED.name,updated_at=now()',
   [uid,role,name]);
