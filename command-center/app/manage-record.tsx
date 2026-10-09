@@ -8,7 +8,7 @@ export type ManagedRecord={
  next?:string;stage?:string;type?:string;kind?:string;active?:boolean;archived?:boolean;
  role?:string;
 };
-type Option={id:string;name:string;active?:boolean;title?:string;archived?:boolean};
+type Option={id:string;name?:string;active?:boolean;title?:string;archived?:boolean};
 type Props={
  kind:ManagedKind; record:ManagedRecord; people:Option[];positions:Option[];streams:string[];
  onClose:()=>void; onSave:(patch:Record<string,string>)=>void;onArchive:()=>void;onRestore:()=>void;
