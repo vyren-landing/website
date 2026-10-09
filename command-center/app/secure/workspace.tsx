@@ -62,7 +62,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
     <button className="primary" disabled={busy||!owner||title.trim().length<2||objective.trim().length<3} onClick={()=>void action("create",{title,objective,expectedOutput:output,ownerId:owner})}>Görev Oluştur</button>
     {!(data?.members||[]).some(m=>m.role==="Contributor")&&<p className="small muted">Test kullanıcısı henüz gerçek hesabıyla doğrulanmadı; şu anda kimseye gerçek görev atanamaz.</p>}
   </section>}
-  <section className="panel stack"><h2>{label("My Tasks","Görevler ve Teslimler")}</h2>
+  {view==="active"&&<section className="panel stack"><h2>{label("My Tasks","Görevler ve Teslimler")}</h2>
     {!data&&<p>{label("Loading...","Yükleniyor...")}</p>}
     {data?.tasks.length===0&&<p>{label("No assigned tasks yet.","Henüz görev bulunmuyor.")}</p>}
     {data?.tasks.map(t=>{
@@ -94,6 +94,6 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
        </div>}
       </article>;
     })}
-  </section>
+  </section>}
  </div>;
 }
