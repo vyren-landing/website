@@ -19,7 +19,7 @@ export default async function SecurePage(){
   const auth=getAuth();
   let signedIn=false;
   try{signedIn=!!(await auth?.api.getSession({headers:await headers()}));}catch{}
-  return <main className="main"><SignIn name={signedIn?"unauthorized":undefined}/></main>;
+  return <main className="main"><SignIn name={signedIn?"unauthorized":undefined} googleEnabled={!!(process.env.GOOGLE_CLIENT_ID&&process.env.GOOGLE_CLIENT_SECRET&&process.env.TEST_GOOGLE_EMAIL)}/></main>;
  }
  return <div className="shell"><aside className="side"><div className="brand">◈ VYREN</div><div className="small muted">COMMAND CENTER · SECURE</div><p style={{marginTop:24}}>{actor.name}</p><p className="small muted">Rol: {actor.role==="Founder"?"Kurucu":"Katkı Sağlayan"}</p><div className="footer"><SignOut/> <p className="small muted">Operational execution only. No canonical authority.</p></div></aside>
  <main className="main"><header className="top"><div><h1>Güvenli Çalışma Alanı</h1><p className="muted">Ortak PostgreSQL · Sunucu tarafı yetkilendirme</p></div></header><SecureWorkspace actor={actor}/></main></div>;
