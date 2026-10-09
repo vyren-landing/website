@@ -62,6 +62,11 @@ export async function POST(request:NextRequest){
  catch{return reject("Geçersiz JSON");}
  try{
   const actor=await actorOrError();if(!actor)return reject("Yetkisiz",401);
+  // Fail closed BEFORE opening a transaction or looking up a task.
+  // The security-check UI uses invalid, non-existent fixtures and must never mutate records.
+  if(["create","approve","revise","archive","restore"].includes(input.operation)&&actor.role!=="Founder"){
+   return reject(input.operation==="create"?"Yalnızca Kurucu görev oluşturabilir":"Yalnızca Kurucu işlem yapabilir",403);
+  }
   const db=database();
   const client=await db.connect();
   try{
