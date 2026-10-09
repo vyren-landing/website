@@ -2,19 +2,23 @@
 import {useState} from "react";
 import {createAuthClient} from "better-auth/react";
 const client=createAuthClient();
-export function SignIn({name}:{name?:string}){
+export function SignIn({name,googleEnabled=false}:{name?:string;googleEnabled?:boolean}){
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
+ const start=async(provider:"github"|"google")=>{
+  setBusy(true);setError("");
+  try{
+   const r=await client.signIn.social({provider,callbackURL:"/secure"});
+   if(r.error)setError(provider==="google"?"Google giriş işlemi tamamlanamadı.":"GitHub giriş işlemi başlatılamadı.");
+  }catch{setError("Giriş işlemi şu anda kullanılamıyor.");}
+  finally{setBusy(false);}
+ };
  return <div className="panel stack" style={{maxWidth:580}}>
   <h2>VYREN Command Center — Güvenli Giriş</h2>
-  <p>Yalnızca önceden onaylanmış Founder ve test hesapları erişebilir. GitHub ile giriş yapılması tek başına yetki vermez.</p>
+  <p>Yalnızca Founder tarafından onaylanmış hesaplar erişebilir. Google veya GitHub ile giriş yapmak tek başına yetki vermez.</p>
   {name&&<p className="muted">Giriş yapıldı, fakat bu hesap yetkilendirilmiş ekip listesinde değil.</p>}
-  <button className="primary" disabled={busy} onClick={async()=>{
-   setBusy(true);setError("");
-   try{const r=await client.signIn.social({provider:"github",callbackURL:"/secure"});if(r.error)setError("GitHub giriş işlemi başlatılamadı.");}
-   catch{setError("Giriş işlemi şu anda kullanılamıyor.");}
-   finally{setBusy(false);}
-  }}>GitHub ile giriş yap</button>
+  <button className="primary" disabled={busy} onClick={()=>void start("github")}>GitHub ile giriş yap</button>
+  {googleEnabled&&<button disabled={busy} onClick={()=>void start("google")}>Google ile giriş yap (test Contributor)</button>}
   {error&&<p role="alert">{error}</p>}
  </div>;
 }
