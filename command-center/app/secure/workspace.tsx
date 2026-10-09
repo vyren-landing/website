@@ -45,7 +45,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   <div className="alert">Bu alan yalnızca operasyonel görevler içindir. Canonical lifecycle, FFA, ekonomi, treasury ve governance yetkisi taşımaz.</div>
   {error&&<div className="alert" role="alert">{error}</div>}
   <button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>
-  {tr&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
+  {tr&&view==="active"&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
     <div className="field"><label>Amaç</label><textarea value={objective} rows={3} maxLength={4000} onChange={e=>setObjective(e.target.value)}/></div>
     <div className="field"><label>Beklenen çıktı</label><input value={output} onChange={e=>setOutput(e.target.value)} maxLength={2000}/></div>
