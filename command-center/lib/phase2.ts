@@ -10,7 +10,7 @@ let pool:Pool|undefined;
 let auth:CCAuth|undefined;
 
 export function phase2Configured(){
- return !!(process.env.DATABASE_URL&&process.env.BETTER_AUTH_SECRET&&process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET&&process.env.FOUNDER_GITHUB_ACCOUNT_ID);
+ return process.env.CC_LIVE_ENABLED==="true" && !!(process.env.DATABASE_URL&&process.env.BETTER_AUTH_SECRET&&process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET&&process.env.FOUNDER_GITHUB_ACCOUNT_ID);
 }
 export function database(){
  if(!process.env.DATABASE_URL)throw new Error("Database is not configured");
