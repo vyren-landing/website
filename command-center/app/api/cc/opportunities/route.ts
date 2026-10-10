@@ -8,7 +8,7 @@ type Stage="RESEARCH"|"QUALIFIED"|"CONTACTED"|"REPLY_RECEIVED"|"DISCUSSION"|
  "PROPOSAL"|"INTERNAL_REVIEW"|"WAITING_EXTERNAL"|"DORMANT"|"CLOSED";
 type Category="PARTNERSHIP"|"PROVIDER"|"FUNDING"|"EXCHANGE"|"OTHER";
 type Mutation={operation?:string;id?:string;revision?:number;title?:string;
- organization?:string;category?:string;stage?:string;summary?:string;
+ organization?:string;workstream?:string;category?:string;stage?:string;summary?:string;
  nextAction?:string;evidenceUrl?:string};
 type LockRow={id:string;revision:number;archived_at:string|null};
 class Failure extends Error{constructor(message:string,public status=400){super(message);}}
@@ -33,7 +33,7 @@ async function ready(){
    AND to_regclass('public.cc_opportunity_events') IS NOT NULL AS ready`);
  return r.rows[0]?.ready===true;
 }
-const columns=`id::text,title,organization,category,stage,summary,
+const columns=`id::text,title,organization,workstream,category,stage,summary,
  next_action AS "nextAction",evidence_url AS "evidenceUrl",revision,
  archived_at AS "archivedAt",created_at AS "createdAt",updated_at AS "updatedAt"`;
 
@@ -90,9 +90,11 @@ export async function POST(request:NextRequest){
    let id="";
    if(op==="create"||op==="update"){
     const title=asText(input.title),organization=asText(input.organization);
+    const workstream=asText(input.workstream);
     const summary=asText(input.summary),nextAction=asText(input.nextAction);
     const evidenceUrl=asText(input.evidenceUrl);
     if(title.length<2||title.length>200||organization.length>200||
+       workstream.length<2||workstream.length>120||
        summary.length>4000||nextAction.length>2000||
        (evidenceUrl&&!safeUrl(evidenceUrl))||
        !stages.includes(input.stage as Stage)||!categories.includes(input.category as Category))
@@ -100,12 +102,12 @@ export async function POST(request:NextRequest){
     if(op==="create"){
      const created=await client.query<{id:string}>(`
       INSERT INTO cc_opportunities
-       (title,organization,category,stage,summary,next_action,evidence_url,created_by,updated_by)
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$8) RETURNING id::text`,
-      [title,organization,input.category,input.stage,summary,nextAction,evidenceUrl||null,actor.id]);
+       (title,organization,workstream,category,stage,summary,next_action,evidence_url,created_by,updated_by)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$9) RETURNING id::text`,
+      [title,organization,workstream,input.category,input.stage,summary,nextAction,evidenceUrl||null,actor.id]);
      id=created.rows[0].id;
     }else{
-     if(!input.id||!uuid(input.id)||!Number.isInteger(input.revision)||input.revision<1)
+     if(!input.id||!uuid(input.id)||typeof input.revision!=="number"||!Number.isInteger(input.revision)||input.revision<1)
       throw new Failure("Fırsat ID veya revizyon geçersiz");
      const locked=await client.query<LockRow>(
       "SELECT id::text,revision,archived_at FROM cc_opportunities WHERE id=$1 FOR UPDATE",[input.id]);
@@ -113,10 +115,10 @@ export async function POST(request:NextRequest){
      if(locked.rows[0].archived_at)throw new Failure("Arşivlenmiş fırsat güncellenemez",409);
      if(locked.rows[0].revision!==input.revision)throw new Failure("Fırsat başka işlemle değişmiş; listeyi yenileyin",409);
      id=locked.rows[0].id;
-     await client.query(`UPDATE cc_opportunities SET title=$2,organization=$3,category=$4,
-      stage=$5,summary=$6,next_action=$7,evidence_url=$8,
-      revision=revision+1,updated_by=$9,updated_at=now() WHERE id=$1`,
-      [id,title,organization,input.category,input.stage,summary,nextAction,evidenceUrl||null,actor.id]);
+     await client.query(`UPDATE cc_opportunities SET title=$2,organization=$3,workstream=$4,category=$5,
+      stage=$6,summary=$7,next_action=$8,evidence_url=$9,
+      revision=revision+1,updated_by=$10,updated_at=now() WHERE id=$1`,
+      [id,title,organization,workstream,input.category,input.stage,summary,nextAction,evidenceUrl||null,actor.id]);
     }
    }else{
     if(!input.id||!uuid(input.id)||!Number.isInteger(input.revision)||input.revision<1)
