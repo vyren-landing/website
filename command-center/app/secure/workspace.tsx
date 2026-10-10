@@ -20,7 +20,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const tr=actor.role==="Founder";
  const label=(en:string,translated:string)=>tr?translated:en;
  const [data,setData]=useState<Data|null>(null);
- const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview">("overview");
+ const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview">(tr?"overview":"active");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
