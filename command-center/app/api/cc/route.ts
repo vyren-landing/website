@@ -4,7 +4,7 @@ import {database,getActor,phase2Configured,type Actor} from "../../../lib/phase2
 class ApiFailure extends Error {constructor(message:string,public status=400){super(message)}}
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
-type Mutation={operation:string;id?:string;title?:string;objective?:string;expectedOutput?:string;ownerId?:string;body?:string;evidenceUrl?:string;reason?:string};
+type Mutation={operation:string;id?:string;title?:string;objective?:string;expectedOutput?:string;ownerId?:string;body?:string;evidenceUrl?:string;reason?:string;testAction?:string};
 const reject=(message:string,status=400)=>Response.json({error:message},{status,headers:{"Cache-Control":"no-store"}});
 async function actorOrError():Promise<Actor|null>{
  if(!phase2Configured())return null;
@@ -15,6 +15,12 @@ function sameOrigin(req:NextRequest){
  return !!origin&&origin===new URL(req.url).origin;
 }
 function validHttps(url:string){try{const u=new URL(url);return u.protocol==="https:"&&!!u.hostname&&url.length<=2000;}catch{return false;}}
+const contributorOperations=["accept","start","submit"];
+// This is the very same ownership rule used by real mutations and Preview-only QA probes.
+function enforceTaskOwner(actor:Actor,ownerId:string,operation:string){
+ if(contributorOperations.includes(operation)&&actor.id!==ownerId)
+  throw new ApiFailure("Başka Contributor görevinde işlem yapılamaz",403);
+}
 export async function GET(request:NextRequest){
  const view=request.nextUrl.searchParams.get("view")||"active";
  if(!["active","archive","audit"].includes(view))return reject("Geçersiz görünüm",400);
@@ -67,6 +73,25 @@ export async function POST(request:NextRequest){
   if(["create","approve","revise","archive","restore"].includes(input.operation)&&actor.role!=="Founder"){
    return reject(input.operation==="create"?"Yalnızca Kurucu görev oluşturabilir":"Yalnızca Kurucu işlem yapabilir",403);
   }
+  if(input.operation==="ownership_security_test"){
+   // Preview-only, read-only QA. Never accept a client-supplied target ID, and
+   // never expose another user's task details or identifier to a Contributor.
+   if(process.env.VERCEL_ENV!=="preview")return reject("Güvenlik testi yalnızca Preview ortamındadır",404);
+   if(actor.role!=="Contributor")return reject("Bu test Contributor içindir",403);
+   const operation=input.testAction||"";
+   if(!contributorOperations.includes(operation))return reject("Geçersiz test işlemi",400);
+   const target=await database().query<{owner_id:string}>(
+    `SELECT t.owner_id FROM cc_tasks t
+      JOIN cc_members m ON m.auth_user_id=t.owner_id
+      WHERE t.owner_id<>$1 AND t.archived_at IS NULL
+        AND t.title LIKE 'CC-ISOLATION-%' AND m.role='Contributor' AND m.active=TRUE
+      ORDER BY t.created_at DESC LIMIT 1`,[actor.id]);
+   if(!target.rowCount)return reject("Başka Contributor'a ait aktif izolasyon test görevi bulunamadı",404);
+   // Same server authorization guard as real accept, start and submit.
+   // It must reject the foreign-owner probe with HTTP 403 before any mutation.
+   enforceTaskOwner(actor,target.rows[0].owner_id,operation);
+   return reject("Güvenlik testi sahiplik kuralını geçemedi",409);
+  }
   const db=database();
   const client=await db.connect();
   try{
@@ -88,6 +113,7 @@ export async function POST(request:NextRequest){
     if(!res.rowCount)throw new ApiFailure("Görev bulunamadı",404);
     const t=res.rows[0];taskId=t.id;
     if(t.archived_at&&input.operation!=="restore")throw new ApiFailure("Arşivlenmiş görev değiştirilemez",409);
+    enforceTaskOwner(actor,t.owner_id,input.operation);
     const own=t.owner_id===actor.id,founder=actor.role==="Founder";
     if(input.operation==="accept"&&own&&t.status==="BRIEFED")await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"ACCEPTED"]);
     else if(input.operation==="start"&&own&&t.status==="ACCEPTED")await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"IN PROGRESS"]);
