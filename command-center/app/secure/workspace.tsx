@@ -8,6 +8,7 @@ import ProjectRecordsPanel from "./project-records-panel";
 import WorkstreamsPanel from "./workstreams-panel";
 import OpportunitiesPanel from "./opportunities-panel";
 import OverviewPanel from "./overview-panel";
+import ProjectContextPanel from "./project-context-panel";
 type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
@@ -20,7 +21,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const tr=actor.role==="Founder";
  const label=(en:string,translated:string)=>tr?translated:en;
  const [data,setData]=useState<Data|null>(null);
- const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview">(tr?"overview":"active");
+ const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview"|"context">(tr?"overview":"active");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
@@ -55,6 +56,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   {!tr&&<SecurityPanel actorId={actor.id}/>}
   {tr&&<div className="row" style={{gap:8,flexWrap:"wrap"}}>
     <button className={view==="overview"?"primary":undefined} disabled={view==="overview"||busy} onClick={()=>setView("overview")}>Yönetim Özeti</button>
+    <button className={view==="context"?"primary":undefined} disabled={view==="context"||busy} onClick={()=>setView("context")}>Proje Bağlamı</button>
     <button className={view==="active"?"primary":undefined} disabled={view==="active"||busy} onClick={()=>{setView("active");void load()}}>Aktif Görevler</button>
     <button className={view==="archive"?"primary":undefined} disabled={view==="archive"||busy} onClick={()=>setView("archive")}>Görev Arşivi</button>
     <button className={view==="audit"?"primary":undefined} disabled={view==="audit"||busy} onClick={()=>setView("audit")}>İşlem Geçmişi</button>
@@ -71,6 +73,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   {tr&&view==="workstreams"&&<WorkstreamsPanel openRecords={()=>setView("records")}/>}
   {tr&&view==="opportunities"&&<OpportunitiesPanel/>}
   {tr&&view==="overview"&&<OverviewPanel openView={setView}/>}
+  {tr&&view==="context"&&<ProjectContextPanel/>}
   {tr&&view==="active"&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
     <div className="field"><label>Amaç</label><textarea value={objective} rows={3} maxLength={4000} onChange={e=>setObjective(e.target.value)}/></div>
