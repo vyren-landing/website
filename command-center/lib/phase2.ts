@@ -54,7 +54,28 @@ export async function getActor():Promise<Actor|null>{
  const googleTest=!!googleId&&!!approvedGoogleEmail&&session.user.emailVerified===true&&
   session.user.email.toLowerCase()===approvedGoogleEmail&&
   (!process.env.TEST_GOOGLE_ACCOUNT_ID||googleId===process.env.TEST_GOOGLE_ACCOUNT_ID);
- const role:MemberRole|null=founder?"Founder":(githubTest||googleTest?"Contributor":null);
+ let role:MemberRole|null=founder?"Founder":(githubTest||googleTest?"Contributor":null);
+ // Only an explicitly invited, verified Google identity may become a new Contributor.
+ // The first verified login pins the grant to Google's provider account ID and Better Auth user.
+ // Revoked grants cannot silently re-bind to a different identity at the same address.
+ if(!role&&googleId&&session.user.emailVerified===true){
+  const email=(session.user.email||"").trim().toLowerCase();
+  if(email){
+   const db=database();
+   const claim=await db.query<{id:string}>(
+    `UPDATE cc_team_invites
+      SET status='ACTIVE',google_account_id=$2,member_id=$3,updated_at=now()
+      WHERE email=$1 AND status='PENDING' AND google_account_id IS NULL AND member_id IS NULL
+      RETURNING id`,[email,googleId,uid]);
+   if(claim.rowCount)role="Contributor";
+   else {
+    const invited=await db.query<{status:string;google_account_id:string|null;member_id:string|null}>(
+     'SELECT status,google_account_id,member_id FROM cc_team_invites WHERE email=$1',[email]);
+    if(invited.rows[0]?.status==="ACTIVE"&&invited.rows[0].google_account_id===googleId&&invited.rows[0].member_id===uid)
+     role="Contributor";
+   }
+  }
+ }
  if(!role)return null;
  const name=(googleTest&&!founder?"VYREN Test Contributor":(session.user.name||"Member")).slice(0,150);
  await database().query(
