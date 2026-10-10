@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS cc_workstreams (
   CHECK (char_length(next_action) <= 2000),
  state TEXT NOT NULL DEFAULT 'ACTIVE'
   CHECK (state IN ('ACTIVE','PAUSED','ARCHIVED')),
+ restore_state TEXT NOT NULL DEFAULT 'ACTIVE'
+  CHECK (restore_state IN ('ACTIVE','PAUSED')),
  revision INTEGER NOT NULL DEFAULT 1 CHECK (revision > 0),
  created_by TEXT NOT NULL REFERENCES cc_members(auth_user_id) ON DELETE RESTRICT,
  updated_by TEXT NOT NULL REFERENCES cc_members(auth_user_id) ON DELETE RESTRICT,
