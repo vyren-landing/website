@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS cc_opportunities (
  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
  title TEXT NOT NULL CHECK(char_length(title) BETWEEN 2 AND 200),
  organization TEXT NOT NULL DEFAULT '' CHECK(char_length(organization)<=200),
+ workstream TEXT NOT NULL DEFAULT 'Partnerships & Funding'
+  CHECK(char_length(workstream) BETWEEN 2 AND 120),
  category TEXT NOT NULL DEFAULT 'PARTNERSHIP'
   CHECK(category IN ('PARTNERSHIP','PROVIDER','FUNDING','EXCHANGE','OTHER')),
  stage TEXT NOT NULL DEFAULT 'RESEARCH'
