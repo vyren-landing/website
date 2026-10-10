@@ -4,6 +4,7 @@ import ArchivePanel from "./archive-panel";
 import AuditPanel from "./audit-panel";
 import SecurityPanel from "./security-panel";
 import TeamPanel from "./team-panel";
+import ProjectRecordsPanel from "./project-records-panel";
 type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
@@ -16,7 +17,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const tr=actor.role==="Founder";
  const label=(en:string,translated:string)=>tr?translated:en;
  const [data,setData]=useState<Data|null>(null);
- const [view,setView]=useState<"active"|"archive"|"audit"|"team">("active");
+ const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records">("active");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
@@ -53,12 +54,14 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
     <button className={view==="active"?"primary":undefined} disabled={view==="active"||busy} onClick={()=>{setView("active");void load()}}>Aktif Görevler</button>
     <button className={view==="archive"?"primary":undefined} disabled={view==="archive"||busy} onClick={()=>setView("archive")}>Görev Arşivi</button>
     <button className={view==="audit"?"primary":undefined} disabled={view==="audit"||busy} onClick={()=>setView("audit")}>İşlem Geçmişi</button>
+    <button className={view==="records"?"primary":undefined} disabled={view==="records"||busy} onClick={()=>setView("records")}>Proje Kayıtları</button>
     <button className={view==="team"?"primary":undefined} disabled={view==="team"||busy} onClick={()=>setView("team")}>Ekip Yönetimi</button>
   </div>}
   {view==="active"&&<button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>}
   {tr&&view==="archive"&&<ArchivePanel onRestore={()=>{setView("active");void load()}}/>}
   {tr&&view==="audit"&&<AuditPanel/>}
   {tr&&view==="team"&&<TeamPanel onChange={()=>void load()}/>}
+  {tr&&view==="records"&&<ProjectRecordsPanel/>}
   {tr&&view==="active"&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
     <div className="field"><label>Amaç</label><textarea value={objective} rows={3} maxLength={4000} onChange={e=>setObjective(e.target.value)}/></div>
