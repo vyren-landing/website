@@ -88,21 +88,58 @@ export async function GET(){
      throw new Error("Workstream export snapshot totals inconsistent");
    }
 
+   // Opportunity pipeline and its immutable history are part of the same portable snapshot.
+   // If migration 005 is not installed, export the existing datasets unchanged.
+   const oppSchema=await client.query<{ready:boolean}>(`SELECT
+     to_regclass('public.cc_opportunities') IS NOT NULL
+     AND to_regclass('public.cc_opportunity_events') IS NOT NULL AS ready`);
+   const withOpportunities=oppSchema.rows[0]?.ready===true;
+   let opportunityCount=0,opportunityEventCount=0;
+   let opportunities:{rows:unknown[];rowCount:number|null}={rows:[],rowCount:0};
+   let opportunityEvents:{rows:unknown[];rowCount:number|null}={rows:[],rowCount:0};
+   if(withOpportunities){
+    const count=await client.query<{opportunities:string;events:string}>(`
+      SELECT (SELECT count(*)::text FROM cc_opportunities) AS opportunities,
+       (SELECT count(*)::text FROM cc_opportunity_events) AS events`);
+    opportunityCount=Number(count.rows[0]?.opportunities||0);
+    opportunityEventCount=Number(count.rows[0]?.events||0);
+    if(!Number.isSafeInteger(opportunityCount)||!Number.isSafeInteger(opportunityEventCount)||
+       opportunityCount>10000||opportunityEventCount>100000){
+     await client.query("ROLLBACK");
+     transactionOpen=false;
+     return errorResponse("Fırsatlar ve geçmişinin eksiksiz aktarım sınırı aşıldı; eksik dosya verilmedi.",413);
+    }
+    opportunities=await client.query(`
+      SELECT id::text,title,organization,workstream,category,stage,
+       summary,next_action AS "nextAction",evidence_url AS "evidenceUrl",
+       revision,created_by AS "createdBy",updated_by AS "updatedBy",
+       archived_at AS "archivedAt",created_at AS "createdAt",updated_at AS "updatedAt"
+      FROM cc_opportunities ORDER BY created_at,id`);
+    opportunityEvents=await client.query(`
+      SELECT id::text,opportunity_id::text AS "opportunityId",
+       actor_id AS "actorId",action,revision,snapshot,created_at AS "createdAt"
+      FROM cc_opportunity_events ORDER BY id`);
+    if(opportunities.rowCount!==opportunityCount||opportunityEvents.rowCount!==opportunityEventCount)
+     throw new Error("Opportunity export totals inconsistent");
+   }
+
    await client.query("COMMIT");
    transactionOpen=false;
    const exportedAt=new Date().toISOString();
    const filename="vyren-command-center-records-"+exportedAt.slice(0,10)+".json";
    const body=JSON.stringify({
-    format:withWorkstreams?"VYREN_CC_OPERATIONAL_RECORDS_V2":"VYREN_CC_OPERATIONAL_RECORDS_V1",
+    format:withOpportunities?"VYREN_CC_OPERATIONAL_RECORDS_V3":withWorkstreams?"VYREN_CC_OPERATIONAL_RECORDS_V2":"VYREN_CC_OPERATIONAL_RECORDS_V1",
     exportedAt,
     authority:"OPERATIONAL_ONLY_NOT_CANONICAL",
-    scope:withWorkstreams?"Command Center operational project records, workstream catalogue, and full event snapshots":"Command Center project records, including archived entries and full event snapshots",
+    scope:"Command Center operational datasets installed in Preview, including archived items and full event snapshots",
     note:"Not VYREN Master, Launch Lifecycle Decision Ledger, FFA or GNR. No canonical decisions are created by this export.",
     counts:{records:recordCount,events:eventCount,
-     ...(withWorkstreams?{workstreams:streamCount,workstreamEvents:eventStreamCount}:{})},
+     ...(withWorkstreams?{workstreams:streamCount,workstreamEvents:eventStreamCount}:{}),
+     ...(withOpportunities?{opportunities:opportunityCount,opportunityEvents:opportunityEventCount}:{})},
     records:records.rows,
     events:events.rows,
-    ...(withWorkstreams?{workstreams:workstreams.rows,workstreamEvents:workstreamEvents.rows}:{})
+    ...(withWorkstreams?{workstreams:workstreams.rows,workstreamEvents:workstreamEvents.rows}:{}),
+    ...(withOpportunities?{opportunities:opportunities.rows,opportunityEvents:opportunityEvents.rows}:{})
    },null,2);
    return new Response(body,{
     status:200,
