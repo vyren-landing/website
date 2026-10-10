@@ -84,7 +84,7 @@ export async function POST(request:NextRequest){
       [title,workstream,summary,input.status,nextAction,evidenceUrl||null,actor.id]);
      id=made.rows[0].id;
     }else{
-     if(!input.id||!uuid(input.id)||!Number.isInteger(input.revision)||input.revision<1)
+     if(!input.id||!uuid(input.id)||typeof input.revision!=="number"||!Number.isInteger(input.revision)||input.revision<1)
       throw new Failure("Kayıt ID/revizyon geçersiz");
      const current=await client.query<Row>(
       "SELECT id::text AS id,revision,archived_at FROM cc_project_records WHERE id=$1 FOR UPDATE",[input.id]);
@@ -98,7 +98,7 @@ export async function POST(request:NextRequest){
       [id,title,workstream,summary,input.status,nextAction,evidenceUrl||null,actor.id]);
     }
    }else{
-    if(!input.id||!uuid(input.id)||!Number.isInteger(input.revision)||input.revision<1)
+    if(!input.id||!uuid(input.id)||typeof input.revision!=="number"||!Number.isInteger(input.revision)||input.revision<1)
      throw new Failure("Kayıt ID/revizyon geçersiz");
     const current=await client.query<Row>(
      "SELECT id::text AS id,revision,archived_at FROM cc_project_records WHERE id=$1 FOR UPDATE",[input.id]);
