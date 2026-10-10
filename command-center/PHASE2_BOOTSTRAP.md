@@ -1,8 +1,5 @@
 # Command Center Phase 2 - Safe bootstrap
 
-> **Current status (2026-10-10):** This file preserves the original Phase-2 setup checklist as **historical bootstrap instructions**, not the current incomplete-work list. Authenticated Preview workspace, team/Contributor isolation and local encrypted backup/recovery QA have been tested. No real operational team is onboarded. The controlling current development status, scope limits and DEFERRED Google Drive automation are in [EXECUTION_STATUS_LEDGER_2026-10-10.md](./EXECUTION_STATUS_LEDGER_2026-10-10.md). Do not repeat completed bootstrap or turn deferred backup OAuth into a mandatory gate.
-
-
 Scope: separate Vercel project `vyren-command-center`, repo folder `command-center/`.
 Branch: `feature/command-center-phase2-auth-db-20261009`. Do not merge or
 promote until all gates are checked. Public VYREN site and canonical data are out of scope.
