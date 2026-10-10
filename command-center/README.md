@@ -1,8 +1,5 @@
 # VYREN Command Center — MVP Preview
 
-> **Current status (2026-10-10):** The `/` page is the browser/localStorage legacy demo described below. The separate `/secure` Phase-2 Preview workspace uses authenticated Founder/Contributor test roles, PostgreSQL tasks, team access and audit history. No real operational users are onboarded. For verified progress, open work and DEFERRED off-site backup scope see [EXECUTION_STATUS_LEDGER_2026-10-10.md](./EXECUTION_STATUS_LEDGER_2026-10-10.md). Do not read the legacy-demo restrictions below as a statement that `/secure` lacks authentication.
-
-
 This is an **isolated UI/flow demonstration** on a feature branch, not a production management system.
 
 ## Boundaries
