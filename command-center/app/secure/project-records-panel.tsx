@@ -24,6 +24,7 @@ export default function ProjectRecordsPanel(){
  const [historyId,setHistoryId]=useState<string|null>(null);
  const [history,setHistory]=useState<HistoryEvent[]|null>(null);
  const [busy,setBusy]=useState(false);
+ const [exportBusy,setExportBusy]=useState(false);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
@@ -68,6 +69,27 @@ export default function ProjectRecordsPanel(){
   }catch(e){setError(e instanceof Error?e.message:"İşlem başarısız");}
   finally{setBusy(false);}
  };
+ const exportRecords=async()=>{
+  setExportBusy(true);setError("");setMessage("");
+  try{
+   const response=await fetch("/api/cc/records/export",{credentials:"same-origin",cache:"no-store"});
+   if(!response.ok){
+    const data=await response.json();
+    throw new Error(data.error||"Veriler dışa aktarılamadı");
+   }
+   const blob=await response.blob();
+   const url=window.URL.createObjectURL(blob);
+   const a=document.createElement("a");
+   a.href=url;
+   a.download="vyren-command-center-records-"+new Date().toISOString().slice(0,10)+".json";
+   document.body.appendChild(a);
+   a.click();
+   a.remove();
+   window.setTimeout(()=>window.URL.revokeObjectURL(url),3000);
+   setMessage("Kayıtlar ve revizyon geçmişi, yalnızca bu cihaza JSON olarak indirildi. Dosyayı özel ve güvenli saklayın.");
+  }catch(e){setError(e instanceof Error?e.message:"Veriler dışa aktarılamadı");}
+  finally{setExportBusy(false);}
+ };
  const showHistory=async(row:RecordRow)=>{
   if(historyId===row.id){setHistoryId(null);setHistory(null);return;}
   setHistoryId(row.id);setHistory(null);setError("");
@@ -90,7 +112,9 @@ export default function ProjectRecordsPanel(){
   <div className="row" style={{gap:8,flexWrap:"wrap"}}>
    <button disabled={loading||busy} onClick={()=>void load(archived)}>Kayıtları Yenile</button>
    <button disabled={busy} onClick={()=>setArchived(x=>!x)}>{archived?"Arşivi Gizle":"Arşivi de Göster"}</button>
+   <button disabled={busy||exportBusy} onClick={()=>void exportRecords()}>{exportBusy?"İndiriliyor...":"Kayıtları ve Geçmişi JSON Olarak İndir"}</button>
   </div>
+  <p className="small muted">JSON aktarımı arşivlenmiş kayıtları ve tüm revizyon olaylarını da içerir; sunucu verisini değiştirmez. İndirilen özel dosya canonical VYREN Master belgesi değildir.</p>
   <section className="card stack" aria-label="Operasyonel kayıt düzenleyici">
    <h3>{editing?"Kaydı Güncelle":"Yeni Operasyonel Kayıt"}</h3>
    <div className="field"><label htmlFor="cc-record-title">Başlık *</label><input id="cc-record-title" maxLength={200} value={form.title} onChange={e=>patch("title",e.target.value)}/></div>
