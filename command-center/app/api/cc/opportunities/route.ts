@@ -121,7 +121,7 @@ export async function POST(request:NextRequest){
       [id,title,organization,workstream,input.category,input.stage,summary,nextAction,evidenceUrl||null,actor.id]);
     }
    }else{
-    if(!input.id||!uuid(input.id)||!Number.isInteger(input.revision)||input.revision<1)
+    if(!input.id||!uuid(input.id)||typeof input.revision!=="number"||!Number.isInteger(input.revision)||input.revision<1)
      throw new Failure("Fırsat ID veya revizyon geçersiz");
     const locked=await client.query<LockRow>(
      "SELECT id::text,revision,archived_at FROM cc_opportunities WHERE id=$1 FOR UPDATE",[input.id]);
