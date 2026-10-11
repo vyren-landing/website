@@ -42,3 +42,10 @@
  .cc-live-scope{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){.cc-live-nav-item{transition:none}}
+
+/* D2 list-first operational panels; no effect on permissions or data. */
+.cc-list-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.cc-list-toolbar>div:first-child{display:grid;gap:5px;min-width:0}
+.cc-list-toolbar h2,.cc-list-toolbar h3{margin:0}
+.cc-editor{border:1px solid #3a5e85;background:#182638;scroll-margin-top:20px}
+@media(max-width:780px){.cc-list-toolbar{align-items:stretch}.cc-list-toolbar>.primary{width:100%}}
