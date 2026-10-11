@@ -55,3 +55,16 @@ Founder supplied result from Contributor's own Preview interface:
 - Result: **PREVIEW POST-MAINTENANCE REGRESSION PASS** for observed schema, role/ownership and project export structure.
 - Limit: This is not an exhaustive penetration test; it does not verify original user/member records or a recoverable Neon backup. It does not independently inspect DB TLS handshake. Tests of all modules and separate disaster recovery remain open.
 - Next incomplete execution point: branch backup of Preview-connected Neon database, verify isolated copy matches original counters, verify retention/recovery method, then consider migration 007 only with proven safeguard.
+
+
+## Backup branch fingerprint parity (user-supplied) — 2026-10-11
+
+Two separately pasted SELECT-result blocks have **identical MD5 digest values** for these five tables:
+`cc_members`, `cc_tasks`, `cc_project_records`, `cc_projects`, `cc_project_events`.
+Earlier five-table counts from two runs were likewise identical: `3 / 5 / 5 / 1 / 4`.
+
+**Disposition: 5/5 fingerprints MATCH; BACKUP_INTEGRITY_SUBSET_PASS conditional on confirming that the two executions selected source `main` and `backup-cc-before-007-20261011` separately.** The pasted SQL results do not contain Neon branch IDs, so the branch selections themselves are not independently evidenced in this record.
+
+This verifies parity of the five selected tables at the time of their respective reads; it does **not** establish independent offsite backup, full PostgreSQL database restoration, retention policy, complete auth/audit/deliverables history parity, or migration 007 execution.
+
+Next: perform a **non-destructive recovery drill** by creating a separate test branch from the preserved backup branch (or restoring a Neon snapshot into a new branch if enabled), verify schema and data against captured baseline, and record source/target branch names. Never restore/overwrite `main` as part of QA.
