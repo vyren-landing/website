@@ -11,7 +11,7 @@ const uuid=(value:string)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-
 function sameOrigin(request:NextRequest){return request.headers.get("origin")===new URL(request.url).origin;}
 async function founder(){
  if(!phase2Configured())return null;
- const actor=await getActor();
+ const actor=await getActor({readOnly:true});
  return actor?.role==="Founder"?actor:null;
 }
 export async function GET(){
