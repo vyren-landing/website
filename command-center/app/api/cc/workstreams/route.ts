@@ -22,9 +22,9 @@ type Mutation={
  operation?:string;sourceKey?:string;name?:string;summary?:string;nextAction?:string;
  state?:string;id?:string;revision?:number
 };
-async function founder(){
+async function founder(readOnly=false){
  if(!phase2Configured())throw new Failure("Command Center Preview yapılandırılmadı",503);
- const actor=await getActor();
+ const actor=await getActor({readOnly});
  if(!actor)throw new Failure("Yetkisiz",401);
  if(actor.role!=="Founder")throw new Failure("Yalnızca Kurucu erişebilir",403);
  return actor;
@@ -38,7 +38,7 @@ async function ready(db:{query:(sql:string)=>Promise<{rows:Array<{ready:boolean}
 
 export async function GET(request:NextRequest){
  try{
-  await founder();
+  await founder(true);
   const client=await database().connect();
   let opened=false;
   try{
