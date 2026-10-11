@@ -21,6 +21,15 @@ export default function ProjectsPanel(){
  const [message,setMessage]=useState("");
  const [history,setHistory]=useState<{action:string;revision:number;createdAt:string}[]|null>(null);
  const [historyId,setHistoryId]=useState<string|null>(null);
+ const [detailId,setDetailId]=useState<string|null>(null);
+ const [detail,setDetail]=useState<{tasks:{id:string;title:string;status:string;ownerName:string}[];records:{id:string;title:string;status:string;nextAction:string}[];taskTruncated:boolean;recordTruncated:boolean}|null>(null);
+ async function showDetail(p:Project){
+  if(detailId===p.id){setDetailId(null);setDetail(null);return;}
+  setDetailId(p.id);setDetail(null);setError("");
+  try{const r=await fetch("/api/cc/projects?detail="+encodeURIComponent(p.id),{credentials:"same-origin",cache:"no-store"});
+   const v=await r.json();if(!r.ok)throw Error(v.error||"Proje ayrıntıları yüklenemedi");setDetail(v);
+  }catch(e){setError(e instanceof Error?e.message:"Proje ayrıntıları yüklenemedi");}
+ }
  const load=useCallback(async()=>{
   setLoading(true);
   try{
@@ -110,9 +119,19 @@ export default function ProjectsPanel(){
    {p.nextAction&&<p><b>Sonraki adım:</b> {p.nextAction}</p>}
    <div className="row" style={{gap:8,flexWrap:"wrap"}}>
     {!p.archivedAt&&<button disabled={busy} onClick={()=>begin(p)}>Düzenle</button>}
+    <button disabled={busy} onClick={()=>void showDetail(p)}>{detailId===p.id?"İşleri Gizle":"Bağlı İşleri Göster"}</button>
     <button disabled={busy} onClick={()=>void showHistory(p)}>{historyId===p.id?"Geçmişi Gizle":"Geçmiş"}</button>
     <button disabled={busy} onClick={()=>void mutate(p.archivedAt?"restore":"archive",p)}>{p.archivedAt?"Geri Al":"Arşivle"}</button>
    </div>
+   {detailId===p.id&&detail&&<div className="panel stack">
+    <b>Bağlı Görevler ({detail.tasks.length}{detail.taskTruncated?"+":""})</b>
+    {detail.tasks.length===0&&<p className="small muted">Bu projeye bağlı görev yok.</p>}
+    {detail.tasks.map(t=><p key={t.id} className="small">{t.title} · {t.status} · {t.ownerName}</p>)}
+    <b>Durum Kayıtları ({detail.records.length}{detail.recordTruncated?"+":""})</b>
+    {detail.records.length===0&&<p className="small muted">Bu projeye bağlı durum kaydı yok.</p>}
+    {detail.records.map(r=><p key={r.id} className="small">{r.title} · {statuses[r.status as Status]||r.status}{r.nextAction?" · Sonraki: "+r.nextAction:""}</p>)}
+    {(detail.taskTruncated||detail.recordTruncated)&&<p className="small muted">İlk 100 sonuç gösteriliyor; tam ilişki verileri JSON dışa aktarımında korunur.</p>}
+   </div>}
    {historyId===p.id&&history&&<div className="stack">{history.map((e,i)=><p key={i} className="small muted">{e.action} · Rev {e.revision} · {new Date(e.createdAt).toLocaleString("tr-TR")}</p>)}</div>}
   </article>)}
  </section>;
