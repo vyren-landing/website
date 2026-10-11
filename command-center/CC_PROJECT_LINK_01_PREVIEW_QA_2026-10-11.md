@@ -230,3 +230,15 @@ User provided the Neon Console Branches view showing **6 branches**, one active 
 - The full 18-table inventory file's second SELECT statement references missing tables and **will error if run on this historical branch**. No need to rerun this known-incompatible query.
 - Snapshot age/fidelity and restricted capacity mean this snapshot is a historical checkpoint, not sufficient as the sole up-to-date backup. The currently live six-hour history window also cannot substitute for durable off-provider encrypted backup.
 - **No database changes made.** Keep `main`, snapshot branch, older backup and recovery-drill branches unmodified. Next operational resilience task: independent current encrypted backup and isolated restore when an authorized secure target is available; existing proof does not justify claiming `FULL_DB_RESTORE_PASS`.
+
+
+## Recovered prior WSL encrypted backup evidence — 2026-10-10
+
+**Correction / supersession of earlier statements that off-provider backup was not yet created:**
+
+- Earlier dated VYREN Command Center WSL user-run evidence confirms an **existing local encrypted PostgreSQL backup** from 2026-10-10: filename `VYREN_CC_main_20261010_160111.dump.gpg`, saved under user's WSL private `vyren_secure_backups` directory; observed size approximately **12 KB**; outcome `BACKUP_CREATED`.
+- User also executed GPG decryption piped into `pg_restore --file=/dev/null`, with successful `BACKUP_READ_OK` result. This validates decryption / backup archive readability but **does not perform a real database restore**, and the 12 KB size is not evidence of current completeness.
+- User-reported 2026-10-10 `main` vs `vyren-recovery-test-20261010` comparison showed **8/8 selected table-content hashes MATCH**, 56 rows in that historical sample. This is a **separate branch data parity check**, not proof that the encrypted WSL dump was restored into that branch.
+- The older Neon snapshot-derived branch `branch_from_snapshot_Oct 10, 2026 2:54 PM GMT+3` is from that period; today's 10/18 schema result is consistent with later operational migrations, not a consequence of the WSL dump. Snapshot origin and dump origin are distinct recovery mechanisms.
+- **Disposition: LOCAL_ENCRYPTED_PG_BACKUP_CREATED_PASS; GPG_DUMP_READABILITY_PASS; ENCRYPTED_DUMP_REAL_RESTORE_PENDING; CURRENT_18_TABLE_ENCRYPTED_BACKUP_PENDING.** Not `OFFSITE_BACKUP_PASS`, since off-device storage is not evidenced. Do not erase, commit or transmit encrypted/unencrypted dump, connection strings or credentials.
+- This section controls over prior statements suggesting an independent encrypted backup had not been created at all. Existing Neon 18/18 isolated branch content fingerprint parity remains independently PASS, and `FULL_DB_RESTORE_PASS` remains unverified.
