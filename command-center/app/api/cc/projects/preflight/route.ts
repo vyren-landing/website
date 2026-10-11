@@ -39,13 +39,13 @@ export async function GET(){
       AND table_name='cc_tasks' AND column_name='project_id') AS "taskLink",
      EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public'
       AND table_name='cc_project_records' AND column_name='project_id') AS "recordLink",
-     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid='public.cc_projects'::regclass
+     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid=to_regclass('public.cc_projects')
       AND c.contype='f' AND c.confrelid=to_regclass('public.cc_workstreams')) AS "projectsWorkstreamFk",
-     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid='public.cc_tasks'::regclass
+     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid=to_regclass('public.cc_tasks')
       AND c.contype='f' AND c.confrelid=to_regclass('public.cc_projects')) AS "tasksProjectFk",
-     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid='public.cc_project_records'::regclass
+     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid=to_regclass('public.cc_project_records')
       AND c.contype='f' AND c.confrelid=to_regclass('public.cc_projects')) AS "recordsProjectFk",
-     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid='public.cc_project_events'::regclass
+     EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conrelid=to_regclass('public.cc_project_events')
       AND c.contype='f' AND c.confrelid=to_regclass('public.cc_projects')) AS "eventsProjectFk"`);
    const schema=metadata.rows[0];
    const missing=required.filter(k=>schema[k]!==true);
