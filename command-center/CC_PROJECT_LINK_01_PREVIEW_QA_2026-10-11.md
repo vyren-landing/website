@@ -306,3 +306,39 @@ Founder ran a read-only local PostgreSQL 18 count inventory against `vyren_cc_re
 - The resulting four-row digest exactly matched the earlier Neon baseline (`2d8eb8bfbffdb3d17cc2fcce827ceaa2`), unlike its pre-normalization digest.
 - **USER_TABLE_CONTENT_FINGERPRINT_PARITY_PASS_AFTER_UTC**. This confirms timezone-dependent JSONB timestamp rendering caused at least the observed difference on that table. It does not yet confirm the other 17 tables; full 18-table rerun with UTC remains next.
 - Restore into independent local PostgreSQL, 19 tables (18 expected plus an auxiliary table), and required-table row counts remain PASS. The source Neon database and encrypted archive are unchanged.
+
+
+## WSL encrypted 18-table off-provider restore content parity PASS — 2026-10-11
+
+User-reported FINAL local PostgreSQL recovery evidence on `vyren_cc_restore_20261011`:
+
+- A fresh 2026-10-11 18:56 daily WSL GPG recipient-encrypted backup was created with the pre-existing backup workflow and safely retained at rest.
+- `gpg --decrypt` streamed the custom PostgreSQL archive into `sudo -u postgres pg_restore` on independent LOCAL PostgreSQL 18, with `--no-owner --no-privileges --single-transaction --exit-on-error`. Terminal returned **RESTORE_EXIT_CODE=0**. No Neon `main` destination was involved.
+- Backup TOC and restored local schema include **19 public TABLE DATA/table entries**: **all 18 required Command Center/Better Auth tables** plus auxiliary `playing_with_neon` with 10 rows.
+- Required restored table row counts **18/18 match** the earlier Neon `main` baseline (**123 rows**). Auxiliary 10 rows yield **133 rows** across 19 public tables.
+- The original local check using `to_jsonb(t)::text` had 17 mismatching nonempty-table MD5s with local `TimeZone=Europe/Istanbul`. User executed **`SET TIME ZONE 'UTC';`** in the local test session; on re-running the full 18-table SELECT-only content fingerprint verification query, **all 18 row counts and all 18 digests matched exactly** the earlier Neon main and isolated PITR samples. The mismatches were due to the session timezone-sensitive rendering used by this hash method.
+- **PASS: WSL_ENCRYPTED_BACKUP_CREATED; GPG_ARCHIVE_READABLE; LOCAL_PG_RESTORE_EXECUTION; LOCAL_19_TABLE_RESTORE; ALL_18_REQUIRED_ROW_COUNT_PARITY; ALL_18_REQUIRED_CONTENT_FINGERPRINT_PARITY_AFTER_UTC**.
+- **CLOSE: OFF_PROVIDER_DATABASE_RESTORE_DATA_PARITY_PASS** (bounded database-level user-observed recovery test, not full running-application production disaster recovery).
+- Reconciles/supersedes earlier local-row-MD5 mismatch and earlier `ENCRYPTED_DUMP_REAL_RESTORE_PENDING` / `CURRENT_18_TABLE_ENCRYPTED_BACKUP_PENDING` notes for this test archive.
+- **Still not verified:** separate off-device/remote storage and key escrow/recovery, app-layer Google OAuth login/auth behavior on the restored database, system-role/privilege exact parity (restore used no-owner/no-privileges), and full disaster recovery cutover. Do not claim `PRODUCTION_RECOVERY_READY` or operational launch authorization solely from this test.
+- No change to Neon `main`, live account access, previously created recovery branches or original encrypted archive.
+
+Full Neon reference digests matched again with UTC-normalized local session:
+  - `account`: `c4f750204c6bb66424a092bea9d71ce7`
+  - `cc_audit`: `c3be99366738a2c09ab764a0746bf59d`
+  - `cc_deliverables`: `6dcc64fc222299c895b75ec2343acc42`
+  - `cc_members`: `b125a49e4ee85bb01802e24f6e8ee700`
+  - `cc_opportunities`: `b5b49cb6f3c5b62ae132fb2582b31020`
+  - `cc_opportunity_events`: `d9e1f2da55f9ac3bb66c44b1db7b5afb`
+  - `cc_project_events`: `0165543c78997ce412b0064144fc11c5`
+  - `cc_project_record_events`: `fa297114b5d12bb4214c9521dcb5e061`
+  - `cc_project_records`: `2290c1c5e6425bcbc71147aae2290033`
+  - `cc_projects`: `ce1efea93d6c85d637d0af60ef1065ae`
+  - `cc_reviews`: `6b3699d08aee198b0af89e5b382d7270`
+  - `cc_tasks`: `3058b8cee4e0bf21719f7cc6870b0065`
+  - `cc_team_invites`: `99118d958744490854369329686ebf41`
+  - `cc_workstream_events`: `55a4613959bc9551d285fc5bf9a837c5`
+  - `cc_workstreams`: `a92ef16fca2afed30e53a17539f75cc0`
+  - `session`: `1aba574fab2a657d491bbfc0c24a5503`
+  - `user`: `2d8eb8bfbffdb3d17cc2fcce827ceaa2`
+  - `verification`: `d41d8cd98f00b204e9800998ecf8427e`
