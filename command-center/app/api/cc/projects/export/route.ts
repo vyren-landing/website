@@ -5,7 +5,7 @@ const headers={"Cache-Control":"private, no-store, max-age=0","X-Content-Type-Op
 const reject=(message:string,status:number)=>Response.json({error:message},{status,headers});
 export async function GET(){
  if(!phase2Configured())return reject("Command Center Preview yapılandırılmadı",503);
- const actor=await getActor();
+ const actor=await getActor({readOnly:true});
  if(!actor)return reject("Yetkisiz",401);
  if(actor.role!=="Founder")return reject("Yalnızca Kurucu erişebilir",403);
  const client=await database().connect();let opened=false;
@@ -31,19 +31,17 @@ export async function GET(){
    await client.query("ROLLBACK");opened=false;
    return reject("Eksiksiz proje aktarımı sınırı aşıldı; sayfalı aktarım gerekli",413);
   }
-  const [projects,events,tasks,records]=await Promise.all([
-   client.query(`SELECT id::text,title,workstream_id::text AS "workstreamId",
+  const projects=await client.query(`SELECT id::text,title,workstream_id::text AS "workstreamId",
      objective,next_action AS "nextAction",status,revision,
      created_by AS "createdBy",updated_by AS "updatedBy",
      archived_at AS "archivedAt",created_at AS "createdAt",updated_at AS "updatedAt"
-     FROM cc_projects ORDER BY created_at,id`),
-   client.query(`SELECT id::text,project_id::text AS "projectId",actor_id AS "actorId",
-     action,revision,snapshot,created_at AS "createdAt" FROM cc_project_events ORDER BY id`),
-   client.query(`SELECT id::text,project_id::text AS "projectId",status,
-     archived_at AS "archivedAt" FROM cc_tasks WHERE project_id IS NOT NULL ORDER BY id`),
-   client.query(`SELECT id::text,project_id::text AS "projectId",revision,
-     archived_at AS "archivedAt" FROM cc_project_records WHERE project_id IS NOT NULL ORDER BY id`)
-  ]);
+     FROM cc_projects ORDER BY created_at,id`);
+  const events=await client.query(`SELECT id::text,project_id::text AS "projectId",actor_id AS "actorId",
+     action,revision,snapshot,created_at AS "createdAt" FROM cc_project_events ORDER BY id`);
+  const tasks=await client.query(`SELECT id::text,project_id::text AS "projectId",status,
+     archived_at AS "archivedAt" FROM cc_tasks WHERE project_id IS NOT NULL ORDER BY id`);
+  const records=await client.query(`SELECT id::text,project_id::text AS "projectId",revision,
+     archived_at AS "archivedAt" FROM cc_project_records WHERE project_id IS NOT NULL ORDER BY id`);
   if([projects.rowCount,events.rowCount,tasks.rowCount,records.rowCount].some((n,i)=>n!==numbers[i]))
    throw Error("Snapshot count mismatch");
   await client.query("COMMIT");opened=false;
