@@ -261,3 +261,18 @@ User provided the Neon Console Branches view showing **6 branches**, one active 
 - **GPG_ARCHIVE_TOC_READ_PASS**: local decryption / PostgreSQL archive table-of-contents listing worked; archive is 25 KB by user output and stored mode 0600.
 - TOC presence is **not** a real data restore, proven row-count/content equivalence, PostgreSQL role/extension compatibility, or assurance that the exact current state can be recovered. `FULL_DB_RESTORE_PASS` is pending.
 - Next: inspect whether a fully isolated WSL/local PostgreSQL server is available, then perform a reversible test database restore without connecting to or mutating Neon `main`; keep archive encrypted at rest, no secret or raw data exports in GitHub.
+
+
+## Independent local PostgreSQL 18 real encrypted archive restore — 2026-10-11
+
+User installed PostgreSQL 18 server inside WSL Ubuntu; observed local `pg_lsclusters` output `18 main 5432 online postgres /var/lib/postgresql/18/main`. This is **local cluster `main`**, not Neon production `main`.
+
+Founder executed GPG stream decryption of the encrypted daily WSL backup `VYREN_CC_daily_20261011_185618_539761457.dump.gpg` piped into the locally addressed server:
+`sudo -u postgres pg_restore -h /var/run/postgresql -p 5432 -d vyren_cc_restore_20261011 --no-owner --no-privileges --single-transaction --exit-on-error` with Bash `set -o pipefail`.
+The terminal reported the GPG recipient fingerprint summary for RSA key `A6AC9153FA18269E` and `RESTORE_EXIT_CODE=0`. No authentication secrets or raw archive contents were sent to the repository.
+
+**LOCAL_ENCRYPTED_ARCHIVE_RESTORE_EXECUTION_PASS (user-observed)**: a real `pg_restore` completed successfully into an isolated LOCAL PostgreSQL database, independent of Neon. This supersedes older `ENCRYPTED_DUMP_REAL_RESTORE_PENDING` language FOR THIS ARCHIVE. No Neon live target/connection was supplied to the restoration command.
+
+**Still to confirm**: 18 required restored tables present and row-content fingerprints of the newly restored data; TOC showed 19 TABLE DATA entries, including extra `playing_with_neon`. For parity, sample counts and deterministic whole-row fingerprints against known source point (not blindly against earlier source due to time drift). Production runtime restoration/app authentication and separately stored off-device backup remain distinct tasks.
+
+**Do not** drop local restore database until test evidence has been captured or overwrite the encrypted archive. Never operate on Neon `main`.
