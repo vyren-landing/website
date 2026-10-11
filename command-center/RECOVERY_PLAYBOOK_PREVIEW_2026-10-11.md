@@ -42,3 +42,18 @@ This branch is **not** a current-system complete restore point. No reset, restor
 
 Keep recovery assurance claims separate: the newer `cc-pitr-drill-20261011` has 18/18 rows+fingerprints matching `main` at user-observed sampling, but the precise historical source timestamp, independent app recovery and off-provider `pg_dump` / `pg_restore` remain unverified.
 
+
+
+## 2026-10-11 local encrypted independent restore completed
+
+**Recovery milestone complete at DATABASE DATA layer (user-reported test):**
+- Existing WSL read-only GPG-encrypted daily backup workflow produced `VYREN_CC_daily_20261011_185618_539761457.dump.gpg`, approximately 25 KB, permissions 0600.
+- Encrypted custom PostgreSQL archive TOC includes 18 mandatory Command Center/Better Auth tables plus `playing_with_neon` (19 total).
+- Stream-decrypted archive successfully restored to locally isolated PostgreSQL 18.6 database `vyren_cc_restore_20261011` using `--single-transaction --exit-on-error --no-owner --no-privileges`: return code **0**.
+- Local schema 19/19 expected physical table entries and per-table counts 18/18 matched Neon main sample (123 required rows; 10 additional in auxiliary table).
+- After explicitly executing `SET TIME ZONE 'UTC'` locally, deterministic all-row `to_jsonb` fingerprints matched Neon reference on **18/18 required tables**. Timestamp rendering timezone was responsible for mismatches in initial local non-UTC comparison.
+- **OFF_PROVIDER_DATABASE_RESTORE_DATA_PARITY_PASS**. Former "off-provider restore unverified" entries are superseded for this particular tested archive and local PostgreSQL instance.
+- A local WSL copy is not **off-device** data durability: backup replication to separate protected storage, secure GPG private-key availability, and external application auth/cutover remain separately open. Do not conflate with `FULL_DB_RESTORE_PASS` as defined above for application-level recovery.
+- Do not delete WSL encrypted archive or local restored DB without an explicit retention policy. Never include secrets, private row data, archive bytes or GPG key material in GitHub.
+
+**Fingerprint verification requirement:** always normalize session timezone to UTC on both ends **before** computing timestamp-sensitive whole-row JSONB digests. Added a session-only timezone setting at the top of `db/VERIFY_18_TABLE_CONTENT_FINGERPRINTS_READ_ONLY.sql`; this does not mutate persistent data or settings.
