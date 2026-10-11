@@ -152,3 +152,13 @@ Limits: negative-path, test-session evidence only; not independent penetration t
 - Existing evidence remains unchanged: Contributor authorization regression 15/15 PASS; workstream and opportunity history sequence PASS; module health structural PASS; migration 007 and position assignment PASS.
 - No-self-lock execution disposition: continuation of non-identity work is permitted, while independent fresh-user invitation and revoke/re-authentication tests remain a **release-readiness assurance gap** to complete before onboarding external Contributors at scale. Do not claim general production identity lifecycle assurance.
 - Next work can cover backup retention/full DB recovery, user experience, and operational reporting, without touching live identities or canonical VYREN governance.
+
+
+## Database recovery readiness inventory — 2026-10-11
+
+- Existing independent Neon branch drill and five-table hash parity remain **PASS with bounded scope**; full database PITR restore or external `pg_dump` restore remains **NOT VERIFIED**.
+- Added `db/008_read_only_full_inventory.sql` as a documentation/SELECT-only verification script covering all 18 declared Better Auth + Command Center tables, including sessions, accounts, audit, invites and historic event tables. **008 is NOT a migration**; no schema changes should be applied for this stage.
+- Updated stale `README.md` that previously described only localStorage demo, now accurately describing current authenticated Preview and remaining launch assurance gaps.
+- Next operator actions: review Neon Console **Backup/Restore → restore window and snapshot options** for the actual project and plan; choose **isolated new branch**, never `main`, for any point-in-time restore drill. Execute inventory script on the explicitly selected branch, and compare its values with an inventory captured at the same recovery timestamp. Verify retention and recovery rights from actual account state.
+- Out-of-provider independent encrypted `pg_dump` / isolated `pg_restore` is an **additional resilience task**, not satisfied by same-project Neon branches.
+- No changes to existing user identities, member sessions, project records or live Neon branch settings.
