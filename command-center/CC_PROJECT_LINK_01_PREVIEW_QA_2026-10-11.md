@@ -84,3 +84,16 @@ Next: perform a **non-destructive recovery drill** by creating a separate test b
 - **RECOVERY_BRANCH_SELECTED_DATA_PASS (reported)**: all 5 table counts and digests match the prior baseline; the branch is queryable with expected schema. The outcome is based on user-observed branch selection and returned results. No independently fetched Neon branch lineage/ID was provided.
 - **Still not FULL_DB_RESTORE_PASS**: no restore to a point in time was conducted; other auth, history and operational tables, retention, and offsite recovery were not independently tested. No source/main branch was reset. `007_contributor_position_titles.sql` is not yet evidenced as applied.
 - Next: apply migration 007 only to the intended active Preview database branch after confirming the source branch in Neon; preserve the backup and drill branches, run the post-migration schema query and re-check counts, then test Founder position editing and regression.
+
+
+## Migration 007 + Founder position/workload UI acceptance — 2026-10-11
+
+- User executed `007_contributor_position_titles.sql` on the Command Center Preview-connected Neon `main` branch (user-reported). Read-only SQL verification returned `position_ready=t`, `constraint_ready=t`, `index_ready=t`.
+- Unchanged baseline table counts: `cc_members=3`, `cc_tasks=5`, `cc_project_records=5`, `cc_projects=1`, `cc_project_events=4`.
+- Founder Team UI presented editable "Organizasyon pozisyonu" fields; user saved and displayed:
+  - `VYREN Test Contributor` → `Kalite Güvence ve Test Sorumlusu`;
+  - `Nothingness Online` → `Topluluk ve İletişim Sorumlusu`.
+- Founder "Görev Dağılımı" UI grouped exactly one Contributor and one non-archived task per position; selected task list displayed `CC-ISOLATION-001 Kopyala` owned by VYREN Test Contributor and `CC-ISOLATION-002` owned by Nothingness Online, both `Tanımlandı`. User-reported aggregate: two tasks / one page.
+- **MIGRATION_007_SCHEMA_PASS**; **POSITION_SAVE_AND_DISPLAY_PASS**; **FOUNDER_ASSIGNMENT_GROUPING_PASS** on submitted results.
+- Nuance: 5 total database task rows vs 2 shown by report need not differ incorrectly; UI groups active/non-archived Contributor assignments. Archived/unassigned/other-owner distribution not independently inspected.
+- Remaining scope: independent Neon retention and full-database restore assurance; additional live regression across opportunities/workstreams/invitations; independent security assessment. No transfer of governance/canonical lifecycle authority from the operational position field.
