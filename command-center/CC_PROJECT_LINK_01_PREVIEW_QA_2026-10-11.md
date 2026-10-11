@@ -242,3 +242,12 @@ User provided the Neon Console Branches view showing **6 branches**, one active 
 - The older Neon snapshot-derived branch `branch_from_snapshot_Oct 10, 2026 2:54 PM GMT+3` is from that period; today's 10/18 schema result is consistent with later operational migrations, not a consequence of the WSL dump. Snapshot origin and dump origin are distinct recovery mechanisms.
 - **Disposition: LOCAL_ENCRYPTED_PG_BACKUP_CREATED_PASS; GPG_DUMP_READABILITY_PASS; ENCRYPTED_DUMP_REAL_RESTORE_PENDING; CURRENT_18_TABLE_ENCRYPTED_BACKUP_PENDING.** Not `OFFSITE_BACKUP_PASS`, since off-device storage is not evidenced. Do not erase, commit or transmit encrypted/unencrypted dump, connection strings or credentials.
 - This section controls over prior statements suggesting an independent encrypted backup had not been created at all. Existing Neon 18/18 isolated branch content fingerprint parity remains independently PASS, and `FULL_DB_RESTORE_PASS` remains unverified.
+
+
+## October 11 daily encrypted WSL backup — user-run
+
+- User manually ran the **existing** installed WSL script `/home/oms29/.local/bin/vyren-cc-backup.sh` (not a new GitHub-generated backup implementation); terminal reported `DAILY_ENCRYPTED_BACKUP_CREATED`.
+- The script emitted a new, private encrypted archive under the user's WSL `vyren_secure_backups/daily/` directory: `VYREN_CC_daily_20261011_185618_539761457.dump.gpg`. Displayed size **25K**, Unix mode **-rw------- (0600)**, mtime 2026-10-11 18:56 local.
+- **CURRENT_DAILY_ENCRYPTED_BACKUP_FILE_CREATED_PASS (user-observed)**. The output alone does not independently establish 18-table TOC completeness, consistent restore, off-device retention, recoverability of the GPG key, or full database recovery.
+- The original daily backup mechanism remains preferred; avoid competing owner-password or parallel GPG encryption flow. The repo's auxiliary `scripts/wsl_neon_main_encrypted_backup.sh` was changed to delegate to the user's existing engine rather than reimplement it.
+- Next: locally inspect this private file with GPG decrypt streamed to `pg_restore --list` and compare the expected 18 table data entries; do not print raw rows, plaintext dump, private keys or connection secrets, and do not alter `main`. Then verify full restore into an isolated PostgreSQL target separately.
