@@ -108,3 +108,13 @@ Next: perform a **non-destructive recovery drill** by creating a separate test b
 - **MODULE_HEALTH_STRUCTURAL_PASS**. The scan exposes counts and integrity flags only and does not alter records.
 - Not yet proven by this scan: actual CREATE/UPDATE/ARCHIVE/RESTORE transition correctness, chronological event continuity and snapshot agreement, newly extended Contributor forbidden-route checks, credential-offboarding, or a full DB restore.
 - Next: compare read-only event-action/revision sequences, then extend Contributor-only safe 403 regression checks for workstreams, opportunities, team, and module health; preserve existing records and identity bindings.
+
+
+## Workstream/opportunity history acceptance and Contributor isolation follow-up — 2026-10-11
+
+User-observed Founder histories from the Preview:
+- **Workstream**, reverse chronological: RESTORE revision 3 ACTIVE (2026-10-10 22:54:09), ARCHIVE revision 2 ARCHIVED (22:52:09), ADOPT revision 1 ACTIVE (22:50:59). Chronological actions ADOPT → ARCHIVE → RESTORE and consecutive revisions 1–3. **WORKSTREAM_EVENT_SEQUENCE_PASS**.
+- **Opportunity**, reverse chronological: RESTORE revision 4 QUALIFIED (2026-10-10 23:11:46), ARCHIVE revision 3 QUALIFIED (23:10:46), UPDATE revision 2 QUALIFIED (23:09:28), CREATE revision 1 RESEARCH (23:08:09). Chronological actions CREATE → UPDATE → ARCHIVE → RESTORE and consecutive revisions 1–4. **OPPORTUNITY_EVENT_SEQUENCE_PASS**.
+- These checks validate presented event actions, revision sequences, and displayed states; they are not independent full snapshot-by-snapshot database equivalence checks.
+- The Contributor `Yetki Güvenliği Testi` UI is extended with four new **read-only GET** checks (workstreams, opportunities, team invites/members, module-health endpoint), requiring HTTP 403 / "Yalnızca Kurucu erişebilir". No mutation or offboarding is attempted. **PENDING live Contributor 4/4 result** until a Contributor performs the test on the ready Preview.
+- No existing assignments, invitations, workstream/opportunity records, or Neon branches were altered by these changes.
