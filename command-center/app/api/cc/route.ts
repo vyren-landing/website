@@ -4,7 +4,7 @@ import {database,getActor,phase2Configured,type Actor} from "../../../lib/phase2
 class ApiFailure extends Error {constructor(message:string,public status=400){super(message)}}
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
-type Mutation={operation:string;id?:string;title?:string;objective?:string;expectedOutput?:string;ownerId?:string;body?:string;evidenceUrl?:string;reason?:string;testAction?:string};
+type Mutation={operation:string;id?:string;title?:string;objective?:string;expectedOutput?:string;ownerId?:string;body?:string;evidenceUrl?:string;reason?:string;testAction?:string;projectId?:string|null};
 const reject=(message:string,status=400)=>Response.json({error:message},{status,headers:{"Cache-Control":"no-store"}});
 async function actorOrError():Promise<Actor|null>{
  if(!phase2Configured())return null;
@@ -16,6 +16,14 @@ function sameOrigin(req:NextRequest){
 }
 function validHttps(url:string){try{const u=new URL(url);return u.protocol==="https:"&&!!u.hostname&&url.length<=2000;}catch{return false;}}
 const contributorOperations=["accept","start","submit"];
+const validId=(s:string)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+async function projectLinksReady(db:{query:(sql:string)=>Promise<{rows:Array<{ready:boolean}>}>}){
+ const r=await db.query(`SELECT
+  to_regclass('public.cc_projects') IS NOT NULL
+  AND EXISTS (SELECT 1 FROM information_schema.columns
+   WHERE table_schema='public' AND table_name='cc_tasks' AND column_name='project_id') AS ready`);
+ return r.rows[0]?.ready===true;
+}
 // This is the very same ownership rule used by real mutations and Preview-only QA probes.
 function enforceTaskOwner(actor:Actor,ownerId:string,operation:string){
  if(contributorOperations.includes(operation)&&actor.id!==ownerId)
@@ -43,10 +51,15 @@ export async function GET(request:NextRequest){
    const page=history.rows.slice(0,50);
    return Response.json({actor,tasks:[],members:[],audit:page,nextCursor:history.rows.length>50?page[49].id:null},{headers:{"Cache-Control":"no-store"}});
   }
+  const linked=await projectLinksReady(db);
   const data=await db.query(
-   `SELECT t.id,t.title,t.objective,t.expected_output AS "expectedOutput",t.owner_id AS "ownerId",
+   `SELECT t.id,t.title,t.objective,t.expected_output AS "expectedOutput",
+     ${linked?'t.project_id::text':'NULL::text'} AS "projectId",
+     ${linked?'p.title':'NULL::text'} AS "projectName",
+     t.owner_id AS "ownerId",
      m.name AS "ownerName",t.status,t.archived_at AS "archivedAt",t.created_at AS "createdAt",t.updated_at AS "updatedAt"
     FROM cc_tasks t JOIN cc_members m ON m.auth_user_id=t.owner_id
+    ${linked?"LEFT JOIN cc_projects p ON p.id=t.project_id":""}
     WHERE t.archived_at IS ${view==="archive"?"NOT NULL":"NULL"} AND ($1::boolean OR t.owner_id=$2)
     ORDER BY ${view==="archive"?"t.archived_at":"t.updated_at"} DESC LIMIT 250`,[actor.role==="Founder",actor.id]);
   const ids=data.rows.map(r=>r.id);
@@ -70,7 +83,7 @@ export async function POST(request:NextRequest){
   const actor=await actorOrError();if(!actor)return reject("Yetkisiz",401);
   // Fail closed BEFORE opening a transaction or looking up a task.
   // The security-check UI uses invalid, non-existent fixtures and must never mutate records.
-  if(["create","approve","revise","archive","restore"].includes(input.operation)&&actor.role!=="Founder"){
+  if(["create","approve","revise","archive","restore","set_project"].includes(input.operation)&&actor.role!=="Founder"){
    return reject(input.operation==="create"?"Yalnızca Kurucu görev oluşturabilir":"Yalnızca Kurucu işlem yapabilir",403);
   }
   if(input.operation==="ownership_security_test"){
@@ -97,6 +110,16 @@ export async function POST(request:NextRequest){
   try{
    await client.query("BEGIN");
    let taskId="";
+   const linked=await projectLinksReady(client);
+   const projectId=input.projectId===null||input.projectId===""||input.projectId===undefined?null:input.projectId;
+   if(input.operation==="create"||input.operation==="set_project"){
+    if(projectId&&!validId(projectId))throw new ApiFailure("Proje ID geçersiz");
+    if(projectId){
+     if(!linked)throw new ApiFailure("Proje bağlantıları için Preview migration 006 gerekli",503);
+     const exists=await client.query("SELECT 1 FROM cc_projects WHERE id=$1 AND archived_at IS NULL",[projectId]);
+     if(!exists.rowCount)throw new ApiFailure("Aktif proje bulunamadı",409);
+    }
+   }
    if(input.operation==="create"){
     if(actor.role!=="Founder")throw new ApiFailure("Yalnızca Kurucu görev oluşturabilir",403);
     const title=(input.title||"").trim(),objective=(input.objective||"").trim();
@@ -104,15 +127,24 @@ export async function POST(request:NextRequest){
     if(title.length<2||title.length>200||objective.length<3||objective.length>4000||expected.length>2000)throw new ApiFailure("Görev alanları geçersiz");
     const ownerRow=await client.query('SELECT 1 FROM cc_members WHERE auth_user_id=$1 AND role=$2 AND active=TRUE',[owner,"Contributor"]);
     if(!ownerRow.rowCount)throw new ApiFailure("Aktif Contributor bulunamadı");
-    const made=await client.query<{id:string}>('INSERT INTO cc_tasks(title,objective,expected_output,owner_id,created_by) VALUES($1,$2,$3,$4,$5) RETURNING id',[title,objective,expected,owner,actor.id]);
+    const made=linked?await client.query<{id:string}>(
+      'INSERT INTO cc_tasks(title,objective,expected_output,owner_id,created_by,project_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',
+      [title,objective,expected,owner,actor.id,projectId]):await client.query<{id:string}>(
+      'INSERT INTO cc_tasks(title,objective,expected_output,owner_id,created_by) VALUES($1,$2,$3,$4,$5) RETURNING id',
+      [title,objective,expected,owner,actor.id]);
     taskId=made.rows[0].id;
    }else{
-    if(!input.id||!/^[0-9a-f-]{36}$/i.test(input.id))throw new ApiFailure("Görev ID geçersiz");
+    if(!input.id||!validId(input.id))throw new ApiFailure("Görev ID geçersiz");
     const res=await client.query<{id:string;owner_id:string;status:string;archived_at:string|null}>(
      'SELECT id,owner_id,status,archived_at FROM cc_tasks WHERE id=$1 FOR UPDATE',[input.id]);
     if(!res.rowCount)throw new ApiFailure("Görev bulunamadı",404);
     const t=res.rows[0];taskId=t.id;
     if(t.archived_at&&input.operation!=="restore")throw new ApiFailure("Arşivlenmiş görev değiştirilemez",409);
+    if(input.operation==="set_project"){
+      if(actor.role!=="Founder")throw new ApiFailure("Yalnızca Kurucu proje bağlantısı değiştirebilir",403);
+      if(!linked)throw new ApiFailure("Proje bağlantıları için Preview migration 006 gerekli",503);
+      await client.query("UPDATE cc_tasks SET project_id=$2,updated_at=now() WHERE id=$1",[t.id,projectId]);
+    }else{
     enforceTaskOwner(actor,t.owner_id,input.operation);
     const own=t.owner_id===actor.id,founder=actor.role==="Founder";
     if(input.operation==="accept"&&own&&t.status==="BRIEFED")await client.query('UPDATE cc_tasks SET status=$2,updated_at=now() WHERE id=$1',[t.id,"ACCEPTED"]);
@@ -137,8 +169,9 @@ export async function POST(request:NextRequest){
     }else if(input.operation==="restore"&&founder&&t.status==="COMPLETED"&&t.archived_at){
      await client.query('UPDATE cc_tasks SET archived_at=NULL,updated_at=now() WHERE id=$1',[t.id]);
     }else throw new ApiFailure("Bu işlem bu rol veya görev durumu için yasak",403);
+    }
    }
-   await client.query('INSERT INTO cc_audit(actor_id,action,target_id,details) VALUES($1,$2,$3,$4)',[actor.id,input.operation,taskId,JSON.stringify({at:new Date().toISOString()})]);
+   await client.query('INSERT INTO cc_audit(actor_id,action,target_id,details) VALUES($1,$2,$3,$4)',[actor.id,input.operation,taskId,JSON.stringify({at:new Date().toISOString(),...(input.operation==="set_project"||input.operation==="create"?{projectId}: {})})]);
    await client.query("COMMIT");
    return Response.json({ok:true,taskId},{headers:{"Cache-Control":"no-store"}});
   }catch(e){await client.query("ROLLBACK");throw e;}
