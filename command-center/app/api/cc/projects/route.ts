@@ -37,6 +37,29 @@ export async function GET(request:NextRequest){
       FROM cc_project_events WHERE project_id=$1 ORDER BY id DESC LIMIT 100`,[history]);
    return Response.json({events:events.rows},{headers});
   }
+  // Read-only Founder drilldown: operational records, not canonical VDCP acceptance.
+  const detail=request.nextUrl.searchParams.get("detail");
+  if(detail!==null){
+   if(!uuid(detail))throw new Failure("Proje ID geçersiz");
+   const exists=await db.query("SELECT 1 FROM cc_projects WHERE id=$1",[detail]);
+   if(!exists.rowCount)throw new Failure("Proje bulunamadı",404);
+   const [taskResult,recordResult]=await Promise.all([
+    db.query(`SELECT t.id::text AS id,t.title,t.status,m.name AS "ownerName",
+       t.created_at AS "createdAt",t.updated_at AS "updatedAt"
+       FROM cc_tasks t JOIN cc_members m ON m.auth_user_id=t.owner_id
+       WHERE t.project_id=$1 AND t.archived_at IS NULL
+       ORDER BY t.updated_at DESC,t.id LIMIT 101`,[detail]),
+    db.query(`SELECT r.id::text AS id,r.title,r.status,r.next_action AS "nextAction",
+       r.updated_at AS "updatedAt" FROM cc_project_records r
+       WHERE r.project_id=$1 AND r.archived_at IS NULL
+       ORDER BY r.updated_at DESC,r.id LIMIT 101`,[detail])
+   ]);
+   return Response.json({tasks:taskResult.rows.slice(0,100),
+     records:recordResult.rows.slice(0,100),
+     taskTruncated:taskResult.rows.length>100,
+     recordTruncated:recordResult.rows.length>100,
+     authority:"OPERATIONAL_ONLY_NOT_CANONICAL"},{headers});
+  }
   const archived=request.nextUrl.searchParams.get("archived")==="1";
   const [projects,workstreams]=await Promise.all([
    db.query(`SELECT p.id::text AS id,p.title,p.objective,p.next_action AS "nextAction",
