@@ -284,3 +284,16 @@ The terminal reported the GPG recipient fingerprint summary for RSA key `A6AC915
 - Returned `19` local `public` base tables. Encrypted backup TOC also held 19 TABLE DATA entries: all 18 required Better Auth + Command Center tables and the extra `playing_with_neon` table.
 - **LOCAL_RESTORE_TABLE_PRESENCE_19_PASS (user observed)** and **LOCAL_ENCRYPTED_ARCHIVE_RESTORE_EXECUTION_PASS** remain established. This is an independent WSL PostgreSQL target; Neon `main` was not selected or modified by restore.
 - Still unverified: per-table restored row counts/fingerprints against the backup-time source baseline, FK/application behavior, remote off-device copy of encrypted archive, and isolated cloud application recovery. Next control: non-mutating local PostgreSQL per-table row-count query.
+
+
+## WSL independent encrypted restore 19-table row-count parity — 2026-10-11
+
+Founder ran a read-only local PostgreSQL 18 count inventory against `vyren_cc_restore_20261011` (restored from 2026-10-11 18:56 GPG archive). It returned **19 public tables**, including `playing_with_neon=10`; the other **18 required Command Center/Better Auth table counts exactly match the earlier 2026-10-11 Neon main / PITR sample**:
+`account=4, cc_audit=59, cc_deliverables=5, cc_members=3, cc_opportunities=1, cc_opportunity_events=4, cc_project_events=4, cc_project_record_events=13, cc_project_records=5, cc_projects=1, cc_reviews=5, cc_tasks=5, cc_team_invites=1, cc_workstream_events=3, cc_workstreams=1, session=5, user=4, verification=0`.
+
+**Counts:** 123 required-table rows, plus 10 rows in `playing_with_neon` = 133 restored rows across 19 tables.
+**LOCAL_OFF_PROVIDER_PG_RESTORE_EXECUTION_PASS; RESTORED_SCHEMA_19_TABLES_PASS; RESTORED_18_REQUIRED_TABLE_COUNT_PARITY_PASS** (user-observed).
+- Unlike the earlier archive readability test, this tested real `pg_restore` into a separate local PostgreSQL database, with `RESTORE_EXIT_CODE=0`.
+- This does not establish exact restored full-row content parity, backup-time transactional identity vs earlier Neon sampling, application auth/runtime readiness, durable off-device storage, or complete production DR posture. Those are separate.
+- Next: run SELECT-only deterministic `to_jsonb(t)` aggregate fingerprints for all 18 required restored tables; compare to previously recorded Neon `main` fingerprints from the same general timeframe, noting legitimate changes if source sample predates backup.
+- No mutation to Neon main; preserve encrypted backup and local restored test DB pending verification.
