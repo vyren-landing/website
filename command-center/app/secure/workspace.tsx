@@ -14,7 +14,7 @@ type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
 type Review={decision:string;reason:string|null;createdAt:string};
-type Task={id:string;title:string;objective:string;expectedOutput:string;ownerId:string;ownerName:string;status:string;archivedAt:string|null;submissions:Submission[];reviews:Review[];createdAt:string};
+type Task={id:string;title:string;objective:string;expectedOutput:string;ownerId:string;ownerName:string;status:string;projectId:string|null;projectName:string|null;archivedAt:string|null;submissions:Submission[];reviews:Review[];createdAt:string};
 type AuditEvent={id:string;action:string;actorName:string;taskTitle:string;createdAt:string};
 type Data={actor:Actor;members:Member[];tasks:Task[];audit?:AuditEvent[];nextCursor?:string|null};
 const dictionary:Record<string,string>={"BRIEFED":"Tanımlandı","ACCEPTED":"Kabul Edildi","IN PROGRESS":"Devam Ediyor","FOUNDER REVIEW":"Kurucu İncelemesi","COMPLETED":"Tamamlandı"};
@@ -29,6 +29,9 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const [objective,setObjective]=useState("");
  const [output,setOutput]=useState("");
  const [owner,setOwner]=useState("");
+ const [projectId,setProjectId]=useState("");
+ const [projects,setProjects]=useState<{id:string;title:string}[]>([]);
+ const [projectReady,setProjectReady]=useState(false);
  const [drafts,setDrafts]=useState<Record<string,string>>({});
  const [links,setLinks]=useState<Record<string,string>>({});
  const [reasons,setReasons]=useState<Record<string,string>>({});
@@ -39,12 +42,18 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   }catch(e){setError(e instanceof Error?e.message:"Unable to load tasks");}
  },[]);
  useEffect(()=>{void load()},[load]);
+ const loadProjects=useCallback(async()=>{if(!tr)return;
+  try{const r=await fetch("/api/cc/projects",{credentials:"same-origin",cache:"no-store"});const v=await r.json();
+   if(r.ok){setProjectReady(v.managementReady===true);setProjects((v.projects||[]).map((p:{id:string;title:string})=>({id:p.id,title:p.title})));}}
+  catch{/* Legacy standalone tasks remain available. */}
+ },[tr]);
+ useEffect(()=>{void loadProjects()},[loadProjects]);
  const action=async(operation:string,fields:Record<string,string>)=>{
   setBusy(true);setError("");
   try{
    const r=await fetch("/api/cc",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify({operation,...fields})});
    const body=await r.json();if(!r.ok)throw new Error(body.error||"Operation failed");
-   if(operation==="create"){setTitle("");setObjective("");setOutput("");}
+   if(operation==="create"){setTitle("");setObjective("");setOutput("");setProjectId("");}
    if(operation==="submit"){setDrafts(x=>({...x,[fields.id]:""}));setLinks(x=>({...x,[fields.id]:""}));}
    if(operation==="revise")setReasons(x=>({...x,[fields.id]:""}));
    await load();
@@ -81,8 +90,11 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
     <div className="field"><label>Amaç</label><textarea value={objective} rows={3} maxLength={4000} onChange={e=>setObjective(e.target.value)}/></div>
     <div className="field"><label>Beklenen çıktı</label><input value={output} onChange={e=>setOutput(e.target.value)} maxLength={2000}/></div>
-    <div className="field"><label>Sorumlu (onaylı gerçek hesap)</label><select value={owner} onChange={e=>setOwner(e.target.value)}><option value="">Bir katkı sağlayan seçin</option>{(data?.members||[]).filter(m=>m.role==="Contributor").map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></div>
-    <button className="primary" disabled={busy||!owner||title.trim().length<2||objective.trim().length<3} onClick={()=>void action("create",{title,objective,expectedOutput:output,ownerId:owner})}>Görev Oluştur</button>
+    {projectReady&&<div className="field"><label>İlgili proje (isteğe bağlı)</label><select value={projectId} onChange={e=>setProjectId(e.target.value)}>
+    <option value="">Bağımsız görev</option>{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}
+   </select></div>}
+   <div className="field"><label>Sorumlu (onaylı gerçek hesap)</label><select value={owner} onChange={e=>setOwner(e.target.value)}><option value="">Bir katkı sağlayan seçin</option>{(data?.members||[]).filter(m=>m.role==="Contributor").map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></div>
+    <button className="primary" disabled={busy||!owner||title.trim().length<2||objective.trim().length<3} onClick={()=>void action("create",{title,objective,expectedOutput:output,ownerId:owner,projectId})}>Görev Oluştur</button>
     {!(data?.members||[]).some(m=>m.role==="Contributor")&&<p className="small muted">Test kullanıcısı henüz gerçek hesabıyla doğrulanmadı; şu anda kimseye gerçek görev atanamaz.</p>}
   </section>}
   {view==="active"&&<section className="panel stack"><h2>{label("My Tasks","Görevler ve Teslimler")}</h2>
@@ -96,7 +108,11 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
       const showEdit=own&&t.status==="IN PROGRESS";
       return <article key={t.id} className="card stack">
        <div className="row between"><b>{t.title}</b><span className="badge">{tr?(dictionary[t.status]||t.status):t.status}</span></div>
-       <p>{t.objective}</p><p className="small muted">{label("Owner","Sorumlu")}: {t.ownerName} · {label("Expected output","Beklenen çıktı")}: {t.expectedOutput}</p>
+       <p>{t.objective}</p>{t.projectName&&<p className="small muted">Proje: {t.projectName}</p>}
+       {tr&&projectReady&&<div className="field"><label>Proje bağlantısı</label><select value={t.projectId||""} disabled={busy} onChange={e=>void action("set_project",{id:t.id,projectId:e.target.value})}>
+        <option value="">Bağımsız görev</option>{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}
+       </select></div>}
+       <p className="small muted">{label("Owner","Sorumlu")}: {t.ownerName} · {label("Expected output","Beklenen çıktı")}: {t.expectedOutput}</p>
        <button onClick={()=>setOpen(expanded?null:t.id)}>{expanded?label("Close details","Ayrıntıları Gizle"):label("Open details","Ayrıntıları Aç")}</button>
        {expanded&&<div className="stack">
         {latest&&<div className="panel stack"><b>{label("Submitted report","Teslim Edilen Rapor")}</b><p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{latest.body}</p>{latest.evidenceUrl&&<a href={latest.evidenceUrl} target="_blank" rel="noopener noreferrer" style={{overflowWrap:"anywhere"}}>Kanıt Bağlantısı</a>}</div>}
