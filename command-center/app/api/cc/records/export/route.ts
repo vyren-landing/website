@@ -14,7 +14,7 @@ function errorResponse(message:string,status:number){
 export async function GET(){
  if(!phase2Configured())return errorResponse("Command Center Preview kurulu değil",503);
  try{
-  const actor=await getActor();
+  const actor=await getActor({readOnly:true});
   if(!actor)return errorResponse("Yetkisiz",401);
   if(actor.role!=="Founder")return errorResponse("Yalnızca Kurucu erişebilir",403);
 
