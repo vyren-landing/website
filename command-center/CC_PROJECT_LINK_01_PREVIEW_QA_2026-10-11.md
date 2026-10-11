@@ -194,3 +194,15 @@ User executed `db/008_read_only_full_inventory.sql` with Neon SQL Editor on `mai
 - This establishes deterministic fingerprint parity of all known rows/columns returned by the current SQL on the two selected branches, not independent verification of actual Neon source lineage or chosen PITR timestamp, data durability outside Neon, full-schema object (function/index/extension/privilege) equivalence, running app ability to connect and authenticate on an isolated restore, or off-provider backup-and-restore.
 - **PITR_DB_SELECTED_DATA_PARITY_PASS** is appropriate at the database row-content level; **FULL_DB_RESTORE_PASS and PRODUCTION_RECOVERY_READY remain UNVERIFIED**.
 - Next safe step: read only the isolated branch's Neon Console metadata (parent/source `main`, creation method/history timestamp and branch name); do not use Restore on `main`, change Vercel production environment variables, or publish DB connection strings. Independent app-level smoke and encrypted off-provider backup may be addressed separately without blocking unrelated operational development.
+
+
+## PITR drill branch lineage metadata — 2026-10-11
+
+User provided Neon Console "Branch overview" fields for isolated `cc-pitr-drill-20261011`:
+- Neon branch ID: `br-purple-mountain-b21do714`.
+- Parent branch: `main`.
+- Branch created: `2026-10-11 18:24:37` (user console display; timezone presumed Europe/Istanbul based on surrounding UI).
+- Last updated: `2026-10-11 18:30:44`. Expiry: `Never`. Console shows 1 database and 1 compute.
+- `LSN` section displays `Reset from parent`, but this excerpt **does not present an explicit parent timestamp, origin LSN or creation method "Time" vs "Head"**. The previously intended timestamp `18:15 Europe/Istanbul` remains **unconfirmed as historical branch point**.
+- **PARENT_MAIN_CONFIRMED** (user-observed metadata). Existing `PITR_SCHEMA_AND_COUNT_PARITY_PASS` and `PITR_CONTENT_FINGERPRINT_PARITY_PASS` remain valid for the user-reported selected branch pair. **HISTORICAL_POINT_AT_18_15_UNVERIFIED**. Identical hashes alone do not discriminate current-time branching from earlier-time branching if no intervening writes happened.
+- Next: preserve independent drill branch; do not click a restore/reset control on `main` and do not infer an exact PITR target timestamp. Current safe operational Preview work need not pause for an artificial DB mutation; full app-on-restored-branch smoke, time-travel provenance and external encrypted backup can remain separately tracked recovery assurance.
