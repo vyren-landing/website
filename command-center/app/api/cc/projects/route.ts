@@ -10,9 +10,9 @@ const uuid=(s:string)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 const statuses=["TODO","IN_PROGRESS","DONE","BLOCKED","DEFERRED"] as const;
 type Mutation={operation?:string;id?:string;revision?:number;title?:string;
  objective?:string;nextAction?:string;status?:string;workstreamId?:string|null};
-async function founder(){
+async function founder(readOnly=false){
  if(!phase2Configured())throw new Failure("Command Center Preview yapılandırılmadı",503);
- const actor=await getActor();
+ const actor=await getActor({readOnly});
  if(!actor)throw new Failure("Yetkisiz",401);
  if(actor.role!=="Founder")throw new Failure("Yalnızca Kurucu erişebilir",403);
  return actor;
@@ -25,7 +25,7 @@ async function ready(){
 }
 export async function GET(request:NextRequest){
  try{
-  await founder();
+  await founder(true);
   if(!await ready())return Response.json({managementReady:false,projects:[],workstreams:[]},{headers});
   const db=database();
   const history=request.nextUrl.searchParams.get("history");
