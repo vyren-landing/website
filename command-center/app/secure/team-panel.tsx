@@ -47,7 +47,7 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
   <button disabled={loading||busy} onClick={()=>void load()}>Ekip Listesini Yenile</button>
   <div className="card stack">
    <h3>Google Contributor İçin Davet Kaydı</h3>
-   <p className="small muted">Bu işlem otomatik e-posta göndermez. Davet edilen hesap ayrıca Google Cloud OAuth Testing → Test users listesinde bulunmalıdır. Hesap ilk doğrulanmış girişinde bağlanır.</p>
+   <p className="small muted">Bu işlem otomatik e-posta göndermez. Google OAuth uygulaması Testing durumundaysa davet edilen hesap Google Cloud OAuth Test users listesinde de bulunmalıdır. Davet kaydı tek başına erişim vermez; hesap ilk doğrulanmış Google girişinde bağlanır. Giriş bağlantısını kişiye ayrıca iletin.</p>
    <div className="field">
     <label htmlFor="cc-team-email">Davet edilecek Google e-posta adresi</label>
     <input id="cc-team-email" type="email" autoComplete="off" value={email} maxLength={254} placeholder="ornek@gmail.com" onChange={e=>setEmail(e.target.value)}/>
