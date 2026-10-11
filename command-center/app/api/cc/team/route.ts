@@ -3,7 +3,7 @@ import {database,getActor,phase2Configured} from "../../../../lib/phase2";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
-type Mutation={operation?:string;email?:string;id?:string};
+type Mutation={operation?:string;email?:string;id?:string;positionTitle?:string};
 class ApiFailure extends Error {constructor(message:string,public status=400){super(message);}}
 const reject=(message:string,status=400)=>Response.json({error:message},{status,headers:{"Cache-Control":"no-store"}});
 const validEmail=(email:string)=>email.length>=5&&email.length<=254&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -21,13 +21,15 @@ export async function GET(){
   if(!actor)return reject("Yetkisiz",401);
   if(actor.role!=="Founder")return reject("Yalnızca Kurucu erişebilir",403);
   const db=database();
+  const positionCheck=await db.query<{ready:boolean}>(`SELECT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='cc_members' AND column_name='position_title') AS ready`);
+  const positionReady=positionCheck.rows[0]?.ready===true;
   const [members,invites]=await Promise.all([
-   db.query(`SELECT auth_user_id AS id,name,role,active,created_at AS "createdAt"
+   db.query(`SELECT auth_user_id AS id,name,role,active,created_at AS "createdAt", ${positionReady?'position_title':'NULL::text'} AS "positionTitle"
      FROM cc_members WHERE role='Contributor' ORDER BY created_at DESC LIMIT 200`),
    db.query(`SELECT id::text,email,status,member_id AS "memberId",created_at AS "createdAt",updated_at AS "updatedAt"
      FROM cc_team_invites ORDER BY created_at DESC LIMIT 200`)
   ]);
-  return Response.json({members:members.rows,invites:invites.rows},{headers:{"Cache-Control":"no-store"}});
+  return Response.json({members:members.rows,invites:invites.rows,positionReady},{headers:{"Cache-Control":"no-store"}});
  }catch{return reject("Ekip kayıtları hazır değil. Önce 002_team_invitations.sql migration uygulanmalı.",503);}
 }
 export async function POST(request:NextRequest){
@@ -43,7 +45,7 @@ export async function POST(request:NextRequest){
   if(!actor)return reject("Yetkisiz",401);
   if(actor.role!=="Founder")return reject("Yalnızca Kurucu işlem yapabilir",403);
   const operation=input.operation||"";
-  if(!["invite","revoke_invite","reactivate_invite","disable_member","enable_member"].includes(operation))
+  if(!["invite","revoke_invite","reactivate_invite","disable_member","enable_member","set_position"].includes(operation))
    return reject("Geçersiz ekip işlemi",400);
   const db=database(),client=await db.connect();
   try{
@@ -84,6 +86,18 @@ export async function POST(request:NextRequest){
      }
      await client.query("UPDATE cc_team_invites SET status=$2,updated_at=now() WHERE id=$1",[id,invite.memberId?"ACTIVE":"PENDING"]);
     }
+   }else if(operation==="set_position"){
+    const id=input.id||"";
+    const title=(input.positionTitle||"").trim();
+    if(!id||id.length>160)throw new ApiFailure("Üye ID geçersiz");
+    if(title&&(title.length<2||title.length>120))throw new ApiFailure("Pozisyon 2-120 karakter olmalı");
+    const positionCheck=await client.query<{ready:boolean}>(`SELECT EXISTS(
+      SELECT 1 FROM information_schema.columns WHERE table_schema='public'
+        AND table_name='cc_members' AND column_name='position_title') AS ready`);
+    if(!positionCheck.rows[0]?.ready)throw new ApiFailure("Pozisyon alanı için Preview migration 007 gerekli",503);
+    const updated=await client.query("UPDATE cc_members SET position_title=$2,updated_at=now() WHERE auth_user_id=$1 AND role='Contributor' RETURNING auth_user_id",[id,title||null]);
+    if(!updated.rowCount)throw new ApiFailure("Contributor bulunamadı",404);
+    auditTarget=id;
    }else{
     const id=input.id||"";
     if(!id||id.length>160)throw new ApiFailure("Üye ID geçersiz");
