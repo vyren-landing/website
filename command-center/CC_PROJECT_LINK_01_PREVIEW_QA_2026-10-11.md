@@ -68,3 +68,19 @@ Earlier five-table counts from two runs were likewise identical: `3 / 5 / 5 / 1 
 This verifies parity of the five selected tables at the time of their respective reads; it does **not** establish independent offsite backup, full PostgreSQL database restoration, retention policy, complete auth/audit/deliverables history parity, or migration 007 execution.
 
 Next: perform a **non-destructive recovery drill** by creating a separate test branch from the preserved backup branch (or restoring a Neon snapshot into a new branch if enabled), verify schema and data against captured baseline, and record source/target branch names. Never restore/overwrite `main` as part of QA.
+
+
+## Isolated recovery drill — 2026-10-11 (user-operated Neon SQL Editor)
+
+- The user reports creating Neon branch `cc-recovery-drill-20261011` and executing a read-only check there. Five required tables returned true: `cc_members`, `cc_tasks`, `cc_project_records`, `cc_projects`, `cc_project_events`.
+- A second read-only combined count + JSONB/MD5 query on the drill branch returned:
+  | Table | Count | MD5 |
+  |---|---:|---|
+  | cc_members | 3 | 446b993bad5f887f4d05fe346c49a192 |
+  | cc_tasks | 5 | bfa49ff8e972c38accd575adadcb3070 |
+  | cc_project_records | 5 | 28b3d541c0c9d925f739e7c3bd5a6d25 |
+  | cc_projects | 1 | a2ea9cf289f940cf3b8837657afbab9d |
+  | cc_project_events | 4 | c2e64dca8b5eef41fd0015b930f5d152 |
+- **RECOVERY_BRANCH_SELECTED_DATA_PASS (reported)**: all 5 table counts and digests match the prior baseline; the branch is queryable with expected schema. The outcome is based on user-observed branch selection and returned results. No independently fetched Neon branch lineage/ID was provided.
+- **Still not FULL_DB_RESTORE_PASS**: no restore to a point in time was conducted; other auth, history and operational tables, retention, and offsite recovery were not independently tested. No source/main branch was reset. `007_contributor_position_titles.sql` is not yet evidenced as applied.
+- Next: apply migration 007 only to the intended active Preview database branch after confirming the source branch in Neon; preserve the backup and drill branches, run the post-migration schema query and re-check counts, then test Founder position editing and regression.
