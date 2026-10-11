@@ -6,9 +6,9 @@ export const runtime="nodejs";
 export const dynamic="force-dynamic";
 type Mutation={operation:string;id?:string;title?:string;objective?:string;expectedOutput?:string;ownerId?:string;body?:string;evidenceUrl?:string;reason?:string;testAction?:string;projectId?:string|null};
 const reject=(message:string,status=400)=>Response.json({error:message},{status,headers:{"Cache-Control":"no-store"}});
-async function actorOrError():Promise<Actor|null>{
+async function actorOrError(readOnly=false):Promise<Actor|null>{
  if(!phase2Configured())return null;
- return getActor();
+ return getActor({readOnly});
 }
 function sameOrigin(req:NextRequest){
  const origin=req.headers.get("origin");
@@ -34,7 +34,7 @@ export async function GET(request:NextRequest){
  if(!["active","archive","audit"].includes(view))return reject("Geçersiz görünüm",400);
  if(!phase2Configured())return reject("Kurulum tamamlanmadı",503);
  try{
-  const actor=await actorOrError();if(!actor)return reject("Yetkisiz",401);
+  const actor=await actorOrError(true);if(!actor)return reject("Yetkisiz",401);
   if(view!=="active"&&actor.role!=="Founder")return reject("Yalnızca Kurucu erişebilir",403);
   const db=database();
   if(view==="audit"){
