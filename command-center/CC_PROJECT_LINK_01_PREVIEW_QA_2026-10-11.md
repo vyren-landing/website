@@ -206,3 +206,16 @@ User provided Neon Console "Branch overview" fields for isolated `cc-pitr-drill-
 - `LSN` section displays `Reset from parent`, but this excerpt **does not present an explicit parent timestamp, origin LSN or creation method "Time" vs "Head"**. The previously intended timestamp `18:15 Europe/Istanbul` remains **unconfirmed as historical branch point**.
 - **PARENT_MAIN_CONFIRMED** (user-observed metadata). Existing `PITR_SCHEMA_AND_COUNT_PARITY_PASS` and `PITR_CONTENT_FINGERPRINT_PARITY_PASS` remain valid for the user-reported selected branch pair. **HISTORICAL_POINT_AT_18_15_UNVERIFIED**. Identical hashes alone do not discriminate current-time branching from earlier-time branching if no intervening writes happened.
 - Next: preserve independent drill branch; do not click a restore/reset control on `main` and do not infer an exact PITR target timestamp. Current safe operational Preview work need not pause for an artificial DB mutation; full app-on-restored-branch smoke, time-travel provenance and external encrypted backup can remain separately tracked recovery assurance.
+
+
+## Complete Neon branch inventory — 2026-10-11
+
+User provided the Neon Console Branches view showing **6 branches**, one active `main` and five branches with idle compute:
+- `main` — Default, Active, displayed storage approximately 33.55 MB.
+- `backup-cc-before-007-20261011` — Parent `main`, Idle. Earlier 5-table pre-migration snapshot and recovery drill reference.
+- `cc-recovery-drill-20261011` — Parent `backup-cc-before-007-20261011`, Idle. Selected 5-table count/hash parity previously verified.
+- `cc-pitr-drill-20261011` — Parent `main`, Idle. All 18-table schema/count/fingerprint parity previously observed, but exact historical branch point still unverified.
+- `vyren-recovery-test-20261010` — Parent `main`, Idle. Independent earlier test branch, detailed restoration semantics not evidenced.
+- `branch_from_snapshot_Oct 10, 2026 2:54 PM GMT+3` — Parent shown as `-`, Idle, displayed storage about 32.65 MB. **Likely snapshot-origin by name**, but the exact snapshot ID, restored contents and relationship to active `main` are **not independently verified**. It is a branch in addition to the snapshot inventory item, not proof of complete snapshot recovery.
+
+**Disposition:** BRANCH_INVENTORY_SIX_RECORDED, NO_MAIN_RESET, EXISTING_BACKUPS_RETAINED. A snapshot-named branch is **available for non-destructive assessment without consuming another branch slot**. If testing it, select that branch in Neon SQL Editor and run `db/008_read_only_full_inventory.sql`. Compare historical data cautiously; migration 007/position metadata may postdate the Oct 10 snapshot. Do not delete branches or overwrite `main` as an unrequested cleanup. Off-provider backup and isolated application smoke testing remain open.
