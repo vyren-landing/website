@@ -20,6 +20,8 @@ export default function ProjectsPanel(){
  const [busy,setBusy]=useState(false);
  const [archived,setArchived]=useState(false);
  const [editing,setEditing]=useState<Project|null>(null);
+ const [formOpen,setFormOpen]=useState(false);
+ const [query,setQuery]=useState("");
  const [form,setForm]=useState<Form>(empty);
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
@@ -48,9 +50,10 @@ export default function ProjectsPanel(){
  },[archived]);
  useEffect(()=>{void load()},[load]);
  function begin(p?:Project){
-  setEditing(p||null);setMessage("");setHistory(null);setHistoryId(null);
+  setEditing(p||null);setFormOpen(true);setMessage("");setHistory(null);setHistoryId(null);
   setForm(p?{title:p.title,objective:p.objective,nextAction:p.nextAction,status:p.status,workstreamId:p.workstreamId||""}:empty);
  }
+ const closeForm=()=>{setFormOpen(false);setEditing(null);setForm(empty);};
  const patch=<K extends keyof Form>(key:K,value:Form[K])=>setForm(s=>({...s,[key]:value}));
  async function mutate(operation:"create"|"update"|"archive"|"restore",p?:Project){
   if(operation==="archive"&&!window.confirm("Projeyi arşivlemek istiyor musunuz? Bağlı görevler ve kayıtlar korunur."))return;
@@ -61,7 +64,7 @@ export default function ProjectsPanel(){
      {operation,id:p?.id,revision:p?.revision};
    const r=await fetch("/api/cc/projects",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
    const v=await r.json();if(!r.ok)throw Error(v.error||"Proje işlemi başarısız");
-   begin();setMessage("Proje işlemi kaydedildi; geçmiş korunuyor.");await load();
+   closeForm();setMessage("Proje işlemi kaydedildi; geçmiş korunuyor.");await load();
   }catch(e){setError(e instanceof Error?e.message:"Proje işlemi başarısız");}
   finally{setBusy(false);}
  }
@@ -102,20 +105,20 @@ export default function ProjectsPanel(){
   }catch(e){setError(e instanceof Error?e.message:"Proje aktarımı başarısız");}
   finally{setBusy(false);}
  };
+ const visibleProjects=projects.filter(p=>(p.title+" "+p.objective+" "+(p.workstreamName||"")).toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR")));
  return <section className="panel stack">
-  <h2>Projeler</h2>
+  <div className="cc-list-toolbar"><div><h2>Projeler</h2><p className="small muted">Projeleri, bağlı görevleri ve durumları yönetin.</p></div>{ready&&<button className="primary" disabled={busy} aria-expanded={formOpen} aria-controls="cc-project-editor" onClick={()=>formOpen?closeForm():begin()}>{formOpen?"Formu Kapat":"+ Yeni Proje"}</button>}</div>
   <div className="alert small">Bu alan yalnızca Command Center operasyonel projelerini yönetir. VDCP, FFA, Master veya lifecycle kabul ve yetkilerini değiştirmez. Görev tamamlanması proje ya da VDCP kabulü değildir.</div>
   {!ready&&!loading&&<div className="alert small">Proje yönetimi Preview migration 006 uygulanana kadar kullanıma kapalıdır. Diğer modüller çalışmaya devam eder.</div>}
   {error&&<div className="alert" role="alert">{error}</div>}
   {message&&<p role="status">{message}</p>}
   <div className="row" style={{gap:8,flexWrap:"wrap"}}>
    <button onClick={()=>void load()} disabled={busy||loading}>Yenile</button>
-   <button disabled={checking||busy} onClick={()=>void inspectSchema()}>{checking?"Şema kontrol ediliyor...":"Preview Şema Ön Kontrolü"}</button>
    <button onClick={()=>setArchived(x=>!x)} disabled={busy}>{archived?"Arşivi Gizle":"Arşivi de Göster"}</button>
-   {ready&&<button className="primary" disabled={busy} onClick={()=>begin()}>Yeni Proje</button>}
    {ready&&<button disabled={busy} onClick={()=>void exportProjects()}>Proje ve Bağlantıları JSON İndir</button>}
   </div>
-  {ready&&<section className="card stack">
+  {ready&&projects.length>0&&<div className="field"><label htmlFor="cc-project-search">Proje ara</label><input id="cc-project-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Başlık, amaç veya çalışma alanı"/></div>}
+  {ready&&formOpen&&<section className="card stack cc-editor" id="cc-project-editor">
    <h3>{editing?"Projeyi Düzenle":"Yeni Proje Oluştur"}</h3>
    <div className="field"><label>Proje başlığı</label><input maxLength={200} value={form.title} onChange={e=>patch("title",e.target.value)}/></div>
    <div className="field"><label>Amaç</label><textarea rows={3} maxLength={4000} value={form.objective} onChange={e=>patch("objective",e.target.value)}/></div>
@@ -129,7 +132,7 @@ export default function ProjectsPanel(){
    <div className="field"><label>Sonraki adım</label><textarea maxLength={2000} rows={2} value={form.nextAction} onChange={e=>patch("nextAction",e.target.value)}/></div>
    <div className="row" style={{gap:8,flexWrap:"wrap"}}>
     <button className="primary" disabled={busy||form.title.trim().length<2} onClick={()=>void mutate(editing?"update":"create")}>{editing?"Değişiklikleri Kaydet":"Proje Oluştur"}</button>
-    {editing&&<button disabled={busy} onClick={()=>begin()}>İptal</button>}
+    <button disabled={busy} onClick={closeForm}>İptal</button>
    </div>
   </section>}
   {preflight&&<section className="card stack" aria-label="Preview veritabanı şema kontrolü">
@@ -142,7 +145,8 @@ export default function ProjectsPanel(){
   </section>}
   {loading&&<p>Projeler yükleniyor...</p>}
   {!loading&&ready&&projects.length===0&&<p className="small muted">Henüz operasyonel proje yok. Eski kayıtlar ve görevler otomatik taşınmadı.</p>}
-  {projects.map(p=><article key={p.id} className="card stack">
+  {ready&&projects.length>0&&visibleProjects.length===0&&<p className="small muted">Aramayla eşleşen proje bulunamadı.</p>}
+  {visibleProjects.map(p=><article key={p.id} className="card stack">
    <div className="row between"><b>{p.title}</b><span className="badge">{statuses[p.status]}{p.archivedAt?" / Arşiv":""}</span></div>
    {p.objective&&<p style={{whiteSpace:"pre-wrap"}}>{p.objective}</p>}
    <p className="small muted">{p.workstreamName||"Bağımsız proje"} · {p.taskCount} bağlı görev · {p.completedTaskCount} tamamlanan görev · {p.recordCount} durum kaydı · Revizyon {p.revision}</p>
