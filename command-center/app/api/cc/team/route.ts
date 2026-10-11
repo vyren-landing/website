@@ -17,7 +17,7 @@ async function founder(){
 export async function GET(){
  if(!phase2Configured())return reject("Kurulum tamamlanmadı",503);
  try{
-  const actor=await getActor();
+  const actor=await getActor({readOnly:true});
   if(!actor)return reject("Yetkisiz",401);
   if(actor.role!=="Founder")return reject("Yalnızca Kurucu erişebilir",403);
   const db=database();
