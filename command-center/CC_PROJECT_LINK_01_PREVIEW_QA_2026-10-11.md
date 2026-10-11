@@ -118,3 +118,18 @@ User-observed Founder histories from the Preview:
 - These checks validate presented event actions, revision sequences, and displayed states; they are not independent full snapshot-by-snapshot database equivalence checks.
 - The Contributor `Yetki Güvenliği Testi` UI is extended with four new **read-only GET** checks (workstreams, opportunities, team invites/members, module-health endpoint), requiring HTTP 403 / "Yalnızca Kurucu erişebilir". No mutation or offboarding is attempted. **PENDING live Contributor 4/4 result** until a Contributor performs the test on the ready Preview.
 - No existing assignments, invitations, workstream/opportunity records, or Neon branches were altered by these changes.
+
+
+## Contributor security regression — 15/15 PASS (user-observed, 2026-10-11)
+
+User ran three controls under a VYREN Test Contributor session in the current Command Center Preview.
+
+| Group | PASS | FAIL | INCONCLUSIVE | Scope |
+|---|---:|---:|---:|---|
+| Existing Founder-only action/read authorization and own active-task scope | 8 | 0 | 0 | Audit/archive GET, denied create/approve/revise/archive/restore, active task owned by the current Contributor (1 task) |
+| Newly added Founder module GET isolation | 4 | 0 | 0 | `/api/cc/workstreams`, `/api/cc/opportunities`, `/api/cc/team`, `/api/cc/module-health`, each HTTP 403 |
+| Cross-Contributor ownership checks | 3 | 0 | 0 | Denied ownership-test accept/start/submit, HTTP 403 using the same server ownership guard; no actual task mutations |
+
+**CONTRIBUTOR_AUTHORIZATION_REGRESSION_PASS: 15 PASS / 0 FAIL / 0 INCONCLUSIVE.** Reported server errors were the expected HTTP 403, including Founder-only module reads and the other-Contributor ownership guard. No assignments, invites, records, or project data were changed by the checks.
+
+Limits: negative-path, test-session evidence only; not independent penetration testing, exhaustive role/cookie tests, newly invited Google user lifecycle/revocation test, all real mutation transitions, or full-database recovery. Preserve approved Contributor access and current isolation-test tasks. Next incomplete gate: review live invitation/revocation flows with a controlled, separate test identity (no existing user lockout) and verify operational launch readiness; separately track full Neon backup/restore/retention assurance.
