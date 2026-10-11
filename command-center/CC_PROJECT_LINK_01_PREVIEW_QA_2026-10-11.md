@@ -42,3 +42,16 @@ Founder supplied result from Contributor's own Preview interface:
   2. Verify any desired independent security and full DB recovery tests separately.
   3. Archive retained QA project if Founder wants clean operational views; do not delete history or mutate the existing isolation QA task.
 - Next development workstream: make responsible Contributor name prominent on task cards, add optional Owner filter to Founder active tasks; then separately scope VDCP integration using current canonical controls. No automatic VDCP state changes from task/project states.
+
+
+## Post-maintenance Preview regression — 2026-10-11
+
+- Deployment: branch `feature/command-center-phase2-auth-db-20261009`, commit `6bfcf3e35cdd44b7e846dac660bc022a147912a9`; Vercel reported READY and stable alias pointed to that deployment.
+- Founder `/secure → Projects → Preview Schema Preflight` observed at 2026-10-11 16:53:58 Europe/Istanbul:
+  - `schemaReady=true`; projects=1, projectEvents=4, linkedTasks=0, linkedRecords=0, orphanTaskLinks=0, orphanRecordLinks=0.
+  - Explicit UI caveat: backup not verified, migration not performed by check, live user tests separate.
+- Contributor regression on new Preview: 8 PASS / 0 FAIL / 0 INCONCLUSIVE for Founder operation/reads and own-active-task scope; 3 PASS / 0 FAIL / 0 INCONCLUSIVE for other Contributor ownership guards.
+- Founder uploaded regenerated private project JSON export stamped `2026-10-11T13:55:16.225Z`. Offline structure validation: `projects=1,events=4,taskLinks=0,recordLinks=0` matches array lengths; four event revisions contiguous 1→4 and all events reference same project; latest RESTORE snapshot matches project title and revision; project unarchived. JSON contents withheld from Git.
+- Result: **PREVIEW POST-MAINTENANCE REGRESSION PASS** for observed schema, role/ownership and project export structure.
+- Limit: This is not an exhaustive penetration test; it does not verify original user/member records or a recoverable Neon backup. It does not independently inspect DB TLS handshake. Tests of all modules and separate disaster recovery remain open.
+- Next incomplete execution point: branch backup of Preview-connected Neon database, verify isolated copy matches original counters, verify retention/recovery method, then consider migration 007 only with proven safeguard.
