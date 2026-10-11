@@ -133,3 +133,12 @@ User ran three controls under a VYREN Test Contributor session in the current Co
 **CONTRIBUTOR_AUTHORIZATION_REGRESSION_PASS: 15 PASS / 0 FAIL / 0 INCONCLUSIVE.** Reported server errors were the expected HTTP 403, including Founder-only module reads and the other-Contributor ownership guard. No assignments, invites, records, or project data were changed by the checks.
 
 Limits: negative-path, test-session evidence only; not independent penetration testing, exhaustive role/cookie tests, newly invited Google user lifecycle/revocation test, all real mutation transitions, or full-database recovery. Preserve approved Contributor access and current isolation-test tasks. Next incomplete gate: review live invitation/revocation flows with a controlled, separate test identity (no existing user lockout) and verify operational launch readiness; separately track full Neon backup/restore/retention assurance.
+
+
+## New Contributor invitation lifecycle preparation — 2026-10-11
+
+- Reviewed current `cc_team_invites` state machine, `getActor()` Google account identity binding and `/api/cc/team` Founder-only operations, without altering live invitations or members.
+- Fixed **login presentation dependency**: Google sign-in now displays when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are configured; no longer requires legacy `TEST_GOOGLE_EMAIL`. The specific test-account bypass remains separate from invitation authorization. A newly invited verified Google identity still requires matching `PENDING` invitation and gets linked to Google provider account ID + Better Auth member ID.
+- UI now correctly notes that Google Cloud OAuth Test users enrollment is needed **only while the OAuth consent app remains in Testing**, and that Command Center stores invitation grants but does not send invitation email.
+- Files modified: `app/secure/page.tsx`, `app/secure/sign-in.tsx`, `app/secure/team-panel.tsx`. No database migration.
+- **INVITE_LIFECYCLE_E2E = PENDING**: requires a distinct, controlled Google test identity, explicit Founder-issued test invite and verified login; later revocation, session invalidation and reactivation must be observed. Existing Contributor accounts and test assignments must not be used for lifecycle destructive QA. Do not claim test PASS from code review.
