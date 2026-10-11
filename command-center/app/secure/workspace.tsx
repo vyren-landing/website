@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import {SignOut} from "./sign-in";
 import ArchivePanel from "./archive-panel";
 import AuditPanel from "./audit-panel";
 import SecurityPanel from "./security-panel";
@@ -20,11 +21,46 @@ type Task={id:string;title:string;objective:string;expectedOutput:string;ownerId
 type AuditEvent={id:string;action:string;actorName:string;taskTitle:string;createdAt:string};
 type Data={actor:Actor;members:Member[];tasks:Task[];audit?:AuditEvent[];nextCursor?:string|null};
 const dictionary:Record<string,string>={"BRIEFED":"Tanımlandı","ACCEPTED":"Kabul Edildi","IN PROGRESS":"Devam Ediyor","FOUNDER REVIEW":"Kurucu İncelemesi","COMPLETED":"Tamamlandı"};
-export default function SecureWorkspace({actor}:{actor:Actor}){
+
+type View="active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview"|"context"|"projects"|"assignment"|"moduleHealth"|"qa";
+type NavItem={id:View;label:string;symbol:string};
+type NavGroup={heading:string;items:NavItem[]};
+const founderNav:NavGroup[]=[
+ {heading:"YÖNETİM",items:[
+  {id:"overview",label:"Genel Bakış",symbol:"◫"},
+  {id:"active",label:"Görevler",symbol:"✓"},
+  {id:"projects",label:"Projeler",symbol:"▣"},
+  {id:"records",label:"Proje Kayıtları",symbol:"≡"},
+  {id:"workstreams",label:"Çalışma Alanları",symbol:"▤"},
+  {id:"opportunities",label:"Fırsatlar",symbol:"◇"}
+ ]},
+ {heading:"ORGANİZASYON",items:[
+  {id:"team",label:"Ekip",symbol:"♙"},
+  {id:"assignment",label:"İş Yükü",symbol:"▥"}
+ ]},
+ {heading:"KAYNAKLAR",items:[{id:"context",label:"Proje Bağlamı",symbol:"⌑"}]},
+ {heading:"GEÇMİŞ",items:[
+  {id:"archive",label:"Görev Arşivi",symbol:"▱"},
+  {id:"audit",label:"İşlem Geçmişi",symbol:"◷"}
+ ]},
+ {heading:"SİSTEM",items:[{id:"moduleHealth",label:"Modül Sağlığı",symbol:"⚙"}]}
+];
+const contributorNav:NavGroup[]=[
+ {heading:"ÇALIŞMA ALANI",items:[{id:"active",label:"Görevlerim",symbol:"✓"}]}
+];
+const qaNav:NavGroup={heading:"GELİŞTİRME / PREVIEW",items:[{id:"qa",label:"Test ve Tanı",symbol:"⌘"}]};
+const defaultView=(founder:boolean):View=>founder?"overview":"active";
+
+export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;showQaTools?:boolean}){
  const tr=actor.role==="Founder";
  const label=(en:string,translated:string)=>tr?translated:en;
  const [data,setData]=useState<Data|null>(null);
- const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview"|"context"|"projects"|"assignment"|"moduleHealth">(tr?"overview":"active");
+ const [view,setView]=useState<View>(defaultView(tr));
+ const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+ const navGroups=tr?founderNav:showQaTools?[...contributorNav,qaNav]:contributorNav;
+ const allowedViews=navGroups.flatMap(group=>group.items.map(item=>item.id));
+ const currentItem=navGroups.flatMap(group=>group.items).find(item=>item.id===view);
+ const viewTitle=currentItem?.label||(tr?"Genel Bakış":"Görevlerim");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
@@ -50,6 +86,32 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   catch{/* Legacy standalone tasks remain available. */}
  },[tr]);
  useEffect(()=>{if(tr&&(view==="active"||view==="projects"))void loadProjects()},[loadProjects,tr,view]);
+
+ // UI routing only. This does not change or extend server permissions.
+ const navigate=useCallback((next:View)=>{
+  const valid=tr?founderNav.flatMap(g=>g.items.map(x=>x.id)):
+   [...contributorNav,...(showQaTools?[qaNav]:[])].flatMap(g=>g.items.map(x=>x.id));
+  if(!valid.includes(next))return;
+  setView(next);setMobileMenuOpen(false);
+  const url=new URL(window.location.href);
+  if(next===defaultView(tr))url.searchParams.delete("tab");
+  else url.searchParams.set("tab",next);
+  window.history.pushState({ccView:next},"",url.pathname+url.search+url.hash);
+  if(next==="active")void load();
+ },[tr,showQaTools,load]);
+ useEffect(()=>{
+  const sync=()=>{
+   const requested=new URLSearchParams(window.location.search).get("tab") as View|null;
+   const valid=tr?founderNav.flatMap(g=>g.items.map(x=>x.id)):
+    [...contributorNav,...(showQaTools?[qaNav]:[])].flatMap(g=>g.items.map(x=>x.id));
+   setView(requested&&valid.includes(requested)?requested:defaultView(tr));
+   setMobileMenuOpen(false);
+  };
+  sync();
+  window.addEventListener("popstate",sync);
+  return ()=>window.removeEventListener("popstate",sync);
+ },[tr,showQaTools]);
+
  const action=async(operation:string,fields:Record<string,string>)=>{
   setBusy(true);setError("");
   try{
@@ -62,35 +124,58 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   }catch(e){setError(e instanceof Error?e.message:"Operation failed");}
   finally{setBusy(false);}
  };
- return <div className="stack">
-  <div className="alert">Bu alan yalnızca operasyonel görevler içindir. Canonical lifecycle, FFA, ekonomi, treasury ve governance yetkisi taşımaz.</div>
-  {error&&<div className="alert" role="alert">{error}</div>}
-  {!tr&&<SecurityPanel actorId={actor.id}/>}
-  {tr&&<div className="row" style={{gap:8,flexWrap:"wrap"}}>
-    <button className={view==="overview"?"primary":undefined} disabled={view==="overview"||busy} onClick={()=>setView("overview")}>Yönetim Özeti</button>
-    <button className={view==="context"?"primary":undefined} disabled={view==="context"||busy} onClick={()=>setView("context")}>Proje Bağlamı</button>
-    <button className={view==="active"?"primary":undefined} disabled={view==="active"||busy} onClick={()=>{setView("active");void load()}}>Aktif Görevler</button>
-    <button className={view==="archive"?"primary":undefined} disabled={view==="archive"||busy} onClick={()=>setView("archive")}>Görev Arşivi</button>
-    <button className={view==="audit"?"primary":undefined} disabled={view==="audit"||busy} onClick={()=>setView("audit")}>İşlem Geçmişi</button>
-    <button className={view==="assignment"?"primary":undefined} disabled={view==="assignment"||busy} onClick={()=>setView("assignment")}>Görev Dağılımı</button>
-    <button className={view==="projects"?"primary":undefined} disabled={view==="projects"||busy} onClick={()=>setView("projects")}>Projeler</button>
-    <button className={view==="records"?"primary":undefined} disabled={view==="records"||busy} onClick={()=>setView("records")}>Proje Kayıtları</button>
-    <button className={view==="workstreams"?"primary":undefined} disabled={view==="workstreams"||busy} onClick={()=>setView("workstreams")}>Çalışma Alanları</button>
-    <button className={view==="team"?"primary":undefined} disabled={view==="team"||busy} onClick={()=>setView("team")}>Ekip Yönetimi</button>
-    <button className={view==="opportunities"?"primary":undefined} disabled={view==="opportunities"||busy} onClick={()=>setView("opportunities")}>Fırsatlar ve İş Ortaklıkları</button>
-    <button className={view==="moduleHealth"?"primary":undefined} disabled={view==="moduleHealth"||busy} onClick={()=>setView("moduleHealth")}>Modül Kontrolü</button>
-  </div>}
+ return <div className="shell cc-live-shell">
+  <aside className={"side cc-live-side"+(mobileMenuOpen?" is-open":"")} id="cc-live-nav">
+   <div className="cc-live-brand">◈ VYREN</div>
+   <p className="cc-live-brand-sub">COMMAND CENTER</p>
+   <nav className="cc-live-nav" aria-label={tr?"Kurucu navigasyonu":"Katkı sağlayan navigasyonu"}>
+    {navGroups.map(group=><div className="cc-live-nav-group" key={group.heading}>
+     <p className="cc-live-nav-heading">{group.heading}</p>
+     {group.items.map(item=><button key={item.id} type="button"
+       className={"cc-live-nav-item"+(view===item.id?" is-active":"")}
+       aria-current={view===item.id?"page":undefined}
+       disabled={busy}
+       onClick={()=>navigate(item.id)}>
+       <span className="cc-live-nav-symbol" aria-hidden="true">{item.symbol}</span>
+       <span>{item.label}</span>
+     </button>)}
+    </div>)}
+   </nav>
+   <div className="cc-live-profile">
+    <span className="cc-live-avatar" aria-hidden="true">{actor.name.trim().charAt(0).toLocaleUpperCase("tr-TR")||"V"}</span>
+    <div className="cc-live-profile-info"><b>{actor.name}</b><span>{tr?"Kurucu":"Katkı Sağlayan"}</span></div>
+   </div>
+   <div className="cc-live-signout"><SignOut/></div>
+  </aside>
+  <main className="main cc-live-main">
+   <div className="cc-live-mobile-top">
+    <b>◈ VYREN <span className="small muted">COMMAND CENTER</span></b>
+    <button type="button" aria-controls="cc-live-nav" aria-expanded={mobileMenuOpen}
+      onClick={()=>setMobileMenuOpen(s=>!s)}>{mobileMenuOpen?"Menüyü Kapat":"☰ Menü"}</button>
+   </div>
+   <header className="cc-live-header">
+    <div><p className="cc-live-eyebrow">{tr?"KURUCU ÇALIŞMA ALANI":"KATKI SAĞLAYAN ÇALIŞMA ALANI"}</p>
+     <h1>{viewTitle}</h1>
+     <p className="muted small">Operasyonel çalışma alanı · Onaylı hesap erişimi</p>
+    </div>
+    <span className="cc-live-scope">Operasyonel · Canonical yetki yok</span>
+   </header>
+   <div className="stack cc-live-content">
+    <p className="cc-live-disclaimer">Bu çalışma alanındaki işlemler VYREN protocol, ekonomi, FFA, governance veya lifecycle kararlarını değiştirmez.</p>
+    {error&&<div className="alert" role="alert">{error}</div>}
+    {!tr&&showQaTools&&view==="qa"&&<SecurityPanel actorId={actor.id}/>}
+
   {view==="active"&&<button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>}
-  {tr&&view==="archive"&&<ArchivePanel onRestore={()=>{setView("active");void load()}}/>}
+  {tr&&view==="archive"&&<ArchivePanel onRestore={()=>navigate("active")}/>}
   {tr&&view==="audit"&&<AuditPanel/>}
   {tr&&view==="team"&&<TeamPanel onChange={()=>void load()}/>}
   {tr&&view==="projects"&&<ProjectsPanel/>}
   {tr&&view==="assignment"&&<AssignmentReportPanel/>}
   {tr&&view==="moduleHealth"&&<ModuleHealthPanel/>}
   {tr&&view==="records"&&<ProjectRecordsPanel/>}
-  {tr&&view==="workstreams"&&<WorkstreamsPanel openRecords={()=>setView("records")}/>}
+  {tr&&view==="workstreams"&&<WorkstreamsPanel openRecords={()=>navigate("records")}/>}
   {tr&&view==="opportunities"&&<OpportunitiesPanel/>}
-  {tr&&view==="overview"&&<OverviewPanel openView={setView}/>}
+  {tr&&view==="overview"&&<OverviewPanel openView={navigate}/>}
   {tr&&view==="context"&&<ProjectContextPanel/>}
   {tr&&view==="active"&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
@@ -140,5 +225,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
       </article>;
     })}
   </section>}
+   </div>
+  </main>
  </div>;
 }
