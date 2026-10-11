@@ -15,9 +15,20 @@ const checks=[
  {key:"restore",name:"İzinsiz geri getirme engeli",method:"POST",path:"/api/cc",operation:"restore",expected:deniedMessage},
 ] as const;
 
+// These four requests are strictly GET and use the same read-only actor lookup
+// as the protected Founder endpoints. A denied response is the expected PASS.
+const moduleChecks=[
+ {key:"workstreams",name:"Çalışma Alanları erişim engeli",path:"/api/cc/workstreams"},
+ {key:"opportunities",name:"Fırsatlar erişim engeli",path:"/api/cc/opportunities"},
+ {key:"team",name:"Ekip ve Davet kayıtları erişim engeli",path:"/api/cc/team"},
+ {key:"module-health",name:"Modül Sağlık Raporu erişim engeli",path:"/api/cc/module-health"}
+] as const;
+
 export default function SecurityPanel({actorId}:{actorId:string}){
  const [running,setRunning]=useState(false);
  const [results,setResults]=useState<Check[]>([]);
+ const [moduleRunning,setModuleRunning]=useState(false);
+ const [moduleResults,setModuleResults]=useState<Check[]>([]);
  const [crossRunning,setCrossRunning]=useState(false);
  const [crossResults,setCrossResults]=useState<Check[]>([]);
  const execute=async()=>{
@@ -60,6 +71,29 @@ export default function SecurityPanel({actorId}:{actorId:string}){
    setResults([...collected]);
   }finally{setRunning(false);}
  };
+ const executeModuleChecks=async()=>{
+  if(running||crossRunning||moduleRunning)return;
+  setModuleRunning(true);setModuleResults([]);
+  const collected:Check[]=[];
+  try{
+   for(const check of moduleChecks){
+    try{
+     const response=await fetch(check.path,{method:"GET",cache:"no-store",credentials:"same-origin"});
+     const body=await response.json();
+     const denied=response.status===403&&body?.error==="Yalnızca Kurucu erişebilir";
+     collected.push({
+      key:check.key,name:check.name,verdict:denied?"pass":"fail",
+      details:denied?"HTTP 403 - Modül yalnızca Kurucuya açık":
+       `Beklenmeyen yanıt: HTTP ${response.status}, ${typeof body?.error==="string"?body.error:"Yanıt doğrulanamadı"}`
+     });
+    }catch(e){
+     collected.push({key:check.key,name:check.name,verdict:"fail",
+      details:e instanceof Error?e.message:"Kontrol isteği başarısız"});
+    }
+    setModuleResults([...collected]);
+   }
+  }finally{setModuleRunning(false);}
+ };
  const executeCross=async()=>{
   if(running||crossRunning)return;
   setCrossRunning(true);setCrossResults([]);
@@ -94,6 +128,8 @@ export default function SecurityPanel({actorId}:{actorId:string}){
    }
   }finally{setCrossRunning(false);}
  };
+ const modulePass=moduleResults.filter(r=>r.verdict==="pass").length;
+ const moduleFail=moduleResults.filter(r=>r.verdict==="fail").length;
  const crossPass=crossResults.filter(r=>r.verdict==="pass").length;
  const crossFail=crossResults.filter(r=>r.verdict==="fail").length;
  const crossUnknown=crossResults.filter(r=>r.verdict==="inconclusive").length;
@@ -114,6 +150,20 @@ export default function SecurityPanel({actorId}:{actorId:string}){
     <p className="small muted">{result.details}</p>
    </div>)}
   </div>}
+  <div className="card stack">
+   <h3>Kurucu Modülleri Erişim İzolasyonu</h3>
+   <p className="small muted">Contributor oturumuyla Çalışma Alanları, Fırsatlar, Ekip Yönetimi ve Modül Sağlık Raporu için yalnızca GET istekleri gönderir. Dört isteğin de HTTP 403 ile engellenmesi beklenir. Kayıt, davet veya görev değiştirmez.</p>
+   <button className="primary" disabled={running||crossRunning||moduleRunning} onClick={()=>void executeModuleChecks()}>
+    {moduleRunning?"Modül erişimleri kontrol ediliyor...":"Modül Erişimlerini Test Et"}
+   </button>
+   {moduleResults.length>0&&<div className="stack" aria-live="polite">
+    <p className="small">Başarılı: {modulePass} · Başarısız: {moduleFail}{moduleRunning?" · Test sürüyor":""}</p>
+    {moduleResults.map(result=><div className="card stack" key={result.key}>
+     <div className="row between"><b>{result.name}</b><span className={result.verdict==="pass"?"badge good":"badge warn"}>{result.verdict==="pass"?"PASS":"FAIL"}</span></div>
+     <p className="small muted">{result.details}</p>
+    </div>)}
+   </div>}
+  </div>
   <div className="card stack">
    <h3>İki Contributor Arasında İşlem Yetkisi Testi</h3>
    <p className="small muted">Başka Contributor'a ait aktif CC-ISOLATION test görevi üzerinde kabul, başlatma ve rapor gönderme için kullanılan ortak sahiplik kuralını sunucuda salt okunur şekilde doğrular. Başka kullanıcının görev bilgilerini göstermez; hiçbir görev veya rapor değişmez.</p>
