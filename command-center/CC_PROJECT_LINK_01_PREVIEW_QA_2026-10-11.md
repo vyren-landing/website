@@ -342,3 +342,13 @@ Full Neon reference digests matched again with UTC-normalized local session:
   - `session`: `1aba574fab2a657d491bbfc0c24a5503`
   - `user`: `2d8eb8bfbffdb3d17cc2fcce827ceaa2`
   - `verification`: `d41d8cd98f00b204e9800998ecf8427e`
+
+
+## User-confirmed Google Drive copy of validated October 11 encrypted backup
+
+- After independent WSL PostgreSQL restore and all 18 mandatory table UTC-normalized row-content fingerprints matched Neon `main`, the Founder confirmed uploading the tested GPG-encrypted daily backup to Google Drive.
+- File intended/uploaded by user: `VYREN_CC_daily_20261011_185618_539761457.dump.gpg` (locally ~25 KB, Linux mode 0600; encrypted GPG archive). Backup identity from the user's already verified local file, not a Google-side file ID.
+- **OFF_DEVICE_ENCRYPTED_BACKUP_USER_CONFIRMED (user-attested)**. Connected Google Drive search for the exact basename and suggested folder name returned no files, so a Drive-side file ID, digest parity, uploaded filename/size, folder permissions, and independent retrievability remain **NOT CONNECTOR_VERIFIED**. This does **not** prove the upload failed or files were deleted; linked Drive access may be a different account/scope.
+- The 2026-10-11 off-provider local restore validation is independently **OFF_PROVIDER_DATABASE_RESTORE_DATA_PARITY_PASS** (18/18 fingerprints after UTC). The new user-attested Drive copy provides intended computer-independent redundancy; do not label it `REMOTE_VERIFIED_CONTENT_PASS` until Drive-side download/checksum validation is actually performed.
+- The existing Windows Scheduled Task runs the WSL **local encrypted daily backup**; automated daily Drive replication and periodic restore from a Drive-downloaded copy remain separate optional improvements. No launch self-lock or unnecessary provider dependency.
+- Never copy plaintext dump, passwords, DB connection URL, or GPG secret key into GitHub, QA report, screenshots or chat. Do not delete existing WSL backups or Neon branches.
