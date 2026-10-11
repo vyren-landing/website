@@ -10,7 +10,7 @@ const validUid=(s:string)=>s.length>0&&s.length<=160;
 export async function GET(request:NextRequest){
  if(!phase2Configured())return reject("Preview yapılandırılmadı",503);
  try{
-  const actor=await getActor();if(!actor)return reject("Yetkisiz",401);
+  const actor=await getActor({readOnly:true});if(!actor)return reject("Yetkisiz",401);
   if(actor.role!=="Founder")return reject("Yalnızca Kurucu erişebilir",403);
   const db=database();
   const schema=await db.query<{positionReady:boolean}>(
