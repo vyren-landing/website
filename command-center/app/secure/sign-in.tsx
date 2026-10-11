@@ -18,11 +18,11 @@ export function SignIn({name,googleEnabled=false,canonicalLoginUrl}:{name?:strin
   <p>Yalnızca Founder tarafından onaylanmış hesaplar erişebilir. Google veya GitHub ile giriş yapmak tek başına yetki vermez.</p>
   {name&&<p className="muted">Giriş yapıldı, fakat bu hesap yetkilendirilmiş ekip listesinde değil.</p>}
   {canonicalLoginUrl?<div className="stack">
-   <p>Bu Preview dağıtım adresi OAuth için tanımlı giriş adresi değil. GitHub girişini sabit Command Center adresinden başlatın.</p>
+   <p>Bu Preview dağıtım adresi OAuth için tanımlı giriş adresi değil. Google veya GitHub girişini sabit Command Center adresinden başlatın.</p>
    <a className="button primary" href={canonicalLoginUrl}>Doğru Command Center giriş adresine geç</a>
   </div>:<>
    <button className="primary" disabled={busy} onClick={()=>void start("github")}>GitHub ile giriş yap</button>
-   {googleEnabled&&<button disabled={busy} onClick={()=>void start("google")}>Google ile giriş yap (test Contributor)</button>}
+   {googleEnabled&&<button disabled={busy} onClick={()=>void start("google")}>Google ile giriş yap (onaylı Contributor)</button>}
   </>}
   {error&&<p role="alert">{error}</p>}
  </div>;
