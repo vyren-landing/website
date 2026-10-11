@@ -9,6 +9,7 @@ const date=(value:string)=>new Date(value).toLocaleString("tr-TR");
 export default function TeamPanel({onChange}:{onChange:()=>void}){
  const [data,setData]=useState<TeamData|null>(null);
  const [email,setEmail]=useState("");
+ const [showInviteForm,setShowInviteForm]=useState(false);
  const [positionDrafts,setPositionDrafts]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [loading,setLoading]=useState(true);
@@ -32,7 +33,7 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
    const response=await fetch("/api/cc/team",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({operation,...fields})});
    const result=await response.json();
    if(!response.ok)throw new Error(result.error||"Ekip işlemi başarısız");
-   if(operation==="invite")setEmail("");
+   if(operation==="invite"){setEmail("");setShowInviteForm(false);}
    setMessage(operation==="invite"?"Davet erişim kaydı oluşturuldu. E-posta gönderilmedi.":"İşlem başarıyla kaydedildi.");
    await load();
    onChange();
@@ -45,15 +46,16 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
   {error&&<div className="alert" role="alert">{error}</div>}
   {message&&<div className="alert" role="status">{message}</div>}
   <button disabled={loading||busy} onClick={()=>void load()}>Ekip Listesini Yenile</button>
-  <div className="card stack">
+  <div className="cc-list-toolbar"><div><h3>Mevcut Ekip</h3><p className="small muted">Onaylı hesaplar, pozisyonlar ve erişim durumu.</p></div><button className="primary" disabled={busy||loading} aria-expanded={showInviteForm} aria-controls="cc-invite-editor" onClick={()=>setShowInviteForm(x=>!x)}>{showInviteForm?"Formu Kapat":"+ Davet Kaydı"}</button></div>
+  {showInviteForm&&<div className="card stack cc-editor" id="cc-invite-editor">
    <h3>Google Contributor İçin Davet Kaydı</h3>
    <p className="small muted">Bu işlem otomatik e-posta göndermez. Google OAuth uygulaması Testing durumundaysa davet edilen hesap Google Cloud OAuth Test users listesinde de bulunmalıdır. Davet kaydı tek başına erişim vermez; hesap ilk doğrulanmış Google girişinde bağlanır. Giriş bağlantısını kişiye ayrıca iletin.</p>
    <div className="field">
     <label htmlFor="cc-team-email">Davet edilecek Google e-posta adresi</label>
     <input id="cc-team-email" type="email" autoComplete="off" value={email} maxLength={254} placeholder="ornek@gmail.com" onChange={e=>setEmail(e.target.value)}/>
    </div>
-   <button className="primary" disabled={busy||loading||email.trim().length<5} onClick={()=>void act("invite",{email})}>Erişim Daveti Oluştur</button>
-  </div>
+   <div className="row"><button className="primary" disabled={busy||loading||email.trim().length<5} onClick={()=>void act("invite",{email})}>Erişim Daveti Oluştur</button><button disabled={busy} onClick={()=>setShowInviteForm(false)}>İptal</button></div>
+  </div>}
   <h3>Mevcut Contributor Hesapları</h3>
   {loading&&!data&&<p>Yükleniyor...</p>}
   {data?.members.length===0&&<p>Henüz kayıtlı Contributor yok.</p>}
