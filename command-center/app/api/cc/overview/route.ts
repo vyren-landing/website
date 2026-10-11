@@ -13,7 +13,7 @@ const normalize=(rows:CountRow[])=>Object.fromEntries(rows.map(r=>[r.status,Numb
 export async function GET(){
  if(!phase2Configured())return reject("Command Center Preview etkin değil",503);
  try{
-  const actor=await getActor();
+  const actor=await getActor({readOnly:true});
   if(!actor)return reject("Yetkisiz",401);
   if(actor.role!=="Founder")return reject("Yalnızca Kurucu erişebilir",403);
   const client=await database().connect();
