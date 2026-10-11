@@ -13,6 +13,7 @@ export default function OpportunitiesPanel(){
  const [archived,setArchived]=useState(false),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true);
  const [error,setError]=useState(""),[message,setMessage]=useState("");
  const [editing,setEditing]=useState<Opportunity|null>(null),[form,setForm]=useState<Form>(empty);
+ const [formOpen,setFormOpen]=useState(false),[query,setQuery]=useState("");
  const [historyId,setHistoryId]=useState<string|null>(null),[history,setHistory]=useState<Event[]|null>(null);
  const load=useCallback(async()=>{
   setLoading(true);setError("");
@@ -24,7 +25,8 @@ export default function OpportunitiesPanel(){
   finally{setLoading(false);}
  },[archived]);
  useEffect(()=>{void load()},[load]);
- const edit=(o:Opportunity)=>{setEditing(o);setForm({title:o.title,organization:o.organization,workstream:o.workstream,category:o.category,stage:o.stage,summary:o.summary,nextAction:o.nextAction,evidenceUrl:o.evidenceUrl||""});};
+ const edit=(o:Opportunity)=>{setFormOpen(true);setEditing(o);setForm({title:o.title,organization:o.organization,workstream:o.workstream,category:o.category,stage:o.stage,summary:o.summary,nextAction:o.nextAction,evidenceUrl:o.evidenceUrl||""});};
+ const resetForm=()=>{setFormOpen(false);setEditing(null);setForm(empty);};
  const patch=(key:keyof Form,value:string)=>setForm(s=>({...s,[key]:value}));
  const mutate=async(operation:string,o?:Opportunity)=>{
   if(operation==="archive"&&!window.confirm("Fırsat arşivlensin mi? Geçmiş silinmez."))return;
@@ -33,7 +35,7 @@ export default function OpportunitiesPanel(){
    const payload=operation==="create"?{operation,...form}:operation==="update"?{operation,...form,id:editing?.id,revision:editing?.revision}:{operation,id:o?.id,revision:o?.revision};
    const r=await fetch("/api/cc/opportunities",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify(payload)});
    const x=await r.json();if(!r.ok)throw new Error(x.error||"İşlem başarısız");
-   setEditing(null);setForm(empty);setHistoryId(null);setHistory(null);
+   resetForm();setHistoryId(null);setHistory(null);
    setMessage("İşlem kaydedildi; geçmiş korundu.");await load();
   }catch(e){setError(e instanceof Error?e.message:"İşlem başarısız");}
   finally{setBusy(false);}
@@ -46,8 +48,9 @@ export default function OpportunitiesPanel(){
    const x=await r.json();if(!r.ok)throw new Error(x.error||"Geçmiş alınamadı");setHistory(x.events||[]);
   }catch(e){setError(e instanceof Error?e.message:"Geçmiş alınamadı");}
  };
+ const visibleRows=rows.filter(o=>(o.title+" "+o.organization+" "+o.workstream+" "+o.nextAction).toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR")));
  return <section className="panel stack">
-  <h2>Fırsatlar ve İş Ortaklıkları</h2>
+  <div className="cc-list-toolbar"><div><h2>Fırsatlar ve İş Ortaklıkları</h2><p className="small muted">Temasları, yanıtları ve sonraki işlemleri takip edin.</p></div>{ready&&<button className="primary" disabled={busy} aria-expanded={formOpen} aria-controls="cc-opportunity-editor" onClick={()=>{if(formOpen)resetForm();else{setEditing(null);setForm(empty);setFormOpen(true);}}}>{formOpen?"Formu Kapat":"+ Yeni Fırsat"}</button>}</div>
   <div className="alert small">Bu ekran yalnızca operasyonel takip içindir. Aşama adları sözleşme, bağlayıcı teklif, fon, borsa listeleme veya canonical VYREN kararı anlamına gelmez. Doğrulanmamış dış yanıtları gerçekmiş gibi kaydetmeyin.</div>
   <div className="row" style={{gap:8,flexWrap:"wrap"}}>
    <button disabled={busy||loading} onClick={()=>void load()}>Yenile</button>
@@ -56,7 +59,8 @@ export default function OpportunitiesPanel(){
   {error&&<div className="alert" role="alert">{error}</div>}
   {message&&<p role="status">{message}</p>}
   {!loading&&!ready&&<p className="alert small">Preview migration 005 henüz uygulanmadı. Mevcut modüller çalışmaya devam ediyor.</p>}
-  {ready&&<section className="card stack">
+  {ready&&rows.length>0&&<div className="field"><label htmlFor="cc-opportunity-search">Fırsat ara</label><input id="cc-opportunity-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Fırsat, kurum veya sonraki işlem"/></div>}
+  {ready&&formOpen&&<section className="card stack cc-editor" id="cc-opportunity-editor">
    <h3>{editing?"Fırsatı Güncelle":"Yeni Operasyonel Fırsat"}</h3>
    {([["title","Fırsat Başlığı *",200],["organization","Kurum / Karşı Taraf",200],["workstream","Çalışma Alanı *",120]] as const).map(([key,label,max])=><div className="field" key={key}>
     <label htmlFor={"op-"+key}>{label}</label>
@@ -79,11 +83,12 @@ export default function OpportunitiesPanel(){
    </div>
    <div className="row" style={{gap:8,flexWrap:"wrap"}}>
     <button className="primary" disabled={busy||form.title.trim().length<2||form.workstream.trim().length<2} onClick={()=>void mutate(editing?"update":"create")}>{busy?"Kaydediliyor...":editing?"Güncellemeyi Kaydet":"Fırsatı Kaydet"}</button>
-    {editing&&<button disabled={busy} onClick={()=>{setEditing(null);setForm(empty);}}>İptal</button>}
+    <button disabled={busy} onClick={resetForm}>İptal</button>
    </div>
   </section>}
   {ready&&rows.length===0&&<p>Henüz operasyonel fırsat kaydı yok. Önceki VYREN görüşmeleri otomatik olarak içe aktarılmadı.</p>}
-  {ready&&rows.map(o=><article className="card stack" key={o.id}>
+  {ready&&rows.length>0&&visibleRows.length===0&&<p className="small muted">Aramayla eşleşen fırsat bulunamadı.</p>}
+  {ready&&visibleRows.map(o=><article className="card stack" key={o.id}>
    <div className="row between"><b>{o.title}</b><span className="badge">{o.archivedAt?"ARŞİV":stageTR[stages.indexOf(o.stage)]||o.stage}</span></div>
    <p className="small muted">{categoryTR[categories.indexOf(o.category)]||o.category} · {o.workstream} · {o.organization} · Revizyon {o.revision}</p>
    {o.summary&&<p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{o.summary}</p>}
