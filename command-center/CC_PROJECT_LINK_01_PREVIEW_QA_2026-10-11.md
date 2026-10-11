@@ -276,3 +276,11 @@ The terminal reported the GPG recipient fingerprint summary for RSA key `A6AC915
 **Still to confirm**: 18 required restored tables present and row-content fingerprints of the newly restored data; TOC showed 19 TABLE DATA entries, including extra `playing_with_neon`. For parity, sample counts and deterministic whole-row fingerprints against known source point (not blindly against earlier source due to time drift). Production runtime restoration/app authentication and separately stored off-device backup remain distinct tasks.
 
 **Do not** drop local restore database until test evidence has been captured or overwrite the encrypted archive. Never operate on Neon `main`.
+
+
+## Local off-provider restore table-presence PASS — 2026-10-11
+
+- After successful GPG-streamed local PostgreSQL 18 `pg_restore` (exit 0), founder ran `sudo -u postgres psql -h /var/run/postgresql -d vyren_cc_restore_20261011 -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';"`.
+- Returned `19` local `public` base tables. Encrypted backup TOC also held 19 TABLE DATA entries: all 18 required Better Auth + Command Center tables and the extra `playing_with_neon` table.
+- **LOCAL_RESTORE_TABLE_PRESENCE_19_PASS (user observed)** and **LOCAL_ENCRYPTED_ARCHIVE_RESTORE_EXECUTION_PASS** remain established. This is an independent WSL PostgreSQL target; Neon `main` was not selected or modified by restore.
+- Still unverified: per-table restored row counts/fingerprints against the backup-time source baseline, FK/application behavior, remote off-device copy of encrypted archive, and isolated cloud application recovery. Next control: non-mutating local PostgreSQL per-table row-count query.
