@@ -11,6 +11,7 @@ import OverviewPanel from "./overview-panel";
 import ProjectContextPanel from "./project-context-panel";
 import ProjectsPanel from "./projects-panel";
 import AssignmentReportPanel from "./assignment-report-panel";
+import ModuleHealthPanel from "./module-health-panel";
 type Actor={id:string;name:string;role:"Founder"|"Contributor"};
 type Member={id:string;name:string;role:string};
 type Submission={id:string;body:string;evidenceUrl:string|null;createdAt:string};
@@ -23,7 +24,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
  const tr=actor.role==="Founder";
  const label=(en:string,translated:string)=>tr?translated:en;
  const [data,setData]=useState<Data|null>(null);
- const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview"|"context"|"projects"|"assignment">(tr?"overview":"active");
+ const [view,setView]=useState<"active"|"archive"|"audit"|"team"|"records"|"workstreams"|"opportunities"|"overview"|"context"|"projects"|"assignment"|"moduleHealth">(tr?"overview":"active");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
@@ -77,6 +78,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
     <button className={view==="workstreams"?"primary":undefined} disabled={view==="workstreams"||busy} onClick={()=>setView("workstreams")}>Çalışma Alanları</button>
     <button className={view==="team"?"primary":undefined} disabled={view==="team"||busy} onClick={()=>setView("team")}>Ekip Yönetimi</button>
     <button className={view==="opportunities"?"primary":undefined} disabled={view==="opportunities"||busy} onClick={()=>setView("opportunities")}>Fırsatlar ve İş Ortaklıkları</button>
+    <button className={view==="moduleHealth"?"primary":undefined} disabled={view==="moduleHealth"||busy} onClick={()=>setView("moduleHealth")}>Modül Kontrolü</button>
   </div>}
   {view==="active"&&<button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>}
   {tr&&view==="archive"&&<ArchivePanel onRestore={()=>{setView("active");void load()}}/>}
@@ -84,6 +86,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
   {tr&&view==="team"&&<TeamPanel onChange={()=>void load()}/>}
   {tr&&view==="projects"&&<ProjectsPanel/>}
   {tr&&view==="assignment"&&<AssignmentReportPanel/>}
+  {tr&&view==="moduleHealth"&&<ModuleHealthPanel/>}
   {tr&&view==="records"&&<ProjectRecordsPanel/>}
   {tr&&view==="workstreams"&&<WorkstreamsPanel openRecords={()=>setView("records")}/>}
   {tr&&view==="opportunities"&&<OpportunitiesPanel/>}
