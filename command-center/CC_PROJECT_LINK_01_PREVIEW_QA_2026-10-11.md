@@ -368,3 +368,17 @@ Founder reported downloading the manually uploaded encrypted daily database back
 - Navigation updates `?tab=` on same /secure URL, supports browser back/forward, role-valid tab IDs only and mobile expandable navigation. Sidebar uses the same live Better Auth actor and existing data panels; no new DB schema/migrations, account changes, canonical actions or mutations were included.
 - No explicit release/promotion to production requested. **D1_IMPLEMENTED_SOURCE_PENDING_BUILD_AND_LIVE_UI_QA**: Vercel deployment inspection did not yet show a READY build of commit `94974fa`; do not claim visually QA PASS until a corresponding Preview build and Founder/Contributor smoke checks are observed.
 - Pending QA checklist: Preview READY at exact commit, sidebar navigation for Founder, ?tab deep link + browser back, mobile menu widths, Contributor own task flow (no QA panel on entry; Preview Test ve Tanı accessible), no security regression, no unintended error on exiting/reentering modules.
+
+
+## D2 list-first operational UI and on-demand forms
+
+D2 UI-only source changes were committed to Preview feature branch after D1:
+- `workspace.tsx`: Founder task creation panel is hidden until `+ Yeni Görev` is clicked, closes after a successful create, and remains available without changing the API. Contributor still receives task list by default.
+- `projects-panel.tsx`: project list and search shown first, project editor opened using `+ Yeni Proje` or `Düzenle`, closed on cancel or successful save. Existing project links/detail/history/archive/export functionality retained.
+- `project-records-panel.tsx`: existing records and status groups first, keyword search added, create/update editor on demand, archive/revision history/link controls retained.
+- `opportunities-panel.tsx`: list-first opportunities with search, on-demand create/edit form, external contact stages and historical actions retained.
+- `team-panel.tsx`: existing Contributor list shown first; Google invite-record editor opened only by `+ Davet Kaydı`; no automatic email functionality added.
+- `globals.css`: compact responsive toolbar and editor styling.
+- UI controls do not change server permissions, API contracts, migration state, Founder/Contributor rights, authentication sessions, Neon records or canonical governance.
+
+**Status: D2_SOURCE_IMPLEMENTED; NEXTJS_BUILD_NOT_YET_VERIFIED; PREVIEW_VISUAL_QA_PENDING.** Vercel create deployment returned 402 `api-deployments-free-per-day` for this project/team. Do not mark a READY deployment or visual QA PASS on an unbuilt feature commit. No upgrade/payment or production promotion was authorized; preserving existing live Preview and Git branch.
