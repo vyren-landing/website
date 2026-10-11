@@ -97,3 +97,14 @@ Next: perform a **non-destructive recovery drill** by creating a separate test b
 - **MIGRATION_007_SCHEMA_PASS**; **POSITION_SAVE_AND_DISPLAY_PASS**; **FOUNDER_ASSIGNMENT_GROUPING_PASS** on submitted results.
 - Nuance: 5 total database task rows vs 2 shown by report need not differ incorrectly; UI groups active/non-archived Contributor assignments. Archived/unassigned/other-owner distribution not independently inspected.
 - Remaining scope: independent Neon retention and full-database restore assurance; additional live regression across opportunities/workstreams/invitations; independent security assessment. No transfer of governance/canonical lifecycle authority from the operational position field.
+
+
+## Founder module health structural scan — 2026-10-11
+
+- User ran the new Founder-only, read-only **Modül Sağlık Kontrolü** at 2026-10-11 17:33:57 Europe/Istanbul on the Command Center Preview application.
+- Schema: `workstreams=ready`, `opportunities=ready`, `invites=ready`, `position=ready`.
+- Counts: `cc_workstreams=1`, `cc_workstream_events=3`; `cc_opportunities=1`, `cc_opportunity_events=4`; `cc_team_invites=1` (`pending=0`, `active=1`, `revoked=0`).
+- Integrity checks: duplicate workstream revisions=0, duplicate opportunity revisions=0, orphan workstream events=0, orphan opportunity events=0, mismatched invite identity link pairs=0.
+- **MODULE_HEALTH_STRUCTURAL_PASS**. The scan exposes counts and integrity flags only and does not alter records.
+- Not yet proven by this scan: actual CREATE/UPDATE/ARCHIVE/RESTORE transition correctness, chronological event continuity and snapshot agreement, newly extended Contributor forbidden-route checks, credential-offboarding, or a full DB restore.
+- Next: compare read-only event-action/revision sequences, then extend Contributor-only safe 403 regression checks for workstreams, opportunities, team, and module health; preserve existing records and identity bindings.
