@@ -58,6 +58,20 @@ export default function ProjectsPanel(){
    const v=await r.json();if(!r.ok)throw Error(v.error||"Geçmiş bulunamadı");setHistory(v.events||[]);
   }catch(e){setError(e instanceof Error?e.message:"Geçmiş alınamadı");}
  }
+ const exportProjects=async()=>{
+  setBusy(true);setError("");
+  try{
+   const r=await fetch("/api/cc/projects/export",{credentials:"same-origin",cache:"no-store"});
+   if(!r.ok){const v=await r.json();throw Error(v.error||"Proje aktarımı başarısız");}
+   const blob=await r.blob();const url=window.URL.createObjectURL(blob);
+   const a=document.createElement("a");a.href=url;
+   a.download="vyren-command-center-projects-"+new Date().toISOString().slice(0,10)+".json";
+   document.body.appendChild(a);a.click();a.remove();
+   window.setTimeout(()=>window.URL.revokeObjectURL(url),3000);
+   setMessage("Proje, bağlantı ve revizyon verileri bu cihaza indirildi; dosyayı güvenli saklayın.");
+  }catch(e){setError(e instanceof Error?e.message:"Proje aktarımı başarısız");}
+  finally{setBusy(false);}
+ };
  return <section className="panel stack">
   <h2>Projeler</h2>
   <div className="alert small">Bu alan yalnızca Command Center operasyonel projelerini yönetir. VDCP, FFA, Master veya lifecycle kabul ve yetkilerini değiştirmez. Görev tamamlanması proje ya da VDCP kabulü değildir.</div>
@@ -68,6 +82,7 @@ export default function ProjectsPanel(){
    <button onClick={()=>void load()} disabled={busy||loading}>Yenile</button>
    <button onClick={()=>setArchived(x=>!x)} disabled={busy}>{archived?"Arşivi Gizle":"Arşivi de Göster"}</button>
    {ready&&<button className="primary" disabled={busy} onClick={()=>begin()}>Yeni Proje</button>}
+   {ready&&<button disabled={busy} onClick={()=>void exportProjects()}>Proje ve Bağlantıları JSON İndir</button>}
   </div>
   {ready&&<section className="card stack">
    <h3>{editing?"Projeyi Düzenle":"Yeni Proje Oluştur"}</h3>
