@@ -20,9 +20,9 @@ const stages:Stage[]=["RESEARCH","QUALIFIED","CONTACTED","REPLY_RECEIVED","DISCU
 const categories:Category[]=["PARTNERSHIP","PROVIDER","FUNDING","EXCHANGE","OTHER"];
 const safeUrl=(u:string)=>{try{const x=new URL(u);return x.protocol==="https:"&&Boolean(x.hostname)&&u.length<=2000;}catch{return false;}};
 const asText=(s:unknown)=>(typeof s==="string"?s:"").trim();
-async function founder(){
+async function founder(readOnly=false){
  if(!phase2Configured())throw new Failure("Command Center Preview yapılandırılmadı",503);
- const actor=await getActor();
+ const actor=await getActor({readOnly});
  if(!actor)throw new Failure("Yetkisiz",401);
  if(actor.role!=="Founder")throw new Failure("Yalnızca Kurucu erişebilir",403);
  return actor;
@@ -39,7 +39,7 @@ const columns=`id::text,title,organization,workstream,category,stage,summary,
 
 export async function GET(request:NextRequest){
  try{
-  await founder();
+  await founder(true);
   const installed=await ready();
   if(!installed){
    return Response.json({ready:false,opportunities:[]},{headers});
