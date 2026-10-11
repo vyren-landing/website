@@ -32,3 +32,13 @@ References (Neon official):
 - https://neon.com/blog/three-ways-to-use-your-snapshots
 - https://neon.com/blog/practical-guide-to-database-branching
 - https://neon.com/blog/point-in-time-recovery
+
+
+## Historical snapshot branch findings
+
+Founder-observed Neon query on `branch_from_snapshot_Oct 10, 2026 2:54 PM GMT+3` returned only **10 of 18** tables from the present schema. Absent: `cc_project_records`, `cc_project_record_events`, `cc_workstreams`, `cc_workstream_events`, `cc_opportunities`, `cc_opportunity_events`, `cc_projects`, `cc_project_events`. This is consistent with an older historical schema, **not a proof of missing or corrupted current `main` data**.
+
+This branch is **not** a current-system complete restore point. No reset, restore, merge, or promotion should target `main` using it. Avoid running the **second statement** in `db/008_read_only_full_inventory.sql` on this branch: it includes tables that are absent and will return an error. To investigate old-version data, use schema-compatible SELECT statements for only its 10 present tables.
+
+Keep recovery assurance claims separate: the newer `cc-pitr-drill-20261011` has 18/18 rows+fingerprints matching `main` at user-observed sampling, but the precise historical source timestamp, independent app recovery and off-provider `pg_dump` / `pg_restore` remain unverified.
+
