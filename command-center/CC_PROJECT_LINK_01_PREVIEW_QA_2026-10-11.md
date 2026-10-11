@@ -297,3 +297,12 @@ Founder ran a read-only local PostgreSQL 18 count inventory against `vyren_cc_re
 - This does not establish exact restored full-row content parity, backup-time transactional identity vs earlier Neon sampling, application auth/runtime readiness, durable off-device storage, or complete production DR posture. Those are separate.
 - Next: run SELECT-only deterministic `to_jsonb(t)` aggregate fingerprints for all 18 required restored tables; compare to previously recorded Neon `main` fingerprints from the same general timeframe, noting legitimate changes if source sample predates backup.
 - No mutation to Neon main; preserve encrypted backup and local restored test DB pending verification.
+
+
+## WSL UTC normalization resolves first restored-table digest mismatch
+
+- On 2026-10-11, the WSL PostgreSQL 18.6 restored database reported session TimeZone `Europe/Istanbul`.
+- User executed session-only `SET TIME ZONE 'UTC'` and reran the deterministic MD5 check on `public.user`.
+- The resulting four-row digest exactly matched the earlier Neon baseline (`2d8eb8bfbffdb3d17cc2fcce827ceaa2`), unlike its pre-normalization digest.
+- **USER_TABLE_CONTENT_FINGERPRINT_PARITY_PASS_AFTER_UTC**. This confirms timezone-dependent JSONB timestamp rendering caused at least the observed difference on that table. It does not yet confirm the other 17 tables; full 18-table rerun with UTC remains next.
+- Restore into independent local PostgreSQL, 19 tables (18 expected plus an auxiliary table), and required-table row counts remain PASS. The source Neon database and encrypted archive are unchanged.
