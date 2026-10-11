@@ -1,14 +1,15 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
 
-type Member={id:string;name:string;role:string;active:boolean;createdAt:string};
+type Member={id:string;name:string;role:string;active:boolean;createdAt:string;positionTitle:string|null};
 type Invite={id:string;email:string;status:"PENDING"|"ACTIVE"|"REVOKED";memberId:string|null;createdAt:string;updatedAt:string};
-type TeamData={members:Member[];invites:Invite[]};
+type TeamData={members:Member[];invites:Invite[];positionReady:boolean};
 const date=(value:string)=>new Date(value).toLocaleString("tr-TR");
 
 export default function TeamPanel({onChange}:{onChange:()=>void}){
  const [data,setData]=useState<TeamData|null>(null);
  const [email,setEmail]=useState("");
+ const [positionDrafts,setPositionDrafts]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
@@ -19,7 +20,7 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
    const response=await fetch("/api/cc/team",{credentials:"same-origin",cache:"no-store"});
    const result=await response.json();
    if(!response.ok)throw new Error(result.error||"Ekip kayıtlarına erişilemedi");
-   setData(result);setError("");
+   setData(result);setPositionDrafts(Object.fromEntries((result.members||[]).map((m:Member)=>[m.id,m.positionTitle||""])));setError("");
   }catch(e){setError(e instanceof Error?e.message:"Ekip kayıtlarına erişilemedi");}
   finally{setLoading(false);}
  },[]);
@@ -59,6 +60,10 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
   {data?.members.map(member=><article key={member.id} className="card stack">
    <div className="row between"><b>{member.name}</b><span className={member.active?"badge good":"badge warn"}>{member.active?"Erişim Açık":"Erişim Kapalı"}</span></div>
    <p className="small muted">Üye: {member.id.slice(0,14)}… · Oluşturulma: {date(member.createdAt)}</p>
+   {data.positionReady&&<div className="field"><label>Organizasyon pozisyonu (isteğe bağlı, yetki değiştirmez)</label>
+    <input maxLength={120} value={positionDrafts[member.id]??""} onChange={e=>setPositionDrafts(v=>({...v,[member.id]:e.target.value}))} placeholder="Örn. Frontend Developer"/>
+    <button disabled={busy||(positionDrafts[member.id]??"") === (member.positionTitle||"")} onClick={()=>void act("set_position",{id:member.id,positionTitle:positionDrafts[member.id]??""})}>Pozisyonu Kaydet</button>
+   </div>}
    {member.active
     ?<button disabled={busy} onClick={()=>void act("disable_member",{id:member.id},"Bu Contributor'ın erişimini hemen kapatıp aktif oturumlarını sonlandırmak istiyor musunuz? Görevleri ve teslim geçmişi silinmez.")}>Erişimi Kapat</button>
     :<button disabled={busy} onClick={()=>void act("enable_member",{id:member.id},"Bu Contributor'ın erişimini yeniden açmak istiyor musunuz?")}>Erişimi Yeniden Aç</button>}
