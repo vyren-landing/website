@@ -219,3 +219,14 @@ User provided the Neon Console Branches view showing **6 branches**, one active 
 - `branch_from_snapshot_Oct 10, 2026 2:54 PM GMT+3` — Parent shown as `-`, Idle, displayed storage about 32.65 MB. **Likely snapshot-origin by name**, but the exact snapshot ID, restored contents and relationship to active `main` are **not independently verified**. It is a branch in addition to the snapshot inventory item, not proof of complete snapshot recovery.
 
 **Disposition:** BRANCH_INVENTORY_SIX_RECORDED, NO_MAIN_RESET, EXISTING_BACKUPS_RETAINED. A snapshot-named branch is **available for non-destructive assessment without consuming another branch slot**. If testing it, select that branch in Neon SQL Editor and run `db/008_read_only_full_inventory.sql`. Compare historical data cautiously; migration 007/position metadata may postdate the Oct 10 snapshot. Do not delete branches or overwrite `main` as an unrequested cleanup. Off-provider backup and isolated application smoke testing remain open.
+
+
+## Snapshot-derived historical branch schema check — 2026-10-11
+
+- Founder selected Neon branch `branch_from_snapshot_Oct 10, 2026 2:54 PM GMT+3` and ran the **schema presence portion** of `db/008_read_only_full_inventory.sql`.
+- Returned `expected_tables=18`, `present_tables=10`, `missing_tables={cc_opportunities,cc_opportunity_events,cc_project_events,cc_project_record_events,cc_project_records,cc_projects,cc_workstream_events,cc_workstreams}`.
+- Those eight missing tables belong to later operational-module migrations 003–006; absence is consistent with an earlier schema snapshot, **not evidence of physical corruption**. Exact source snapshot metadata and historical contents are not independently verified from this result.
+- **HISTORICAL_SNAPSHOT_SCHEMA_10_OF_18_CONFIRMED**, **CURRENT_FULL_SCHEMA_RESTORE_FROM_THIS_SNAPSHOT_NOT_SUITABLE**. It must not be used to replace present `main`. Separate PITR drill of 18/18 tables remains PASS by counts and fingerprints.
+- The full 18-table inventory file's second SELECT statement references missing tables and **will error if run on this historical branch**. No need to rerun this known-incompatible query.
+- Snapshot age/fidelity and restricted capacity mean this snapshot is a historical checkpoint, not sufficient as the sole up-to-date backup. The currently live six-hour history window also cannot substitute for durable off-provider encrypted backup.
+- **No database changes made.** Keep `main`, snapshot branch, older backup and recovery-drill branches unmodified. Next operational resilience task: independent current encrypted backup and isolated restore when an authorized secure target is available; existing proof does not justify claiming `FULL_DB_RESTORE_PASS`.
