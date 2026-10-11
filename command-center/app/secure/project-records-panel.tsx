@@ -5,7 +5,7 @@ type Status="TODO"|"IN_PROGRESS"|"DONE"|"BLOCKED"|"DEFERRED";
 type RecordRow={
  id:string;title:string;workstream:string;summary:string;status:Status;
  nextAction:string;evidenceUrl:string|null;revision:number;
- archivedAt:string|null;createdAt:string;updatedAt:string;
+ archivedAt:string|null;createdAt:string;updatedAt:string;projectId:string|null;
 };
 type FormState={title:string;workstream:string;summary:string;status:Status;nextAction:string;evidenceUrl:string};
 type HistoryEvent={action:string;revision:number;createdAt:string;snapshot:Record<string,unknown>};
@@ -18,6 +18,8 @@ const date=(v:string)=>new Date(v).toLocaleString("tr-TR");
 
 export default function ProjectRecordsPanel(){
  const [rows,setRows]=useState<RecordRow[]>([]);
+ const [projects,setProjects]=useState<{id:string;title:string}[]>([]);
+ const [projectReady,setProjectReady]=useState(false);
  const [form,setForm]=useState<FormState>(empty);
  const [editing,setEditing]=useState<RecordRow|null>(null);
  const [archived,setArchived]=useState(false);
@@ -40,6 +42,9 @@ export default function ProjectRecordsPanel(){
   finally{setLoading(false);}
  },[]);
  useEffect(()=>{void load(archived)},[load,archived]);
+ useEffect(()=>{void (async()=>{try{const r=await fetch("/api/cc/projects",{credentials:"same-origin",cache:"no-store"});
+  const v=await r.json();if(r.ok){setProjectReady(v.managementReady===true);setProjects(v.projects||[]);}}
+ catch{/* Legacy records remain usable. */}})()},[]);
  const patch=(key:keyof FormState,value:string)=>setForm(s=>({...s,[key]:value}));
  const reset=()=>{setEditing(null);setForm(empty);};
  const edit=(row:RecordRow)=>{
@@ -67,6 +72,15 @@ export default function ProjectRecordsPanel(){
    setHistory(null);setHistoryId(null);
    await load(archived);
   }catch(e){setError(e instanceof Error?e.message:"İşlem başarısız");}
+  finally{setBusy(false);}
+ };
+ const setProject=async(row:RecordRow,projectId:string)=>{
+  setBusy(true);setError("");setMessage("");
+  try{const r=await fetch("/api/cc/records",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({operation:"set_project",id:row.id,revision:row.revision,projectId:projectId||null})});
+   const v=await r.json();if(!r.ok)throw Error(v.error||"Proje bağlantısı güncellenemedi");
+   setMessage("Proje bağlantısı güncellendi; kayıt geçmişi korundu.");await load(archived);
+  }catch(e){setError(e instanceof Error?e.message:"Proje bağlantısı güncellenemedi");}
   finally{setBusy(false);}
  };
  const exportRecords=async()=>{
@@ -145,6 +159,11 @@ export default function ProjectRecordsPanel(){
     {group.items.map(row=><article key={row.id} className="card stack">
      <div className="row between"><b style={{overflowWrap:"anywhere"}}>{row.title}</b><span className="badge">{labels[row.status]}</span></div>
      <p className="small muted">{row.workstream} · Son güncelleme {date(row.updatedAt)} · Revizyon {row.revision}</p>
+     {projectReady&&!row.archivedAt&&<div className="field"><label>İlgili proje</label>
+       <select value={row.projectId||""} disabled={busy} onChange={e=>void setProject(row,e.target.value)}>
+        <option value="">Bağımsız durum kaydı</option>
+        {projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}
+       </select></div>}
      {row.summary&&<p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{row.summary}</p>}
      {row.nextAction&&<p className="small"><b>Sonraki adım:</b> {row.nextAction}</p>}
      {row.evidenceUrl&&<a href={row.evidenceUrl} target="_blank" rel="noopener noreferrer" style={{overflowWrap:"anywhere"}}>Kanıt Bağlantısı</a>}
