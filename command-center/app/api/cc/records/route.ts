@@ -13,9 +13,9 @@ const uuid=(s:string)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 const statuses:Status[]=["TODO","IN_PROGRESS","DONE","BLOCKED","DEFERRED"];
 const safeUrl=(u:string)=>{try{const x=new URL(u);return x.protocol==="https:"&&Boolean(x.hostname)&&u.length<=2000;}catch{return false;}};
 const sameOrigin=(r:NextRequest)=>r.headers.get("origin")===new URL(r.url).origin;
-async function checkedFounder(){
+async function checkedFounder(readOnly=false){
  if(!phase2Configured())throw new Failure("Command Center Preview kurulumunu kontrol edin",503);
- const actor=await getActor();
+ const actor=await getActor({readOnly});
  if(!actor)throw new Failure("Yetkisiz",401);
  if(actor.role!=="Founder")throw new Failure("Yalnızca Kurucu erişebilir",403);
  return actor;
@@ -27,7 +27,7 @@ const columns=`id::text,title,workstream,summary,status,next_action AS "nextActi
 
 export async function GET(request:NextRequest){
  try{
-  await checkedFounder();
+  await checkedFounder(true);
   const db=database();
   const history=request.nextUrl.searchParams.get("history");
   if(history!==null){
