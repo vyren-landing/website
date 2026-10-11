@@ -22,6 +22,8 @@ export default function ProjectRecordsPanel(){
  const [projectReady,setProjectReady]=useState(false);
  const [form,setForm]=useState<FormState>(empty);
  const [editing,setEditing]=useState<RecordRow|null>(null);
+ const [formOpen,setFormOpen]=useState(false);
+ const [query,setQuery]=useState("");
  const [archived,setArchived]=useState(false);
  const [historyId,setHistoryId]=useState<string|null>(null);
  const [history,setHistory]=useState<HistoryEvent[]|null>(null);
@@ -46,9 +48,9 @@ export default function ProjectRecordsPanel(){
   const v=await r.json();if(r.ok){setProjectReady(v.managementReady===true);setProjects(v.projects||[]);}}
  catch{/* Legacy records remain usable. */}})()},[]);
  const patch=(key:keyof FormState,value:string)=>setForm(s=>({...s,[key]:value}));
- const reset=()=>{setEditing(null);setForm(empty);};
+ const reset=()=>{setEditing(null);setForm(empty);setFormOpen(false);};
  const edit=(row:RecordRow)=>{
-  setEditing(row);setMessage("");
+  setEditing(row);setFormOpen(true);setMessage("");
   setForm({title:row.title,workstream:row.workstream,summary:row.summary,
    status:row.status,nextAction:row.nextAction,evidenceUrl:row.evidenceUrl||""});
  };
@@ -115,10 +117,10 @@ export default function ProjectRecordsPanel(){
   }catch(e){setError(e instanceof Error?e.message:"Geçmiş okunamadı");}
  };
  const grouped=(Object.keys(labels) as Status[]).map(status=>({
-  status,items:rows.filter(r=>r.status===status&&!r.archivedAt)
+  status,items:rows.filter(r=>r.status===status&&!r.archivedAt&&(r.title+" "+r.workstream+" "+r.summary+" "+r.nextAction).toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR")))
  }));
  return <section className="panel stack">
-  <h2>Proje Kayıtları ve Durum Takibi</h2>
+  <div className="cc-list-toolbar"><div><h2>Proje Kayıtları ve Durum Takibi</h2><p className="small muted">Mevcut kayıtlar ve sonraki adımlar.</p></div><button className="primary" disabled={busy} aria-expanded={formOpen} aria-controls="cc-record-editor" onClick={()=>{if(formOpen)reset();else{setEditing(null);setForm(empty);setFormOpen(true);}}}>{formOpen?"Formu Kapat":"+ Yeni Kayıt"}</button></div>
   <div className="alert small">Yalnızca operasyonel yönetim kaydıdır. VYREN Master, FFA, GNR, token ekonomisi veya lifecycle kararlarını değiştirmez. Burada “YAPILDI” yazılması bir canonical PASS anlamına gelmez.</div>
   <p className="small muted">Kurucu bu alanda işlerin mevcut durumunu ve sonraki adımını kaydedebilir. Geçmiş güncellemeler saklanır; geriye dönük sahte işlem kaydı oluşturulmaz.</p>
   {error&&<div className="alert" role="alert">{error}</div>}
@@ -129,7 +131,8 @@ export default function ProjectRecordsPanel(){
    <button disabled={busy||exportBusy} onClick={()=>void exportRecords()}>{exportBusy?"İndiriliyor...":"Kayıtları ve Geçmişi JSON Olarak İndir"}</button>
   </div>
   <p className="small muted">JSON aktarımı arşivlenmiş kayıtları ve tüm revizyon olaylarını da içerir; sunucu verisini değiştirmez. İndirilen özel dosya canonical VYREN Master belgesi değildir.</p>
-  <section className="card stack" aria-label="Operasyonel kayıt düzenleyici">
+  {rows.length>0&&<div className="field"><label htmlFor="cc-record-search">Kayıtlarda ara</label><input id="cc-record-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Başlık, çalışma alanı veya sonraki adım"/></div>}
+  {formOpen&&<section className="card stack cc-editor" id="cc-record-editor" aria-label="Operasyonel kayıt düzenleyici">
    <h3>{editing?"Kaydı Güncelle":"Yeni Operasyonel Kayıt"}</h3>
    <div className="field"><label htmlFor="cc-record-title">Başlık *</label><input id="cc-record-title" maxLength={200} value={form.title} onChange={e=>patch("title",e.target.value)}/></div>
    <div className="field"><label htmlFor="cc-record-stream">Çalışma alanı *</label><input id="cc-record-stream" maxLength={120} value={form.workstream} onChange={e=>patch("workstream",e.target.value)}/></div>
@@ -149,11 +152,12 @@ export default function ProjectRecordsPanel(){
    </div>
    <div className="row" style={{gap:8,flexWrap:"wrap"}}>
     <button className="primary" disabled={busy||form.title.trim().length<2||form.workstream.trim().length<2} onClick={()=>void mutate(editing?"update":"create")}>{busy?"Kaydediliyor...":editing?"Güncellemeyi Kaydet":"Operasyonel Kaydı Oluştur"}</button>
-    {editing&&<button disabled={busy} onClick={reset}>Düzenlemeyi İptal Et</button>}
+    <button disabled={busy} onClick={reset}>İptal</button>
    </div>
-  </section>
+  </section>}
   {loading&&<p>Kayıtlar yükleniyor...</p>}
   {!loading&&rows.length===0&&<p className="small muted">Henüz operasyonel proje kaydı yok. Test sonuçları veya canonical kararlar otomatik olarak içe aktarılmadı.</p>}
+  {rows.some(r=>!r.archivedAt)&&!grouped.some(g=>g.items.length>0)&&<p className="small muted">Aramayla eşleşen aktif kayıt bulunamadı.</p>}
   {grouped.map(group=>group.items.length>0&&<section key={group.status} className="stack">
     <h3>{labels[group.status]} ({group.items.length})</h3>
     {group.items.map(row=><article key={row.id} className="card stack">
