@@ -64,6 +64,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
+ const [showTaskForm,setShowTaskForm]=useState(false);
  const [objective,setObjective]=useState("");
  const [output,setOutput]=useState("");
  const [owner,setOwner]=useState("");
@@ -117,7 +118,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
   try{
    const r=await fetch("/api/cc",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify({operation,...fields})});
    const body=await r.json();if(!r.ok)throw new Error(body.error||"Operation failed");
-   if(operation==="create"){setTitle("");setObjective("");setOutput("");setProjectId("");}
+   if(operation==="create"){setTitle("");setObjective("");setOutput("");setProjectId("");setShowTaskForm(false);}
    if(operation==="submit"){setDrafts(x=>({...x,[fields.id]:""}));setLinks(x=>({...x,[fields.id]:""}));}
    if(operation==="revise")setReasons(x=>({...x,[fields.id]:""}));
    await load();
@@ -165,7 +166,11 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
     {error&&<div className="alert" role="alert">{error}</div>}
     {!tr&&showQaTools&&view==="qa"&&<SecurityPanel actorId={actor.id}/>}
 
-  {view==="active"&&<button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>}
+  {view==="active"&&<div className="cc-list-toolbar">
+   <div><h2>{tr?"Görevler ve Teslimler":"Görevlerim"}</h2><p className="small muted">{tr?"Mevcut görevleri yönetin, teslimleri inceleyin ve gerektiğinde yeni görev atayın.":"Atanan işleri ve teslimlerinizi yönetin."}</p></div>
+   <div className="row"><button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>
+   {tr&&<button className="primary" disabled={busy} aria-expanded={showTaskForm} aria-controls="cc-task-editor" onClick={()=>setShowTaskForm(v=>!v)}>{showTaskForm?"Formu Kapat":"+ Yeni Görev"}</button>}</div>
+  </div>}
   {tr&&view==="archive"&&<ArchivePanel onRestore={()=>navigate("active")}/>}
   {tr&&view==="audit"&&<AuditPanel/>}
   {tr&&view==="team"&&<TeamPanel onChange={()=>void load()}/>}
@@ -177,7 +182,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
   {tr&&view==="opportunities"&&<OpportunitiesPanel/>}
   {tr&&view==="overview"&&<OverviewPanel openView={navigate}/>}
   {tr&&view==="context"&&<ProjectContextPanel/>}
-  {tr&&view==="active"&&<section className="panel stack"><h2>Yeni Görev Ata</h2>
+  {tr&&view==="active"&&showTaskForm&&<section className="panel stack cc-editor" id="cc-task-editor"><h2>Yeni Görev Ata</h2>
     <div className="field"><label>Görev başlığı</label><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></div>
     <div className="field"><label>Amaç</label><textarea value={objective} rows={3} maxLength={4000} onChange={e=>setObjective(e.target.value)}/></div>
     <div className="field"><label>Beklenen çıktı</label><input value={output} onChange={e=>setOutput(e.target.value)} maxLength={2000}/></div>
@@ -185,10 +190,10 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
     <option value="">Bağımsız görev</option>{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}
    </select></div>}
    <div className="field"><label>Sorumlu (onaylı gerçek hesap)</label><select value={owner} onChange={e=>setOwner(e.target.value)}><option value="">Bir katkı sağlayan seçin</option>{(data?.members||[]).filter(m=>m.role==="Contributor").map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></div>
-    <button className="primary" disabled={busy||!owner||title.trim().length<2||objective.trim().length<3} onClick={()=>void action("create",{title,objective,expectedOutput:output,ownerId:owner,projectId})}>Görev Oluştur</button>
+    <div className="row"><button className="primary" disabled={busy||!owner||title.trim().length<2||objective.trim().length<3} onClick={()=>void action("create",{title,objective,expectedOutput:output,ownerId:owner,projectId})}>Görev Oluştur</button><button disabled={busy} onClick={()=>setShowTaskForm(false)}>İptal</button></div>
     {!(data?.members||[]).some(m=>m.role==="Contributor")&&<p className="small muted">Test kullanıcısı henüz gerçek hesabıyla doğrulanmadı; şu anda kimseye gerçek görev atanamaz.</p>}
   </section>}
-  {view==="active"&&<section className="panel stack"><h2>{label("My Tasks","Görevler ve Teslimler")}</h2>
+  {view==="active"&&<section className="panel stack"><h2>{tr?"Mevcut Görevler":"Atanan Görevlerim"}</h2>
     {!data&&<p>{label("Loading...","Yükleniyor...")}</p>}
     {data?.tasks.length===0&&<p>{label("No assigned tasks yet.","Henüz görev bulunmuyor.")}</p>}
     {data?.tasks.map(t=>{
