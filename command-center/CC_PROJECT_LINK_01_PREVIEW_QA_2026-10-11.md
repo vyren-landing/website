@@ -251,3 +251,13 @@ User provided the Neon Console Branches view showing **6 branches**, one active 
 - **CURRENT_DAILY_ENCRYPTED_BACKUP_FILE_CREATED_PASS (user-observed)**. The output alone does not independently establish 18-table TOC completeness, consistent restore, off-device retention, recoverability of the GPG key, or full database recovery.
 - The original daily backup mechanism remains preferred; avoid competing owner-password or parallel GPG encryption flow. The repo's auxiliary `scripts/wsl_neon_main_encrypted_backup.sh` was changed to delegate to the user's existing engine rather than reimplement it.
 - Next: locally inspect this private file with GPG decrypt streamed to `pg_restore --list` and compare the expected 18 table data entries; do not print raw rows, plaintext dump, private keys or connection secrets, and do not alter `main`. Then verify full restore into an isolated PostgreSQL target separately.
+
+
+## October 11 WSL encrypted archive table of contents — 19 entries
+
+- Founder ran GPG decryption piped into `pg_restore --list`, counting `TABLE DATA public` entries in the local encrypted daily archive `VYREN_CC_daily_20261011_185618_539761457.dump.gpg`, with `pipefail`. The archive contained **19 TABLE DATA entries**.
+- Founder provided the following TOC table names, sorted: `account`, `cc_audit`, `cc_deliverables`, `cc_members`, `cc_opportunities`, `cc_opportunity_events`, `cc_project_events`, `cc_project_record_events`, `cc_project_records`, `cc_projects`, `cc_reviews`, `cc_tasks`, `cc_team_invites`, `cc_workstream_events`, `cc_workstreams`, `playing_with_neon`, `session`, `user`, `verification`.
+- **BACKUP_ALL_18_REQUIRED_TABLE_DATA_TOC_PASS**: all 18 expected Better Auth / Command Center tables appear as TABLE DATA entries. Extra `playing_with_neon` appears in addition and is not one of the 18 required tables.
+- **GPG_ARCHIVE_TOC_READ_PASS**: local decryption / PostgreSQL archive table-of-contents listing worked; archive is 25 KB by user output and stored mode 0600.
+- TOC presence is **not** a real data restore, proven row-count/content equivalence, PostgreSQL role/extension compatibility, or assurance that the exact current state can be recovered. `FULL_DB_RESTORE_PASS` is pending.
+- Next: inspect whether a fully isolated WSL/local PostgreSQL server is available, then perform a reversible test database restore without connecting to or mutating Neon `main`; keep archive encrypted at rest, no secret or raw data exports in GitHub.
