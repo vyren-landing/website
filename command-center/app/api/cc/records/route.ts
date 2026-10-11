@@ -5,7 +5,7 @@ export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
 type Status="TODO"|"IN_PROGRESS"|"DONE"|"BLOCKED"|"DEFERRED";
-type Mutation={operation?:string;id?:string;revision?:number;workstream?:string;title?:string;summary?:string;status?:string;nextAction?:string;evidenceUrl?:string};
+type Mutation={operation?:string;id?:string;revision?:number;workstream?:string;title?:string;summary?:string;status?:string;nextAction?:string;evidenceUrl?:string;projectId?:string|null};
 type Row={id:string;revision:number;archived_at:string|null};
 class Failure extends Error{constructor(message:string,public status=400){super(message);}}
 const reject=(message:string,status=400)=>Response.json({error:message},{status,headers:{"Cache-Control":"no-store"}});
@@ -39,8 +39,12 @@ export async function GET(request:NextRequest){
    return Response.json({events:events.rows},{headers:{"Cache-Control":"no-store"}});
   }
   const includeArchived=request.nextUrl.searchParams.get("archived")==="1";
+  const linkReady=await db.query<{ready:boolean}>(`SELECT EXISTS (
+     SELECT 1 FROM information_schema.columns WHERE table_schema='public'
+     AND table_name='cc_project_records' AND column_name='project_id') AS ready`);
+  const extra=linkReady.rows[0]?.ready?',project_id::text AS "projectId"':',NULL::text AS "projectId"';
   const records=await db.query(
-   `SELECT ${columns} FROM cc_project_records
+   `SELECT ${columns} ${extra} FROM cc_project_records
     WHERE ($1::boolean OR archived_at IS NULL) ORDER BY updated_at DESC LIMIT 250`,
    [includeArchived]);
   return Response.json({records:records.rows},{headers:{"Cache-Control":"no-store"}});
@@ -62,12 +66,30 @@ export async function POST(request:NextRequest){
  try{
   const actor=await checkedFounder();
   const op=input.operation;
-  if(!["create","update","archive","restore"].includes(op||""))throw new Failure("Geçersiz kayıt işlemi");
+  if(!["create","update","archive","restore","set_project"].includes(op||""))throw new Failure("Geçersiz kayıt işlemi");
   const db=database(),client=await db.connect();
   try{
    await client.query("BEGIN");
    let id="";
-   if(op==="create"||op==="update"){
+   if(op==="set_project"){
+    if(!input.id||!uuid(input.id)||!Number.isInteger(input.revision)||!input.revision||input.revision<1)throw new Failure("Kayıt ID/revizyon geçersiz");
+    const check=await client.query<{ready:boolean}>(`SELECT to_regclass('public.cc_projects') IS NOT NULL AND EXISTS (
+     SELECT 1 FROM information_schema.columns WHERE table_schema='public'
+      AND table_name='cc_project_records' AND column_name='project_id') AS ready`);
+    if(!check.rows[0]?.ready)throw new Failure("Proje bağlantıları için Preview migration 006 gerekli",503);
+    const projectId=input.projectId||null;
+    if(projectId){
+     if(!uuid(projectId))throw new Failure("Proje ID geçersiz");
+     const p=await client.query("SELECT 1 FROM cc_projects WHERE id=$1 AND archived_at IS NULL",[projectId]);
+     if(!p.rowCount)throw new Failure("Aktif proje bulunamadı",409);
+    }
+    const row=await client.query<Row>("SELECT id::text AS id,revision,archived_at FROM cc_project_records WHERE id=$1 FOR UPDATE",[input.id]);
+    if(!row.rowCount)throw new Failure("Kayıt bulunamadı",404);
+    if(row.rows[0].archived_at)throw new Failure("Arşivlenmiş kayıt değiştirilemez",409);
+    if(row.rows[0].revision!==input.revision)throw new Failure("Kayıt başka işlemle güncellendi; yenileyin",409);
+    id=input.id;
+    await client.query("UPDATE cc_project_records SET project_id=$2,revision=revision+1,updated_by=$3,updated_at=now() WHERE id=$1",[id,projectId,actor.id]);
+   }else if(op==="create"||op==="update"){
     const title=(input.title||"").trim();
     const workstream=(input.workstream||"").trim();
     const summary=(input.summary||"").trim();
@@ -119,7 +141,7 @@ export async function POST(request:NextRequest){
    await client.query(
     `INSERT INTO cc_project_record_events(record_id,actor_id,action,revision,snapshot)
       VALUES($1,$2,$3,$4,$5::jsonb)`,
-    [id,actor.id,(op||"").toUpperCase(),after.rows[0].revision,JSON.stringify(after.rows[0].state)]);
+    [id,actor.id,(op==="set_project"?"UPDATE":(op||"").toUpperCase()),after.rows[0].revision,JSON.stringify(after.rows[0].state)]);
    await client.query("INSERT INTO cc_audit(actor_id,action,target_id,details) VALUES($1,$2,$3,$4)",
     [actor.id,"record_"+op,id,JSON.stringify({revision:after.rows[0].revision})]);
    await client.query("COMMIT");
