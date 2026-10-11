@@ -174,3 +174,12 @@ User executed `db/008_read_only_full_inventory.sql` with Neon SQL Editor on `mai
 - These are read-only presence/count results; no complete-table hash equality, relational consistency across all foreign keys, dump integrity, point-in-time recovery, or isolated 18-table restore is yet evidenced.
 - Existing isolated backup-branch subset validation remains distinct and cannot be automatically credited as verification of all 18 tables.
 - **Next incomplete execution point:** create a new isolated point-in-time branch from `main` at a known recent timestamp within the currently visible 6-hour history window (if the plan permits), without restoring/rewinding `main`; run the same full inventory on that target and compare timestamp-aware counts. Document source branch, exact restore timestamp and target branch. Recognize that a sample taken later on `main` can differ in sessions/audit. New snapshot slots/retention require no upgrade for this test.
+
+
+## Isolated PITR branch 18-table schema and count parity — 2026-10-11
+
+- Founder reports creating isolated Neon PITR branch `cc-pitr-drill-20261011` from `main` (intended point in time was 2026-10-11 18:15 Europe/Istanbul, but final UI-confirmed branch source timestamp/ancestry not independently captured).
+- User executed read-only `db/008_read_only_full_inventory.sql` on selected PITR branch and supplied `expected_tables=18`, `present_tables=18`, `missing_tables={}`.
+- All 18 counts matched the earlier `main` sample exactly: `user=4`, `session=5`, `account=4`, `verification=0`, `cc_members=3`, `cc_tasks=5`, `cc_deliverables=5`, `cc_reviews=5`, `cc_audit=59`, `cc_team_invites=1`, `cc_project_records=5`, `cc_project_record_events=13`, `cc_workstreams=1`, `cc_workstream_events=3`, `cc_opportunities=1`, `cc_opportunity_events=4`, `cc_projects=1`, `cc_project_events=4`; sum 123.
+- **PITR_SCHEMA_AND_COUNT_PARITY_PASS (user-reported)**. Not yet evidence of row-content parity, verified timestamp/lineage, authenticated application runtime or full recovery. No modification to `main` performed.
+- Added `db/VERIFY_18_TABLE_CONTENT_FINGERPRINTS_READ_ONLY.sql`, a separate SELECT-only deterministic whole-row fingerprint query for these 18 current small tables. Execute on each branch and compare matching timestamps with care: live auth sessions/audit may change. No individual auth/account/session values or private data should be posted.
