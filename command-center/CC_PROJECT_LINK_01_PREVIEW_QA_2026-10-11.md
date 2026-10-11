@@ -357,3 +357,14 @@ Full Neon reference digests matched again with UTC-normalized local session:
 ## October 11 remote-copy digest verification
 
 Founder reported downloading the manually uploaded encrypted daily database backup and comparing its SHA-256 with the original WSL archive. The second PowerShell attempt succeeded after the first file-not-found result; both computed values matched, ignoring hexadecimal letter case. Evidence: the Oct 11 encrypted backup filename already identified above, hash parity observed by founder. Status: OFF_DEVICE_DOWNLOAD_HASH_PARITY_PASS (user observed). The daily local WSL job remains separate from manual remote copy. Actual application recovery and scheduled cloud transfer remain separate checks. No active database changes.
+
+
+## D1 secure workspace visual navigation refactor — 2026-10-11
+
+- UI-only refactor commit `94974fa3696b60001823bc2c8e97a4d68100b70f` on Preview feature branch.
+- Moved the live /secure Founder module selection from 12 top-of-page buttons into a persistent, grouped sidebar. Main navigation: Genel Bakış, Görevler, Projeler, Proje Kayıtları, Çalışma Alanları, Fırsatlar, Ekip, İş Yükü; additional sections: Proje Bağlamı, Görev Arşivi, İşlem Geçmişi, Modül Sağlığı.
+- Live Contributor workflow now opens straight into `Görevlerim`; the legacy contributor security test component is NOT rendered ahead of everyday tasks.
+- Existing security regression test UI is retained, but rendered only when `showQaTools` is true (Vercel Preview/development; not production) and user explicitly navigates to `Test ve Tanı`. Founder read-only module checks remain grouped under `SİSTEM`. **This is UI placement, not a change to backend permissions or a replacement for server-side authorization.**
+- Navigation updates `?tab=` on same /secure URL, supports browser back/forward, role-valid tab IDs only and mobile expandable navigation. Sidebar uses the same live Better Auth actor and existing data panels; no new DB schema/migrations, account changes, canonical actions or mutations were included.
+- No explicit release/promotion to production requested. **D1_IMPLEMENTED_SOURCE_PENDING_BUILD_AND_LIVE_UI_QA**: Vercel deployment inspection did not yet show a READY build of commit `94974fa`; do not claim visually QA PASS until a corresponding Preview build and Founder/Contributor smoke checks are observed.
+- Pending QA checklist: Preview READY at exact commit, sidebar navigation for Founder, ?tab deep link + browser back, mobile menu widths, Contributor own task flow (no QA panel on entry; Preview Test ve Tanı accessible), no security regression, no unintended error on exiting/reentering modules.
