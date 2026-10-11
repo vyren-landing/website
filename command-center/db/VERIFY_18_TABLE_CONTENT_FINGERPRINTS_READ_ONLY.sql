@@ -1,6 +1,7 @@
 -- VYREN Command Center — read-only 18-table content fingerprint comparison.
 -- VERIFICATION SCRIPT ONLY; NOT A MIGRATION. NO tables/data are changed.
--- Run ONCE per intentionally selected Neon branch (main and isolated PITR drill).
+-- Run on each intentionally selected source/restore PostgreSQL database.
+-- The fingerprints serialize timestamptz; use UTC on all endpoints to avoid false mismatches.
 -- Record branch name and source timestamp OUTSIDE these SQL results.
 -- Only aggregate count/hash leaves PostgreSQL; auth/session/account records remain private.
 -- Deterministic aggregate hash includes ALL columns and duplicate rows, independent of row order.
@@ -9,6 +10,9 @@
 -- A row-content match increases assurance but does not independently prove correct
 -- point-in-time selection, application login, provider retention, or disaster recovery.
 -- Different session/audit records can legitimately reflect PITR timestamp or live churn.
+
+-- Session-only setting, does not change persisted database timezone.
+SET TIME ZONE 'UTC';
 
 SELECT 'user' AS table_name,
        count(*)::bigint AS row_count,
