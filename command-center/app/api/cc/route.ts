@@ -110,9 +110,12 @@ export async function POST(request:NextRequest){
   try{
    await client.query("BEGIN");
    let taskId="";
+   let previousProjectId:string|null=null;
    const linked=await projectLinksReady(client);
    const projectId=input.projectId===null||input.projectId===""||input.projectId===undefined?null:input.projectId;
    if(input.operation==="create"||input.operation==="set_project"){
+    if(input.operation==="set_project"&&input.projectId===undefined)
+     throw new ApiFailure("Proje bağlantısı açıkça belirtilmeli");
     if(projectId&&!validId(projectId))throw new ApiFailure("Proje ID geçersiz");
     if(projectId){
      if(!linked)throw new ApiFailure("Proje bağlantıları için Preview migration 006 gerekli",503);
@@ -143,6 +146,9 @@ export async function POST(request:NextRequest){
     if(input.operation==="set_project"){
       if(actor.role!=="Founder")throw new ApiFailure("Yalnızca Kurucu proje bağlantısı değiştirebilir",403);
       if(!linked)throw new ApiFailure("Proje bağlantıları için Preview migration 006 gerekli",503);
+      const old=await client.query<{projectId:string|null}>(
+       'SELECT project_id::text AS "projectId" FROM cc_tasks WHERE id=$1',[t.id]);
+      previousProjectId=old.rows[0]?.projectId??null;
       await client.query("UPDATE cc_tasks SET project_id=$2,updated_at=now() WHERE id=$1",[t.id,projectId]);
     }else{
     enforceTaskOwner(actor,t.owner_id,input.operation);
@@ -171,7 +177,9 @@ export async function POST(request:NextRequest){
     }else throw new ApiFailure("Bu işlem bu rol veya görev durumu için yasak",403);
     }
    }
-   await client.query('INSERT INTO cc_audit(actor_id,action,target_id,details) VALUES($1,$2,$3,$4)',[actor.id,input.operation,taskId,JSON.stringify({at:new Date().toISOString(),...(input.operation==="set_project"||input.operation==="create"?{projectId}: {})})]);
+   await client.query('INSERT INTO cc_audit(actor_id,action,target_id,details) VALUES($1,$2,$3,$4)',[actor.id,input.operation,taskId,JSON.stringify({at:new Date().toISOString(),
+    ...(input.operation==="set_project"?{previousProjectId,projectId}:
+      input.operation==="create"?{projectId}:{})})]);
    await client.query("COMMIT");
    return Response.json({ok:true,taskId},{headers:{"Cache-Control":"no-store"}});
   }catch(e){await client.query("ROLLBACK");throw e;}
