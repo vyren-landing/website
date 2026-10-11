@@ -47,7 +47,7 @@ export default function SecureWorkspace({actor}:{actor:Actor}){
    if(r.ok){setProjectReady(v.managementReady===true);setProjects((v.projects||[]).map((p:{id:string;title:string})=>({id:p.id,title:p.title})));}}
   catch{/* Legacy standalone tasks remain available. */}
  },[tr]);
- useEffect(()=>{void loadProjects()},[loadProjects]);
+ useEffect(()=>{if(tr&&(view==="active"||view==="projects"))void loadProjects()},[loadProjects,tr,view]);
  const action=async(operation:string,fields:Record<string,string>)=>{
   setBusy(true);setError("");
   try{
