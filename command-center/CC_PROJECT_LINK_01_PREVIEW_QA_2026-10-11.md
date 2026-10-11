@@ -352,3 +352,8 @@ Full Neon reference digests matched again with UTC-normalized local session:
 - The 2026-10-11 off-provider local restore validation is independently **OFF_PROVIDER_DATABASE_RESTORE_DATA_PARITY_PASS** (18/18 fingerprints after UTC). The new user-attested Drive copy provides intended computer-independent redundancy; do not label it `REMOTE_VERIFIED_CONTENT_PASS` until Drive-side download/checksum validation is actually performed.
 - The existing Windows Scheduled Task runs the WSL **local encrypted daily backup**; automated daily Drive replication and periodic restore from a Drive-downloaded copy remain separate optional improvements. No launch self-lock or unnecessary provider dependency.
 - Never copy plaintext dump, passwords, DB connection URL, or GPG secret key into GitHub, QA report, screenshots or chat. Do not delete existing WSL backups or Neon branches.
+
+
+## October 11 remote-copy digest verification
+
+Founder reported downloading the manually uploaded encrypted daily database backup and comparing its SHA-256 with the original WSL archive. The second PowerShell attempt succeeded after the first file-not-found result; both computed values matched, ignoring hexadecimal letter case. Evidence: the Oct 11 encrypted backup filename already identified above, hash parity observed by founder. Status: OFF_DEVICE_DOWNLOAD_HASH_PARITY_PASS (user observed). The daily local WSL job remains separate from manual remote copy. Actual application recovery and scheduled cloud transfer remain separate checks. No active database changes.
