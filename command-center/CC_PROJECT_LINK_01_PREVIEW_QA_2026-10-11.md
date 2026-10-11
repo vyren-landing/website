@@ -142,3 +142,13 @@ Limits: negative-path, test-session evidence only; not independent penetration t
 - UI now correctly notes that Google Cloud OAuth Test users enrollment is needed **only while the OAuth consent app remains in Testing**, and that Command Center stores invitation grants but does not send invitation email.
 - Files modified: `app/secure/page.tsx`, `app/secure/sign-in.tsx`, `app/secure/team-panel.tsx`. No database migration.
 - **INVITE_LIFECYCLE_E2E = PENDING**: requires a distinct, controlled Google test identity, explicit Founder-issued test invite and verified login; later revocation, session invalidation and reactivation must be observed. Existing Contributor accounts and test assignments must not be used for lifecycle destructive QA. Do not claim test PASS from code review.
+
+
+## Invitation E2E deferred without third Google test identity — 2026-10-11
+
+- Founder states there is no third Google/Gmail account available for an independent invitation-to-first-login test.
+- **INVITATION_LIFECYCLE_LIVE_E2E = DEFERRED_UNVERIFIED**, not PASS or failed. Do not create a new identity solely as an artificial launch dependency.
+- Existing two Contributor accounts, their active access, assignments and sessions must not be revoked as a shortcut to this test. They remain in use. Do not treat synthetic SQL/branch simulations as evidence of a real provider OAuth flow.
+- Existing evidence remains unchanged: Contributor authorization regression 15/15 PASS; workstream and opportunity history sequence PASS; module health structural PASS; migration 007 and position assignment PASS.
+- No-self-lock execution disposition: continuation of non-identity work is permitted, while independent fresh-user invitation and revoke/re-authentication tests remain a **release-readiness assurance gap** to complete before onboarding external Contributors at scale. Do not claim general production identity lifecycle assurance.
+- Next work can cover backup retention/full DB recovery, user experience, and operational reporting, without touching live identities or canonical VYREN governance.
