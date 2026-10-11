@@ -5,6 +5,10 @@ type Project={id:string;title:string;objective:string;nextAction:string;workstre
  workstreamName:string|null;status:Status;revision:number;archivedAt:string|null;updatedAt:string;
  taskCount:number;completedTaskCount:number;recordCount:number};
 type Stream={id:string;name:string;sourceKey:string;state:string};
+type Preflight={scope:string;schemaReady:boolean;missing:string[];
+ checks:Record<string,boolean>;counts:null|{projects:number;projectEvents:number;linkedTasks:number;
+ linkedRecords:number;orphanTaskLinks:number;orphanRecordLinks:number};
+ backup:string;migrationExecution:string;runtimeTests:string;checkedAt:string};
 type Form={title:string;objective:string;nextAction:string;status:Status;workstreamId:string};
 const empty:Form={title:"",objective:"",nextAction:"",status:"TODO",workstreamId:""};
 const statuses:Record<Status,string>={TODO:"Yapılacak",IN_PROGRESS:"Devam Ediyor",DONE:"Yapıldı",BLOCKED:"Engellendi",DEFERRED:"Ertelendi"};
@@ -19,6 +23,8 @@ export default function ProjectsPanel(){
  const [form,setForm]=useState<Form>(empty);
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
+ const [checking,setChecking]=useState(false);
+ const [preflight,setPreflight]=useState<Preflight|null>(null);
  const [history,setHistory]=useState<{action:string;revision:number;createdAt:string}[]|null>(null);
  const [historyId,setHistoryId]=useState<string|null>(null);
  const [detailId,setDetailId]=useState<string|null>(null);
@@ -67,6 +73,21 @@ export default function ProjectsPanel(){
    const v=await r.json();if(!r.ok)throw Error(v.error||"Geçmiş bulunamadı");setHistory(v.events||[]);
   }catch(e){setError(e instanceof Error?e.message:"Geçmiş alınamadı");}
  }
+ const inspectSchema=async()=>{
+  setChecking(true);setError("");setPreflight(null);
+  try{
+   // Relative URL keeps the existing Founder session on this exact host.
+   const r=await fetch("/api/cc/projects/preflight",{credentials:"same-origin",cache:"no-store"});
+   const v=await r.json();
+   if(!r.ok){
+    if(r.status===401)throw Error("Bu adreste geçerli Kurucu oturumu bulunamadı. Aynı Command Center adresindeki /secure ekranından GitHub ile giriş yapın.");
+    if(r.status===403)throw Error("Bu hesap Kurucu olarak yetkilendirilmemiş.");
+    throw Error(v.error||"Ön kontrol çalıştırılamadı");
+   }
+   setPreflight(v);
+  }catch(e){setError(e instanceof Error?e.message:"Ön kontrol çalıştırılamadı");}
+  finally{setChecking(false);}
+ };
  const exportProjects=async()=>{
   setBusy(true);setError("");
   try{
@@ -89,6 +110,7 @@ export default function ProjectsPanel(){
   {message&&<p role="status">{message}</p>}
   <div className="row" style={{gap:8,flexWrap:"wrap"}}>
    <button onClick={()=>void load()} disabled={busy||loading}>Yenile</button>
+   <button disabled={checking||busy} onClick={()=>void inspectSchema()}>{checking?"Şema kontrol ediliyor...":"Preview Şema Ön Kontrolü"}</button>
    <button onClick={()=>setArchived(x=>!x)} disabled={busy}>{archived?"Arşivi Gizle":"Arşivi de Göster"}</button>
    {ready&&<button className="primary" disabled={busy} onClick={()=>begin()}>Yeni Proje</button>}
    {ready&&<button disabled={busy} onClick={()=>void exportProjects()}>Proje ve Bağlantıları JSON İndir</button>}
@@ -109,6 +131,14 @@ export default function ProjectsPanel(){
     <button className="primary" disabled={busy||form.title.trim().length<2} onClick={()=>void mutate(editing?"update":"create")}>{editing?"Değişiklikleri Kaydet":"Proje Oluştur"}</button>
     {editing&&<button disabled={busy} onClick={()=>begin()}>İptal</button>}
    </div>
+  </section>}
+  {preflight&&<section className="card stack" aria-label="Preview veritabanı şema kontrolü">
+   <h3>Preview Şema Ön Kontrolü</h3>
+   <p><b>{preflight.schemaReady?"Şema hazır":"Eksik şema tespit edildi"}</b></p>
+   {preflight.missing.length>0&&<p className="small">Eksik alanlar: {preflight.missing.join(", ")}</p>}
+   {preflight.schemaReady&&preflight.counts&&<p className="small">Projeler: {preflight.counts.projects} · Proje geçmişi: {preflight.counts.projectEvents} · Bağlı görevler: {preflight.counts.linkedTasks} · Bağlı kayıtlar: {preflight.counts.linkedRecords} · Yetim görev bağlantısı: {preflight.counts.orphanTaskLinks} · Yetim kayıt bağlantısı: {preflight.counts.orphanRecordLinks}</p>}
+   <p className="small muted">Bu kontrol salt okunurdur. Yedek: doğrulanmadı · Migration çalıştırılmaz · Gerçek kullanıcı testleri ayrıca gereklidir.</p>
+   <p className="small muted">Son kontrol: {new Date(preflight.checkedAt).toLocaleString("tr-TR")}</p>
   </section>}
   {loading&&<p>Projeler yükleniyor...</p>}
   {!loading&&ready&&projects.length===0&&<p className="small muted">Henüz operasyonel proje yok. Eski kayıtlar ve görevler otomatik taşınmadı.</p>}
