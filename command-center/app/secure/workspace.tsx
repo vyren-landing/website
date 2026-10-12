@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import StatusPill from "./status-pill";
 import {SignOut} from "./sign-in";
 import ArchivePanel from "./archive-panel";
 import AuditPanel from "./audit-panel";
@@ -203,7 +204,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
       const own=t.ownerId===actor.id;
       const showEdit=own&&t.status==="IN PROGRESS";
       return <article key={t.id} className="card stack">
-       <div className="row between"><b>{t.title}</b><span className="badge">{tr?(dictionary[t.status]||t.status):t.status}</span></div>
+       <div className="row between"><b>{t.title}</b><StatusPill status={t.status} label={tr?(dictionary[t.status]||t.status):t.status}/></div>
        <p>{t.objective}</p>{t.projectName&&<p className="small muted">Proje: {t.projectName}</p>}
        {tr&&projectReady&&<div className="field"><label>Proje bağlantısı</label><select value={t.projectId||""} disabled={busy} onChange={e=>void action("set_project",{id:t.id,projectId:e.target.value})}>
         <option value="">Bağımsız görev</option>{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}
