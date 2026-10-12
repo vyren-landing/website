@@ -382,3 +382,14 @@ D2 UI-only source changes were committed to Preview feature branch after D1:
 - UI controls do not change server permissions, API contracts, migration state, Founder/Contributor rights, authentication sessions, Neon records or canonical governance.
 
 **Status: D2_SOURCE_IMPLEMENTED; NEXTJS_BUILD_NOT_YET_VERIFIED; PREVIEW_VISUAL_QA_PENDING.** Vercel create deployment returned 402 `api-deployments-free-per-day` for this project/team. Do not mark a READY deployment or visual QA PASS on an unbuilt feature commit. No upgrade/payment or production promotion was authorized; preserving existing live Preview and Git branch.
+
+
+## D2 Founder Overview action-first layout — 2026-10-12
+
+- Source commits `3204c97eb53e7e1f217fbaed2dd7cc050adf31da` and `ea7aaed540493bc6d2f7d3d508234bad613d1ed5` implemented a new Founder `Genel Bakış` layout.
+- Prioritizes 3 existing read-only action queues: Founder review submissions, operational project-record next actions (including blocked statuses), and opportunity/external follow-ups.
+- Separately presents four operational count tiles and an optional collapsible detailed status distribution. Preserves per-queue API limit (8), shows up to four items per card, clearly discloses truncation and links to respective full modules.
+- Preserves existing read-only `/api/cc/overview` response shape, authorization, transaction/snapshot semantics, data ownership, review/approval business logic, and noncanonical boundary. No API, migration, storage, member permission or live database write in this D2 change.
+- Added keyboard-focus and responsive CSS for small screens. Time label uses Europe/Istanbul explicitly.
+- **D2_OVERVIEW_SOURCE_COMPLETE; BUILD_AND_BROWSER_QA_PENDING.** No newly verified READY Vercel deployment for this commit, and no authenticated visual run or typechecked Next.js build completed yet. Earlier Vercel API preview deploy returned the project/team daily request cap; do not promote or claim shipped.
+- Suggested smoke checklist when Preview deploy available: Founder sees three queues before counts; empty states; all queue links; counts/archived distinctions; details toggle; mobile layout; valid Contributor cannot access Founder overview endpoint; no regression in D1 navigation and D2 on-demand forms.
