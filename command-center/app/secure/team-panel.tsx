@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import StatusPill from "./status-pill";
 
 type Member={id:string;name:string;role:string;active:boolean;createdAt:string;positionTitle:string|null};
 type Invite={id:string;email:string;status:"PENDING"|"ACTIVE"|"REVOKED";memberId:string|null;createdAt:string;updatedAt:string};
@@ -60,7 +61,7 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
   {loading&&!data&&<p>Yükleniyor...</p>}
   {data?.members.length===0&&<p>Henüz kayıtlı Contributor yok.</p>}
   {data?.members.map(member=><article key={member.id} className="card stack">
-   <div className="row between"><b>{member.name}</b><span className={member.active?"badge good":"badge warn"}>{member.active?"Erişim Açık":"Erişim Kapalı"}</span></div>
+   <div className="row between"><b>{member.name}</b><StatusPill status={member.active?"ACTIVE":"DISABLED"} label={member.active?"Erişim Açık":"Erişim Kapalı"}/></div>
    <p className="small muted">Üye: {member.id.slice(0,14)}… · Oluşturulma: {date(member.createdAt)}</p>
    {data.positionReady&&<div className="field"><label>Organizasyon pozisyonu (isteğe bağlı, yetki değiştirmez)</label>
     <input maxLength={120} value={positionDrafts[member.id]??""} onChange={e=>setPositionDrafts(v=>({...v,[member.id]:e.target.value}))} placeholder="Örn. Frontend Developer"/>
@@ -75,7 +76,7 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
   {data?.invites.map(invite=><article key={invite.id} className="card stack">
    <div className="row between">
     <b style={{overflowWrap:"anywhere"}}>{invite.email}</b>
-    <span className="badge">{invite.status==="PENDING"?"Giriş Bekleniyor":invite.status==="ACTIVE"?"Aktif":"İptal Edildi"}</span>
+    <StatusPill status={invite.status} label={invite.status==="PENDING"?"Giriş Bekleniyor":invite.status==="ACTIVE"?"Aktif":"İptal Edildi"}/>
    </div>
    <p className="small muted">Davet tarihi: {date(invite.createdAt)} · {invite.memberId?"Google hesabıyla eşleşti":"Henüz eşleşmedi"}</p>
    {invite.status==="PENDING"&&<button disabled={busy} onClick={()=>void act("revoke_invite",{id:invite.id},"Davet kaydını iptal etmek istiyor musunuz?")}>Daveti İptal Et</button>}
