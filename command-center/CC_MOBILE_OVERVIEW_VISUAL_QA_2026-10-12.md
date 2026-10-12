@@ -40,3 +40,15 @@ Founder supplied two Android Chrome mobile screenshots with the `Menü` control 
 - User-supplied images are not committed; no private browser/session details are included in the QA report.
 
 Next safe manual check on current UI: select `Görevler` from expanded mobile menu, confirm it changes to task list and menu closes. No DB writes required.
+
+
+## Mobile navigation selection PASS + overlay implementation (2026-10-12)
+
+Founder explicitly confirmed that tapping `Görevler` in the expanded mobile menu navigated to the tasks screen and automatically closed the menu. **MOBILE_NAVIGATE_TO_TASKS_AND_AUTO_CLOSE_PASS (user-observed on previous menu implementation).**
+
+New Preview feature-branch-only UI change:
+- `workspace.tsx`: a mobile drawer with click-to-dismiss backdrop, visible close control, Escape-to-close, focus handling, scroll lock while open, and auto-close on valid navigation. Existing Founder/Contributor navigation and permission contracts unchanged.
+- `globals.css`: at widths <=780px, drawer floats over page instead of displacing document content; bounded width, internal vertical scroll and darkened backdrop. Desktop sidebar remains unchanged.
+- Code commits: `a85689b4dbdde7802f40a775f3a68a9aaf1a4f67`, `dbda94d355d81171b039827c9c5b96baaf9db956`.
+- **SOURCE_IMPLEMENTED; NEW_PREVIEW_BUILD_AND_POST_CHANGE_MOBILE_VISUAL_QA_PENDING.** The earlier user-observed navigation PASS was on the old flow layout, not proof of the new overlay implementation.
+- No database write, account/session mutation, production release or protocol/canonical decision change.
