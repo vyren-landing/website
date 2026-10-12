@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import StatusPill from "./status-pill";
 type Opportunity={id:string;title:string;organization:string;workstream:string;category:string;stage:string;summary:string;nextAction:string;evidenceUrl:string|null;revision:number;archivedAt:string|null;updatedAt:string};
 type Form={title:string;organization:string;workstream:string;category:string;stage:string;summary:string;nextAction:string;evidenceUrl:string};
 type Event={action:string;revision:number;createdAt:string;snapshot:Record<string,unknown>};
@@ -89,7 +90,7 @@ export default function OpportunitiesPanel(){
   {ready&&rows.length===0&&<p>Henüz operasyonel fırsat kaydı yok. Önceki VYREN görüşmeleri otomatik olarak içe aktarılmadı.</p>}
   {ready&&rows.length>0&&visibleRows.length===0&&<p className="small muted">Aramayla eşleşen fırsat bulunamadı.</p>}
   {ready&&visibleRows.map(o=><article className="card stack" key={o.id}>
-   <div className="row between"><b>{o.title}</b><span className="badge">{o.archivedAt?"ARŞİV":stageTR[stages.indexOf(o.stage)]||o.stage}</span></div>
+   <div className="row between"><b>{o.title}</b><StatusPill status={o.archivedAt?"ARCHIVED":o.stage} label={o.archivedAt?"ARŞİV":stageTR[stages.indexOf(o.stage)]||o.stage}/></div>
    <p className="small muted">{categoryTR[categories.indexOf(o.category)]||o.category} · {o.workstream} · {o.organization} · Revizyon {o.revision}</p>
    {o.summary&&<p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{o.summary}</p>}
    {o.nextAction&&<p><b>Sonraki işlem:</b> {o.nextAction}</p>}
