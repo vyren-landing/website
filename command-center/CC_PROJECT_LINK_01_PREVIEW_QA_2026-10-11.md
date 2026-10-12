@@ -417,3 +417,24 @@ Vercel project: `vyren-command-center` / `prj_dKnuIt9cz0eRRKSS8kwW9mqMx8aY`, bra
 - Previously documented Vercel API free-tier 100+ deploy request cap did **not** prevent automatic Git-integrated deployment `828d4fc` from reaching READY. Keep API rate cap and Git build mechanisms distinct.
 - Still pending: authenticated Founder/Contributor runtime navigation, actual screenshot mobile QA, tab back/forward, forms and editing, status styles, and accessibility/browser interaction. No authority to claim browser QA PASS without observed signed-in results.
 - No production deployment, Neon DB change, schema migration or user account change performed by this inspection.
+
+
+## Founder desktop screenshot — D1-D3 UI observed 2026-10-12
+
+Founder provided screenshot of the signed-in canonical OAuth Preview alias
+`https://vyren-command-center-git-feature-comm-8a904a-vyrenlabs-projects.vercel.app/secure`
+and confirmed that the operational navigation sections are visible. This is user-supplied screenshot/Founder-reported UI evidence; screenshot is **not** uploaded to this repository.
+
+**Observed UI PASS (desktop scope only):**
+- Secure Founder sidebar and selected `Genel Bakış` module visible; Founder identity/profile area, grouped management/organization/resources/history/system navigation present.
+- Action-first overview cards `Kurucu İncelemesi`, `Proje Takibi`, `Dış Temaslar`, plus four operational metric tiles and optional status distribution details visible.
+- The image displays actual operational data after authenticated navigation: 2 tasks, 4 project records, 1 workstream and 1 opportunity (as shown at screenshot time). These numbers are observations only, not a current/full DB snapshot.
+- Distinct text-labelled status chips appear in the action cards. The canonical boundary disclaimer is visible.
+- User had initially visited an immutable deployment hostname and got correct OAuth fixed-origin warning; Vercel `get_alias` confirmed the configured stable alias targets READY `dpl_DJ2B8ztms38krQJmXimMc1EG7nMa`, code `828d4fc7580d7a8a1fe3a0e1b4aa7656a411577a`. No OAuth host change is needed.
+
+**UX follow-ups, no immediate mutations:**
+- Action cards surfaced known test fixture-like record titles `CC-QA-006 Durum Kaydı Testi` and `CC-OPP-TEST-001 Fırsat Yönetimi Testi`. Hiding QA controls alone does not segregate test DATA from operational dashboards. Plan a safe test/operational distinction without deleting history or imposing new launch blockers.
+- Sidebar is somewhat long and scrollable on the observed viewport; consider progressive organization after remaining UI QA.
+- **Not yet verified:** any click, form edit/save, 360px/768px responsive behavior, Contributor account experience, actual security regression retest, keyboard navigation or mobile menu. Screenshot PASS does not imply full functional QA PASS.
+
+Next user-guided QA: click `Görevler` from stable OAuth alias and confirm list-first editor collapsed and existing task cards work; then `Projeler`, `Proje Kayıtları`, `Fırsatlar`, `Ekip` and mobile as needed.
