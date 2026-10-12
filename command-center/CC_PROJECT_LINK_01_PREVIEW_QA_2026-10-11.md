@@ -453,3 +453,23 @@ Founder supplied three authenticated desktop screenshots of the stable OAuth Pre
 **Visual correction committed in same change:** CSS confines authenticated main content to top of its grid track using `.cc-live-shell .cc-live-main{margin:0 auto;align-self:start}`. The earlier global `.main{margin:auto}` caused short sections (e.g. Projeler) to be vertically centered in available viewport height. No business logic changes.
 
 **Remaining:** Build of this CSS adjustment, Founder interaction smoke checks (+ New opens editor, cancel closes, browser back, details/history), small-screen width check, Contributor experience and API authorization checks. Screenshots show entry-state only; no functional PASS is asserted.
+
+
+## Founder screenshot QA — Workload, Team, Opportunities, Workstreams — 2026-10-12
+
+Founder supplied four authenticated **desktop** screenshots of stable OAuth Preview alias using `?tab=assignment`, `?tab=team`, `?tab=opportunities`, and `?tab=workstreams`.
+
+**Visual/entry-state checks PASS, screenshot-reported only:**
+- `İş Yükü`: navigation selected correctly. 2 active assignments, both BRIEFED, one associated with each of 2 Contributors and distinct positions. Per-person grouped report and `Bu Kişinin Görevlerini Göster` controls render. No actual drilldown was clicked/verified.
+- `Ekip`: Founder-only Team screen lists 2 approved Contributors with enabled status text and editable optional organization position fields; `+ Davet Kaydı` is present and the invitation form is initially collapsed. Account identifiers appear in the primary card despite not being needed in everyday operation; future UX cleanup recommended. No invitation, disable, or position write occurred.
+- `Fırsatlar`: search and `+ Yeni Fırsat` present, editor initially collapsed. Existing QA fixture opportunity, status badge, edit/history/archive controls visible. No mutation clicked. Vertical blank space above header visible in supplied capture from before the latest CSS patch took effect.
+- `Çalışma Alanları`: source and last-read information, one operational workstream and its four associated project-record counts, readable status breakdown, related QA record next action, search and `Yeni Çalışma Alanı` control visible. No create/archive/edit behavior exercised.
+- On observed desktop viewport, sidebar navigation, typography, contrast and main list-first design are usable; screens contain operational-only/canonical boundaries.
+
+**Current deployment cross-check:** Vercel stable OAuth alias `vyren-command-center-git-feature-comm-8a904a-vyrenlabs-projects.vercel.app` was checked after these screenshots and targets READY deployment `dpl_7nDg4RDxkqEhgZ9dhyCqTkd44gvs`, commit `f5ea80069435ef96ddda7f70b50fba40d21dea4d`, which includes the top-alignment CSS fix. Supplied captures may precede this alias update; **do not claim fixed top-alignment visually verified** from them.
+
+**UX follow-ups (not hard gates, no live mutations):**
+- Reduce technical member ID prominence; technical IDs can stay accessible via diagnostic detail.
+- Long permission/canonical warning copy and full-width report action buttons can be visually reduced without changing actual warnings or permissions.
+- QA fixtures appear in Founder queues, opportunity and workstream reports. Define an explicit QA/operational classification strategy in future without name-prefix guessing, deleting original history, changing role grants or creating new dependencies.
+- Remaining: Founder click-through smoke of new/cancel, detail/history, mobile-width check, Contributor own task navigation and permission checks. **FULL_FUNCTIONAL_QA_PENDING**. This screenshot pass is not an authorization regression or performance test.
