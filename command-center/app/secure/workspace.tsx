@@ -1,5 +1,5 @@
 "use client";
-import {useCallback,useEffect,useState} from "react";
+import {useCallback,useEffect,useRef,useState} from "react";
 import StatusPill from "./status-pill";
 import {SignOut} from "./sign-in";
 import ArchivePanel from "./archive-panel";
@@ -58,6 +58,41 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
  const [data,setData]=useState<Data|null>(null);
  const [view,setView]=useState<View>(defaultView(tr));
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+ const mobileMenuPanelRef=useRef<HTMLElement>(null);
+ const mobileMenuCloseRef=useRef<HTMLButtonElement>(null);
+ const mobileMenuTriggerRef=useRef<HTMLButtonElement>(null);
+ const closeMobileMenu=()=>{
+  setMobileMenuOpen(false);
+  mobileMenuTriggerRef.current?.focus();
+ };
+ useEffect(()=>{
+  if(!mobileMenuOpen)return;
+  const priorOverflow=document.body.style.overflow;
+  document.body.style.overflow="hidden";
+  mobileMenuCloseRef.current?.focus();
+  const onKeyDown=(event:KeyboardEvent)=>{
+   if(event.key==="Escape"){
+    event.preventDefault();
+    setMobileMenuOpen(false);
+    mobileMenuTriggerRef.current?.focus();
+    return;
+   }
+   if(event.key!=="Tab")return;
+   const controls=mobileMenuPanelRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])');
+   if(!controls?.length)return;
+   const first=controls[0],last=controls[controls.length-1];
+   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  };
+  document.addEventListener("keydown",onKeyDown);
+  return ()=>{document.removeEventListener("keydown",onKeyDown);document.body.style.overflow=priorOverflow;};
+ },[mobileMenuOpen]);
+ useEffect(()=>{
+  const media=window.matchMedia("(max-width: 780px)");
+  const resetOnDesktop=()=>{if(!media.matches)setMobileMenuOpen(false);};
+  media.addEventListener("change",resetOnDesktop);
+  return ()=>media.removeEventListener("change",resetOnDesktop);
+ },[]);
  const navGroups=tr?founderNav:showQaTools?[...contributorNav,qaNav]:contributorNav;
  const allowedViews=navGroups.flatMap(group=>group.items.map(item=>item.id));
  const currentItem=navGroups.flatMap(group=>group.items).find(item=>item.id===view);
@@ -95,12 +130,13 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
    [...contributorNav,...(showQaTools?[qaNav]:[])].flatMap(g=>g.items.map(x=>x.id));
   if(!valid.includes(next))return;
   setView(next);setMobileMenuOpen(false);
+  if(mobileMenuOpen)mobileMenuTriggerRef.current?.focus();
   const url=new URL(window.location.href);
   if(next===defaultView(tr))url.searchParams.delete("tab");
   else url.searchParams.set("tab",next);
   window.history.pushState({ccView:next},"",url.pathname+url.search+url.hash);
   if(next==="active")void load();
- },[tr,showQaTools,load]);
+ },[tr,showQaTools,load,mobileMenuOpen]);
  useEffect(()=>{
   const sync=()=>{
    const requested=new URLSearchParams(window.location.search).get("tab") as View|null;
@@ -127,7 +163,14 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
   finally{setBusy(false);}
  };
  return <div className="shell cc-live-shell">
-  <aside className={"side cc-live-side"+(mobileMenuOpen?" is-open":"")} id="cc-live-nav">
+  {mobileMenuOpen&&<button type="button" className="cc-mobile-menu-backdrop" tabIndex={-1}
+   onClick={closeMobileMenu} aria-label="Mobil menüyü kapat"/>}
+  <aside className={"side cc-live-side"+(mobileMenuOpen?" is-open":"")} id="cc-live-nav"
+   ref={mobileMenuPanelRef} role={mobileMenuOpen?"dialog":undefined}
+   aria-modal={mobileMenuOpen?true:undefined}
+   aria-label={mobileMenuOpen?"Command Center mobil menüsü":undefined}>
+   <button type="button" className="cc-live-mobile-close" ref={mobileMenuCloseRef}
+    onClick={closeMobileMenu} aria-label="Menüyü kapat">✕ <span>Menüyü Kapat</span></button>
    <div className="cc-live-brand">◈ VYREN</div>
    <p className="cc-live-brand-sub">COMMAND CENTER</p>
    <nav className="cc-live-nav" aria-label={tr?"Kurucu navigasyonu":"Katkı sağlayan navigasyonu"}>
@@ -152,8 +195,8 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
   <main className="main cc-live-main">
    <div className="cc-live-mobile-top">
     <b>◈ VYREN <span className="small muted">COMMAND CENTER</span></b>
-    <button type="button" aria-controls="cc-live-nav" aria-expanded={mobileMenuOpen}
-      onClick={()=>setMobileMenuOpen(s=>!s)}>{mobileMenuOpen?"Menüyü Kapat":"☰ Menü"}</button>
+    <button type="button" ref={mobileMenuTriggerRef} aria-controls="cc-live-nav" aria-expanded={mobileMenuOpen}
+      onClick={()=>setMobileMenuOpen(s=>!s)}>☰ Menü</button>
    </div>
    <header className="cc-live-header">
     <div><p className="cc-live-eyebrow">{tr?"KURUCU ÇALIŞMA ALANI":"KATKI SAĞLAYAN ÇALIŞMA ALANI"}</p>
