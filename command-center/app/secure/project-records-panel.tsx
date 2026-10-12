@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import StatusPill from "./status-pill";
 
 type Status="TODO"|"IN_PROGRESS"|"DONE"|"BLOCKED"|"DEFERRED";
 type RecordRow={
@@ -161,7 +162,7 @@ export default function ProjectRecordsPanel(){
   {grouped.map(group=>group.items.length>0&&<section key={group.status} className="stack">
     <h3>{labels[group.status]} ({group.items.length})</h3>
     {group.items.map(row=><article key={row.id} className="card stack">
-     <div className="row between"><b style={{overflowWrap:"anywhere"}}>{row.title}</b><span className="badge">{labels[row.status]}</span></div>
+     <div className="row between"><b style={{overflowWrap:"anywhere"}}>{row.title}</b><StatusPill status={row.status} label={labels[row.status]}/></div>
      <p className="small muted">{row.workstream} · Son güncelleme {date(row.updatedAt)} · Revizyon {row.revision}</p>
      {projectReady&&!row.archivedAt&&<div className="field"><label>İlgili proje</label>
        <select value={row.projectId||""} disabled={busy} onChange={e=>void setProject(row,e.target.value)}>
