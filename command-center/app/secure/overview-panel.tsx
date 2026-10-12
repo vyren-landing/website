@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useMemo,useState} from "react";
+import StatusPill from "./status-pill";
 
 type Destination="active"|"records"|"workstreams"|"opportunities";
 type Item={
@@ -69,7 +70,7 @@ function AttentionGroup({title,subtitle,countLabel,items,empty,open,buttonLabel}
     shown.map(item=><div className="cc-overview-item" key={item.id}>
      <div className="row between">
       <b>{item.title}</b>
-      <span className="badge">{labels[item.status]||item.status}</span>
+      <StatusPill status={item.status} label={labels[item.status]||item.status}/>
      </div>
      {(item.ownerName||item.organization||item.workstream)&&
       <p className="small muted">
