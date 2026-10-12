@@ -83,3 +83,16 @@
 .cc-overview-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px;color:#91a5bf;font-size:11px}
 @media(max-width:1150px){.cc-overview-attention-grid{grid-template-columns:1fr}.cc-overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.cc-overview-metrics,.cc-overview-breakdowns{grid-template-columns:1fr}.cc-overview-attention-card{padding:13px}}
+
+
+/* D3 shared operational status, focus, text overflow and responsive polish. */
+.cc-status-pill{display:inline-flex;align-items:center;max-width:100%;flex-shrink:0;overflow-wrap:anywhere;border-radius:999px;border:1px solid #41526b;background:#233247;color:#d7e6f6;padding:4px 10px;font-size:11px;font-weight:700;line-height:1.4}
+.cc-status-pill[data-tone="info"]{background:#173d5d;border-color:#2d6e9f;color:#b8e1ff}
+.cc-status-pill[data-tone="success"]{background:#1b473b;border-color:#2b765b;color:#adf3d2}
+.cc-status-pill[data-tone="warning"]{background:#4c3820;border-color:#8d6b35;color:#ffe0a5}
+.cc-status-pill[data-tone="danger"]{background:#512a30;border-color:#9c414b;color:#ffd2d6}
+.cc-live-content .panel,.cc-live-content .card{min-width:0}
+.cc-live-content p,.cc-live-content b,.cc-live-content a{overflow-wrap:anywhere}
+.cc-live-content button:focus-visible,.cc-live-content a:focus-visible,.cc-live-content input:focus-visible,.cc-live-content select:focus-visible,.cc-live-content textarea:focus-visible{outline:2px solid #95c5ff;outline-offset:2px}
+.cc-live-content button:not(:disabled){min-height:39px}
+@media(max-width:780px){.cc-live-content .row.between{align-items:flex-start}.cc-live-content .panel,.cc-live-content .card{padding:14px}}
