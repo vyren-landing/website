@@ -1,5 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import StatusPill from "./status-pill";
 type Status="TODO"|"IN_PROGRESS"|"DONE"|"BLOCKED"|"DEFERRED";
 type Project={id:string;title:string;objective:string;nextAction:string;workstreamId:string|null;
  workstreamName:string|null;status:Status;revision:number;archivedAt:string|null;updatedAt:string;
@@ -147,7 +148,7 @@ export default function ProjectsPanel(){
   {!loading&&ready&&projects.length===0&&<p className="small muted">Henüz operasyonel proje yok. Eski kayıtlar ve görevler otomatik taşınmadı.</p>}
   {ready&&projects.length>0&&visibleProjects.length===0&&<p className="small muted">Aramayla eşleşen proje bulunamadı.</p>}
   {visibleProjects.map(p=><article key={p.id} className="card stack">
-   <div className="row between"><b>{p.title}</b><span className="badge">{statuses[p.status]}{p.archivedAt?" / Arşiv":""}</span></div>
+   <div className="row between"><b>{p.title}</b><StatusPill status={p.archivedAt?"ARCHIVED":p.status} label={statuses[p.status]+(p.archivedAt?" / Arşiv":"")}/></div>
    {p.objective&&<p style={{whiteSpace:"pre-wrap"}}>{p.objective}</p>}
    <p className="small muted">{p.workstreamName||"Bağımsız proje"} · {p.taskCount} bağlı görev · {p.completedTaskCount} tamamlanan görev · {p.recordCount} durum kaydı · Revizyon {p.revision}</p>
    {p.nextAction&&<p><b>Sonraki adım:</b> {p.nextAction}</p>}
