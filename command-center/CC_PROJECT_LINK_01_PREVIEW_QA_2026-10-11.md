@@ -393,3 +393,13 @@ D2 UI-only source changes were committed to Preview feature branch after D1:
 - Added keyboard-focus and responsive CSS for small screens. Time label uses Europe/Istanbul explicitly.
 - **D2_OVERVIEW_SOURCE_COMPLETE; BUILD_AND_BROWSER_QA_PENDING.** No newly verified READY Vercel deployment for this commit, and no authenticated visual run or typechecked Next.js build completed yet. Earlier Vercel API preview deploy returned the project/team daily request cap; do not promote or claim shipped.
 - Suggested smoke checklist when Preview deploy available: Founder sees three queues before counts; empty states; all queue links; counts/archived distinctions; details toggle; mobile layout; valid Contributor cannot access Founder overview endpoint; no regression in D1 navigation and D2 on-demand forms.
+
+
+## D3 design system and accessibility source update — 2026-10-12
+
+- Added reusable `app/secure/status-pill.tsx` for operational status chips with explicit text, not color-only meaning. Shared palette distinguishes neutral, informational, completed/active, caution/pending, and blocked/disabled. This does not alter any workflow state or server access check.
+- Replaced status chips with the shared component in authenticated task list, projects, project records, opportunities, Founder overview, and team/invitation view.
+- `app/globals.css` includes responsive text-wrap/overflow, visible keyboard focus for buttons, links and form controls, mobile card padding and accessible status colors. Demo app styles and canonical VYREN project decisions unchanged.
+- No DB migration, API change, session mutation, role permissions, GNR rights or Production deployment.
+- **D3_SOURCE_PARTIAL_PASS**: code changes applied. **Next.js typecheck/build NOT VERIFIED**, because this tool runtime cannot fetch the connected GitHub private repo into the local container and no dependency-backed local build was run; no GitHub Actions runs are present and earlier Vercel new deployment was blocked by `api-deployments-free-per-day`. Browser/cross-device QA remains unverified.
+- Next validation: actual Preview build of current feature head, Founder/Contributor navigation, status text and semantic tones, keyboard focus, responsive 360px/768px/desktop, task/form workflows without data mutation in QA; preserve optional Preview-only Contributor security tests.
