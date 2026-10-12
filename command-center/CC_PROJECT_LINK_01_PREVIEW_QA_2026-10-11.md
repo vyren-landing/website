@@ -494,3 +494,15 @@ Founder supplied six authenticated desktop screenshots of the stable OAuth Previ
 **Vercel cross-check after screenshots:** stable OAuth alias currently points to READY deployment `dpl_9innP7GjoeKLrJcEZswdthVanXxZ`, commit `bb6e4d24cbf0f605547f3f455ec438b4dbe3d737`. The source includes prior `f5ea8006` top-alignment CSS. Screenshot time vs alias update is not pinned to a specific deployment, so avoid treating screenshot as definitive evidence the fix was loaded.
 
 **Next safe user test:** On stable alias `Fırsatlar` page with editor open, click `İptal`, then check editor disappears and `+ Yeni Fırsat` returns while pre-existing opportunity persists. No data modification. Afterwards run optional Founder read-only Module Health check without any authentication/test-user changes.
+
+
+## Founder opportunity editor cancellation — user-observed PASS — 2026-10-12
+
+The Founder clarified the live authenticated Preview UI sequence, correcting ambiguity in the previous QA note:
+1. Opening `Fırsatlar` initially showed the existing opportunity list and `+ Yeni Fırsat`; no editor was open.
+2. Clicking `+ Yeni Fırsat` showed the `Yeni Operasyonel Fırsat` form, changed the top toggle to `Formu Kapat`, and displayed the form's bottom `İptal` button.
+3. Clicking **`İptal`** returned the view to its original list-first, form-closed state, showing `+ Yeni Fırsat` again. The pre-existing `CC-OPP-TEST-001` opportunity remained visible.
+4. The **`Arşivle (Silmeden)`** control belongs to the existing opportunity card and was not used as part of the form-cancel test.
+
+**OPPORTUNITY_CREATE_FORM_OPEN_CANCEL_UI_PASS (Founder-reported).**
+The result verifies UI open/close and retention of the visible existing row, not database-level transaction absence, valid form submission, create, edit, or archive workflows. No test record or live data mutation is requested or performed in this documentation update.
