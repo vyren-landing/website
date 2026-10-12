@@ -438,3 +438,18 @@ and confirmed that the operational navigation sections are visible. This is user
 - **Not yet verified:** any click, form edit/save, 360px/768px responsive behavior, Contributor account experience, actual security regression retest, keyboard navigation or mobile menu. Screenshot PASS does not imply full functional QA PASS.
 
 Next user-guided QA: click `Görevler` from stable OAuth alias and confirm list-first editor collapsed and existing task cards work; then `Projeler`, `Proje Kayıtları`, `Fırsatlar`, `Ekip` and mobile as needed.
+
+
+## Founder screenshot QA — Tasks, Projects, Project Records — 2026-10-12
+
+Founder supplied three authenticated desktop screenshots of the stable OAuth Preview alias using `/secure?tab=active`, `/secure?tab=projects`, and `/secure?tab=records`.
+
+**Screenshot-observed visual QA (PASS for desktop layout and default collapsed editor presentation only):**
+- `Görevler`: Founder navigation correctly marks active tab; task cards `CC-ISOLATION-002` and `CC-ISOLATION-001 Kopyala` appear in list-first view, status text `Tanımlandı`, actions `Ayrıntıları Aç`, `Yenile`, and `+ Yeni Görev` visible; new task form is initially hidden. Screenshots are not proof that form submission or task actions work.
+- `Projeler`: `?tab=projects` correctly selects navigation; one operational test project card `CC-QA-006 - Proje Yönetimi Testi` shown, search input and `+ Yeni Proje` button visible with editor initially closed; edit, related tasks, history, archive actions visible. Noticeable extra vertical blank area above page header compared with other screenshots.
+- `Proje Kayıtları`: `?tab=records` correctly selects navigation; `+ Yeni Kayıt` visible and form initially closed; search and groups `DEVAM EDİYOR (1)`, `YAPILDI (3)` visible. Test record `CC-QA-006 Durum Kaydı Testi` appears with text status and follow-up.
+- Both QA fixture and operational record presentation currently share main Founder surfaces; no automatic deletion, hiding-by-title, history rewrite, data migration, or live DB edits are authorized by these screenshots.
+
+**Visual correction committed in same change:** CSS confines authenticated main content to top of its grid track using `.cc-live-shell .cc-live-main{margin:0 auto;align-self:start}`. The earlier global `.main{margin:auto}` caused short sections (e.g. Projeler) to be vertically centered in available viewport height. No business logic changes.
+
+**Remaining:** Build of this CSS adjustment, Founder interaction smoke checks (+ New opens editor, cancel closes, browser back, details/history), small-screen width check, Contributor experience and API authorization checks. Screenshots show entry-state only; no functional PASS is asserted.

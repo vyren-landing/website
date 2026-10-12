@@ -96,3 +96,6 @@
 .cc-live-content button:focus-visible,.cc-live-content a:focus-visible,.cc-live-content input:focus-visible,.cc-live-content select:focus-visible,.cc-live-content textarea:focus-visible{outline:2px solid #95c5ff;outline-offset:2px}
 .cc-live-content button:not(:disabled){min-height:39px}
 @media(max-width:780px){.cc-live-content .row.between{align-items:flex-start}.cc-live-content .panel,.cc-live-content .card{padding:14px}}
+
+/* D3 desktop top alignment of authenticated content. */
+.cc-live-shell .cc-live-main{margin:0 auto;align-self:start}
