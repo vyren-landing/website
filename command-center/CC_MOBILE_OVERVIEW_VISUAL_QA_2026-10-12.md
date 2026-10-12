@@ -27,3 +27,16 @@ Classification: operational UI only; not a VYREN Master / FFA / lifecycle / GNR 
 
 No code change, Neon data mutation, OAuth or role changes, production deployment or canonical state change was made for this visual review.
 Next Founder-led safe test: tap `Menü` on mobile and verify opening, close and access to `Görevler`, with no record modification.
+
+
+## Founder mobile navigation open — screenshot observation (2026-10-12, Europe/Istanbul)
+
+Founder supplied two Android Chrome mobile screenshots with the `Menü` control activated.
+
+- **MOBILE_MENU_OPEN_VISUAL_PASS**: grouped `YÖNETİM`, `ORGANİZASYON`, `KAYNAKLAR`, `GEÇMİŞ`, `SİSTEM` navigation is visibly expanded.
+- `Genel Bakış` has the active selection highlight; `Görevler`, `Projeler`, `Proje Kayıtları`, `Çalışma Alanları`, `Fırsatlar`, `Ekip`, `İş Yükü` navigation entries are present; account profile, signout and `Menüyü Kapat` are visible at bottom of expanded menu.
+- **MOBILE_NAVIGATION_TO_TASKS_NOT_YET_OBSERVED**, **MENU_CLOSE_NOT_YET_OBSERVED**: existence of clickable controls does not confirm either action executed.
+- **UX finding:** mobile expanded sidebar participates in normal document flow and pushes the original General Overview content down, after a very long navigation list. It creates unnecessary scroll distance. Recommended small-scope follow-up: use an overlay/drawer with internal scrolling, close automatically when a valid nav item is clicked and preserve role-based menu content and permissions. No code change claimed in this evidence entry.
+- User-supplied images are not committed; no private browser/session details are included in the QA report.
+
+Next safe manual check on current UI: select `Görevler` from expanded mobile menu, confirm it changes to task list and menu closes. No DB writes required.
