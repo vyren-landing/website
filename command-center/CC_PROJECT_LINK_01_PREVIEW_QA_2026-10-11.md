@@ -473,3 +473,24 @@ Founder supplied four authenticated **desktop** screenshots of stable OAuth Prev
 - Long permission/canonical warning copy and full-width report action buttons can be visually reduced without changing actual warnings or permissions.
 - QA fixtures appear in Founder queues, opportunity and workstream reports. Define an explicit QA/operational classification strategy in future without name-prefix guessing, deleting original history, changing role grants or creating new dependencies.
 - Remaining: Founder click-through smoke of new/cancel, detail/history, mobile-width check, Contributor own task navigation and permission checks. **FULL_FUNCTIONAL_QA_PENDING**. This screenshot pass is not an authorization regression or performance test.
+
+
+## Founder screenshots — opportunity create form, archive, audit, context and health — 2026-10-12
+
+Founder supplied six authenticated desktop screenshots of the stable OAuth Preview alias. These are image-derived observations only. Screenshots are not preserved in this GitHub QA document, and no credentials or account IDs are copied.
+
+**Observed user-facing entry-state / nonmutating checks:**
+- `Fırsatlar`, `?tab=opportunities`: `+ Yeni Fırsat` opened the `Yeni Operasyonel Fırsat` editor (upper and lower portions evidenced in separate screenshots). Title, counterparty, workstream, opportunity type, stage, verified status, next action, optional HTTPS evidence and `Fırsat Kaydet` / `İptal` visible; missing required fields keep `Fırsat Kaydet` disabled. Top button changes to `Formu Kapat`. Existing QA opportunity remains in the list beneath the editor. **FORM_OPEN_VISUAL_PASS**; **CANCEL_CLOSE_NOT_YET_OBSERVED**. No create/save action evidenced, so no mutation PASS asserted.
+- `Görev Arşivi`, `?tab=archive`: multiple archived test tasks with statuses, responsible Contributor, archive timestamps and `Tüm Teslim ve Onayları Göster` control visible. Screenshot-only list UI PASS; expanded review contents not observed.
+- `İşlem Geçmişi`, `?tab=audit`: chronological operational audit cards visible with raw event codes, actor reference and timestamp. List rendering PASS; UX follow-up: localized friendly action names, technical event codes/member IDs in expandable technical details instead of primary surface. No historical data mutation.
+- `Proje Bağlamı`, `?tab=context`: source reference search and guidance cards for Master Project Status, Launch Lifecycle Decision Ledger and GNR-STD-001 visible, each explaining that the interface is not a live canonical synchronization/source. This validates static directory rendering, **not** that referenced documents are latest canonical revision.
+- `Modül Sağlığı`, `?tab=moduleHealth`: Founder-only read-only control is visible, with `Modül Kontrollerini Çalıştır` action. **BUTTON_VISIBLE_ONLY**; no evidence this control was clicked or that endpoint integrity checks passed at screenshot time.
+
+**Visual observations:**
+- Module Health capture showed large blank upper section before the header, reminiscent of pre-fix vertical centering; a new screenshot or forced reload on verified newer deployment is needed to conclude the `f5ea8006` top alignment fix is visually effective. Existing short-page CSS fix should not be marked visually PASS based only on that capture.
+- The longer opportunity form is legible at desktop width and requires vertical scrolling. Grouping fields and mobile 360–768px checks remain optional UX follow-up.
+- Existing QA fixtures are still surfaced alongside real operational work. Any separation should use explicit classification rather than title-prefix guessing; preserve full archival/revision evidence.
+
+**Vercel cross-check after screenshots:** stable OAuth alias currently points to READY deployment `dpl_9innP7GjoeKLrJcEZswdthVanXxZ`, commit `bb6e4d24cbf0f605547f3f455ec438b4dbe3d737`. The source includes prior `f5ea8006` top-alignment CSS. Screenshot time vs alias update is not pinned to a specific deployment, so avoid treating screenshot as definitive evidence the fix was loaded.
+
+**Next safe user test:** On stable alias `Fırsatlar` page with editor open, click `İptal`, then check editor disappears and `+ Yeni Fırsat` returns while pre-existing opportunity persists. No data modification. Afterwards run optional Founder read-only Module Health check without any authentication/test-user changes.
