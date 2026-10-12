@@ -403,3 +403,17 @@ D2 UI-only source changes were committed to Preview feature branch after D1:
 - No DB migration, API change, session mutation, role permissions, GNR rights or Production deployment.
 - **D3_SOURCE_PARTIAL_PASS**: code changes applied. **Next.js typecheck/build NOT VERIFIED**, because this tool runtime cannot fetch the connected GitHub private repo into the local container and no dependency-backed local build was run; no GitHub Actions runs are present and earlier Vercel new deployment was blocked by `api-deployments-free-per-day`. Browser/cross-device QA remains unverified.
 - Next validation: actual Preview build of current feature head, Founder/Contributor navigation, status text and semantic tones, keyboard focus, responsive 360px/768px/desktop, task/form workflows without data mutation in QA; preserve optional Preview-only Contributor security tests.
+
+
+## D1–D3 preview compilation verified — 2026-10-12
+
+Vercel project: `vyren-command-center` / `prj_dKnuIt9cz0eRRKSS8kwW9mqMx8aY`, branch `feature/command-center-phase2-auth-db-20261009`, team `team_9Fyp6QiwrZNhMJd68e1HdPvt`.
+
+**BUILD_PASS / TYPECHECK_PASS (Vercel-observed):**
+- Deployment `dpl_DJ2B8ztms38krQJmXimMc1EG7nMa`, source commit `828d4fc7580d7a8a1fe3a0e1b4aa7656a411577a`, state **READY**, URL `https://vyren-command-center-him7c52o8-vyrenlabs-projects.vercel.app/secure`.
+- Build logs explicitly report `Next.js 15.5.18`, `✓ Compiled successfully in 7.0s`, followed by `Linting and checking validity of types`, and static generation `✓ Generating static pages (4/4)`. The dynamic `/secure` route appears in the successful build output.
+- **LINT_NOT_RUN**: logs report `ESLint must be installed in order to run during builds: npm install --save-dev eslint`. Deployment succeeds nonetheless; do NOT mark a lint pass.
+- Only subsequent source commit `c8845115eb40aaa21cc7a4271e52dc157f1355fd` added QA documentation, no runtime UI code. Its own deployment `dpl_GepVSRr3etkzNVr9E3UBc9HTxyHD` was **QUEUED** when inspected; do not claim it is READY.
+- Previously documented Vercel API free-tier 100+ deploy request cap did **not** prevent automatic Git-integrated deployment `828d4fc` from reaching READY. Keep API rate cap and Git build mechanisms distinct.
+- Still pending: authenticated Founder/Contributor runtime navigation, actual screenshot mobile QA, tab back/forward, forms and editing, status styles, and accessibility/browser interaction. No authority to claim browser QA PASS without observed signed-in results.
+- No production deployment, Neon DB change, schema migration or user account change performed by this inspection.
