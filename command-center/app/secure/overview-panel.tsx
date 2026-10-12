@@ -1,106 +1,208 @@
 "use client";
 import {useCallback,useEffect,useMemo,useState} from "react";
-type Item={id:string;title:string;status:string;nextAction?:string;workstream?:string;organization?:string;ownerName?:string};
-type Counts={tasks:Record<string,number>;records:Record<string,number>;workstreams:Record<string,number>;opportunities:Record<string,number>;archivedTasks:number;archivedRecords:number;archivedOpportunities:number};
-type Report={asOf:string;scope:string;source:string;features:{streams:boolean;opportunities:boolean};counts:Counts;attention:{founderReviews:Item[];recordActions:Item[];opportunityActions:Item[]};limits:{perQueue:number}};
-const names:Record<string,string>={
- "BRIEFED":"TANIMLANDI","ACCEPTED":"KABUL EDİLDİ","IN PROGRESS":"DEVAM EDİYOR",
- "FOUNDER REVIEW":"KURUCU İNCELEMESİ","COMPLETED":"TAMAMLANDI","CANCELLED":"İPTAL",
- "TODO":"YAPILACAK","IN_PROGRESS":"DEVAM EDİYOR","DONE":"YAPILDI",
- "BLOCKED":"ENGELLENDİ","DEFERRED":"ERTELENDİ","ACTIVE":"AKTİF",
- "PAUSED":"BEKLEMEDE","ARCHIVED":"ARŞİV",
- "RESEARCH":"ARAŞTIRMA","QUALIFIED":"ÖN ELEME","CONTACTED":"İLETİŞİM",
- "REPLY_RECEIVED":"YANIT ALINDI","DISCUSSION":"GÖRÜŞME","PROPOSAL":"TEKLİF",
- "INTERNAL_REVIEW":"İÇ İNCELEME","WAITING_EXTERNAL":"DIŞ YANIT BEKLENİYOR",
- "DORMANT":"DURGUN","CLOSED":"TAKİP KAPANDI"
+
+type Destination="active"|"records"|"workstreams"|"opportunities";
+type Item={
+ id:string;title:string;status:string;nextAction?:string;workstream?:string;
+ organization?:string;ownerName?:string
 };
-const total=(data:Record<string,number>)=>Object.values(data).reduce((n,v)=>n+v,0);
-const ordered=(data:Record<string,number>)=>Object.entries(data).sort((a,b)=>b[1]-a[1]);
-function CountsGroup({title,counts,archived}:{title:string;counts:Record<string,number>;archived?:number}){
- return <article className="card stack">
-  <div className="row between"><b>{title}</b><span className="badge">{total(counts)} aktif</span></div>
-  {Object.keys(counts).length===0?<p className="small muted">Henüz aktif operasyonel kayıt yok.</p>:
-   ordered(counts).map(([key,count])=><p className="small" key={key}>{names[key]||key}: <b>{count}</b></p>)}
-  {archived!==undefined&&<p className="small muted">Arşivde: {archived}</p>}
+type Counts={
+ tasks:Record<string,number>;records:Record<string,number>;
+ workstreams:Record<string,number>;opportunities:Record<string,number>;
+ archivedTasks:number;archivedRecords:number;archivedOpportunities:number
+};
+type Report={
+ asOf:string;scope:string;source:string;
+ features:{streams:boolean;opportunities:boolean};
+ counts:Counts;
+ attention:{founderReviews:Item[];recordActions:Item[];opportunityActions:Item[]};
+ limits:{perQueue:number}
+};
+
+const labels:Record<string,string>={
+ "BRIEFED":"Tanımlandı","ACCEPTED":"Kabul Edildi","IN PROGRESS":"Devam Ediyor",
+ "FOUNDER REVIEW":"Kurucu İncelemesi","COMPLETED":"Tamamlandı","CANCELLED":"İptal",
+ "TODO":"Yapılacak","IN_PROGRESS":"Devam Ediyor","DONE":"Yapıldı",
+ "BLOCKED":"Engellendi","DEFERRED":"Ertelendi","ACTIVE":"Aktif",
+ "PAUSED":"Beklemede","ARCHIVED":"Arşiv","RESEARCH":"Araştırma",
+ "QUALIFIED":"Ön Eleme","CONTACTED":"İletişim Kuruldu",
+ "REPLY_RECEIVED":"Yanıt Alındı","DISCUSSION":"Görüşme","PROPOSAL":"Teklif",
+ "INTERNAL_REVIEW":"İç İnceleme","WAITING_EXTERNAL":"Dış Yanıt Bekleniyor",
+ "DORMANT":"Durgun","CLOSED":"Takip Kapandı"
+};
+const total=(data:Record<string,number>)=>
+ Object.values(data).reduce((n,value)=>n+value,0);
+const sorted=(data:Record<string,number>)=>
+ Object.entries(data).sort((a,b)=>b[1]-a[1]);
+const shortListLimit=4;
+
+function StatusBreakdown({title,counts,archived}:{
+ title:string;counts:Record<string,number>;archived?:number
+}){
+ return <article className="cc-overview-breakdown-card">
+  <div className="row between"><b>{title}</b><span className="small muted">{total(counts)} kayıt</span></div>
+  {sorted(counts).length===0&&<p className="small muted">Kayıt bulunmuyor.</p>}
+  {sorted(counts).map(([status,count])=>
+   <div className="cc-overview-breakdown-row" key={status}>
+    <span>{labels[status]||status}</span><b>{count}</b>
+   </div>)}
+  {archived!==undefined&&<div className="cc-overview-breakdown-row muted">
+   <span>Arşivlenen</span><b>{archived}</b>
+  </div>}
  </article>;
 }
-function Queue({title,items,empty,open}:{title:string;items:Item[];empty:string;open:()=>void}){
- return <article className="card stack">
-  <div className="row between"><h3>{title}</h3><button onClick={open}>İlgili Bölümü Aç</button></div>
-  {items.length===0&&<p className="small muted">{empty}</p>}
-  {items.map(row=><div key={row.id} className="panel stack">
-   <b>{row.title}</b>
-   <p className="small muted">{names[row.status]||row.status}{row.workstream?" · "+row.workstream:""}{row.ownerName?" · "+row.ownerName:""}{row.organization?" · "+row.organization:""}</p>
-   {row.nextAction&&<p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{row.nextAction}</p>}
-  </div>)}
+
+function AttentionGroup({title,subtitle,countLabel,items,empty,open,buttonLabel}:{
+ title:string;subtitle:string;countLabel:string;items:Item[];
+ empty:string;open:()=>void;buttonLabel:string
+}){
+ const shown=items.slice(0,shortListLimit);
+ return <article className="cc-overview-attention-card">
+  <div className="cc-overview-attention-head">
+   <div className="stack" style={{gap:4}}>
+    <h3>{title}</h3><p className="small muted">{subtitle}</p>
+   </div>
+   <span className="cc-overview-count">{countLabel}</span>
+  </div>
+  <div className="cc-overview-items">
+   {shown.length===0?<p className="cc-overview-empty">{empty}</p>:
+    shown.map(item=><div className="cc-overview-item" key={item.id}>
+     <div className="row between">
+      <b>{item.title}</b>
+      <span className="badge">{labels[item.status]||item.status}</span>
+     </div>
+     {(item.ownerName||item.organization||item.workstream)&&
+      <p className="small muted">
+       {[item.ownerName,item.organization,item.workstream].filter(Boolean).join(" · ")}
+      </p>}
+     {item.nextAction&&<p className="cc-overview-next"><b>Sonraki:</b> {item.nextAction}</p>}
+    </div>)}
+   {items.length>shown.length&&
+    <p className="small muted">Bu kartta ilk {shown.length} kayıt gösteriliyor.</p>}
+  </div>
+  <button type="button" className="cc-overview-open" onClick={open}>
+   {buttonLabel} <span aria-hidden="true">→</span>
+  </button>
  </article>;
 }
-export default function OverviewPanel({openView}:{openView:(view:"active"|"records"|"workstreams"|"opportunities")=>void}){
+
+function Metric({label,value,description,open}:{
+ label:string;value:number;description:string;open:()=>void
+}){
+ return <button type="button" className="cc-overview-metric" onClick={open}>
+  <span className="small muted">{label}</span>
+  <span className="cc-overview-metric-value">{value}</span>
+  <span className="cc-overview-metric-caption">{description} <span aria-hidden="true">↗</span></span>
+ </button>;
+}
+
+export default function OverviewPanel({openView}:{openView:(view:Destination)=>void}){
  const [data,setData]=useState<Report|null>(null);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  const load=useCallback(async()=>{
   setBusy(true);setError("");
   try{
-   const r=await fetch("/api/cc/overview",{credentials:"same-origin",cache:"no-store"});
-   const body=await r.json();
-   if(!r.ok)throw new Error(body.error||"Yönetim özeti yüklenemedi");
-   if(!body.counts||!body.attention)throw new Error("Geçersiz rapor yanıtı");
-   setData(body);
-  }catch(e){setError(e instanceof Error?e.message:"Yönetim özeti yüklenemedi");}
-  finally{setBusy(false);}
+   const response=await fetch("/api/cc/overview",{credentials:"same-origin",cache:"no-store"});
+   const result=await response.json();
+   if(!response.ok)throw new Error(result.error||"Yönetim özeti yüklenemedi");
+   if(!result.counts||!result.attention)throw new Error("Geçersiz rapor yanıtı");
+   setData(result as Report);
+  }catch(e){
+   setError(e instanceof Error?e.message:"Yönetim özeti yüklenemedi");
+  }finally{setBusy(false);}
  },[]);
  useEffect(()=>{void load()},[load]);
+
  const focus=useMemo(()=>{
   if(!data)return null;
-  const c=data.counts;
+  const counts=data.counts;
   return {
-   tasks:total(c.tasks),
-   records:total(c.records),
-   opportunities:total(c.opportunities),
-   review:c.tasks["FOUNDER REVIEW"]||0,
-   blocked:c.records.BLOCKED||0,
-   waiting:(c.opportunities.WAITING_EXTERNAL||0),
-   streams:total(c.workstreams)
+   tasks:total(counts.tasks),
+   records:total(counts.records),
+   streams:total(counts.workstreams),
+   opportunities:total(counts.opportunities),
+   reviews:counts.tasks["FOUNDER REVIEW"]||0,
+   blocked:counts.records.BLOCKED||0,
+   waiting:counts.opportunities.WAITING_EXTERNAL||0
   };
  },[data]);
- return <section className="panel stack">
-  <h2>Yönetim Özeti / Raporlar</h2>
-  <div className="alert small">Bu ekran sadece Command Center PostgreSQL operasyonlarını özetler. VYREN Master, VDCP, GNR, FFA veya Launch Lifecycle ile canlı senkronize değildir. Gösterilmeyen işlerin tamamlandığı veya Genesis'in hazır olduğu sonucu çıkarılamaz.</div>
-  <div className="row" style={{gap:8,flexWrap:"wrap"}}>
-   <button disabled={busy} onClick={()=>void load()}>{busy?"Okunuyor...":"Raporu Yenile"}</button>
-   <button onClick={()=>openView("records")}>Proje Kayıtlarına Git</button>
+
+ return <section className="cc-overview stack" aria-label="Operasyonel Genel Bakış">
+  <div className="cc-list-toolbar">
+   <div>
+    <h2>Operasyonun Genel Görünümü</h2>
+    <p className="small muted">Önce inceleme ve takip gerektiren işleri görün, ardından diğer kayıtlara geçin.</p>
+   </div>
+   <button type="button" disabled={busy} onClick={()=>void load()}>
+    {busy?"Yenileniyor...":"Görünümü Yenile"}
+   </button>
   </div>
-  {error&&<p className="alert" role="alert">{error}</p>}
-  {data&&<p className="small muted">Tutarlı PostgreSQL okuması: {new Date(data.asOf).toLocaleString("tr-TR")} · Kaynak: yalnızca operasyonel kayıtlar · Bu ekran veri değiştirmez.</p>}
-  {focus&&<section className="card stack">
-   <h3>Tek Bakışta</h3>
-   <div className="row" style={{gap:12,flexWrap:"wrap"}}>
-    <span><b>{focus.tasks}</b> aktif görev</span>
-    <span><b>{focus.records}</b> aktif proje kaydı</span>
-    <span><b>{focus.streams}</b> çalışma alanı</span>
-    <span><b>{focus.opportunities}</b> aktif fırsat</span>
-   </div>
-   <p className="small">Kurucu incelemesi bekleyen görev: <b>{focus.review}</b> · Engellenen proje kaydı: <b>{focus.blocked}</b> · Dış yanıt bekleyen fırsat: <b>{focus.waiting}</b></p>
-  </section>}
-  {data&&<div className="stack">
-   <div className="row" style={{gap:12,flexWrap:"wrap",alignItems:"stretch"}}>
-    <div style={{flex:"1 1 220px"}}><CountsGroup title="Görev Durumu" counts={data.counts.tasks} archived={data.counts.archivedTasks}/></div>
-    <div style={{flex:"1 1 220px"}}><CountsGroup title="Proje Kayıtları" counts={data.counts.records} archived={data.counts.archivedRecords}/></div>
-   </div>
-   <div className="row" style={{gap:12,flexWrap:"wrap",alignItems:"stretch"}}>
-    <div style={{flex:"1 1 220px"}}><CountsGroup title="Çalışma Alanları" counts={data.counts.workstreams}/></div>
-    <div style={{flex:"1 1 220px"}}><CountsGroup title="Fırsatlar" counts={data.counts.opportunities} archived={data.counts.archivedOpportunities}/></div>
-   </div>
-   <h3>Takip ve İnceleme Kuyruğu</h3>
-   <Queue title="Kurucu İncelemesi Bekleyen Görevler" items={data.attention.founderReviews}
-    empty="Şu anda bu ekrana kayıtlı Kurucu incelemesi bekleyen görev yok." open={()=>openView("active")}/>
-   <Queue title="Proje Kayıtlarının Sonraki Adımları" items={data.attention.recordActions}
-    empty="Aktif, engellenen veya ertelenen proje kayıtlarında sonraki adım yok." open={()=>openView("records")}/>
-   <Queue title="Fırsatlar ve Dış Temaslar" items={data.attention.opportunityActions}
-    empty="Bu görünümde takip işlemi yazılmış açık fırsat bulunmuyor." open={()=>openView("opportunities")}/>
-   <p className="small muted">Kuyruklar her kategoride en çok {data.limits.perQueue} öğe gösterir. Sayılar tüm aktif tablolardan hesaplanır; kuyruklar tam dışa aktarma değildir. Arşivlenmiş veriler geçmişleriyle korunur.</p>
-  </div>}
-  {busy&&!data&&<p>Yönetim özeti hazırlanıyor...</p>}
+  <p className="cc-overview-boundary">
+   Yalnızca Command Center'a girilmiş operasyonel kayıtlar. VYREN Master, FFA, GNR, VDCP ve
+   Launch Lifecycle ile canlı senkronizasyon veya canonical PASS anlamı taşımaz.
+  </p>
+  {error&&<p role="alert" className="alert">{error}</p>}
+  {!data&&busy&&<p className="panel" role="status">Operasyonel kayıtlar okunuyor...</p>}
+  {data&&focus&&<>
+   <section className="cc-overview-priority" aria-labelledby="cc-overview-priority-title">
+    <div className="cc-overview-section-head">
+     <div><h2 id="cc-overview-priority-title">Öncelikli Takip</h2>
+      <p className="small muted">İlgili işlem modülüne geçin. Bu ekran yalnızca bilgi gösterir.</p>
+     </div>
+     <span className="small muted">Her listede en çok {data.limits.perQueue} kayıt alınır.</span>
+    </div>
+    <div className="cc-overview-attention-grid">
+     <AttentionGroup title="Kurucu İncelemesi" subtitle="Teslim ve onay bekleyen görevler"
+      countLabel={focus.reviews+" bekliyor"}
+      items={data.attention.founderReviews||[]} empty="İnceleme bekleyen görev yok."
+      open={()=>openView("active")} buttonLabel="Görevleri Aç"/>
+     <AttentionGroup title="Proje Takibi" subtitle="Engeller ve kaydedilmiş sonraki adımlar"
+      countLabel={focus.blocked+" engelli"}
+      items={data.attention.recordActions||[]} empty="Takip sırasına alınmış proje kaydı yok."
+      open={()=>openView("records")} buttonLabel="Proje Kayıtlarını Aç"/>
+     <AttentionGroup title="Dış Temaslar" subtitle="Fırsatlar, dış yanıtlar ve görüşmeler"
+      countLabel={focus.waiting+" yanıt bekliyor"}
+      items={data.attention.opportunityActions||[]} empty="Kayıtlı açık takip işlemi yok."
+      open={()=>openView("opportunities")} buttonLabel="Fırsatları Aç"/>
+    </div>
+   </section>
+
+   <section className="cc-overview-snapshot" aria-labelledby="cc-overview-snapshot-title">
+    <div className="cc-overview-section-head">
+     <div><h2 id="cc-overview-snapshot-title">Operasyonun Durumu</h2>
+      <p className="small muted">Arşiv dışı kayıtlar; çalışma alanları için kayıtlı toplam.</p>
+     </div>
+    </div>
+    <div className="cc-overview-metrics">
+     <Metric label="Görevler" value={focus.tasks} description="Görev listesini aç"
+      open={()=>openView("active")}/>
+     <Metric label="Proje Kayıtları" value={focus.records} description="Durum takibine git"
+      open={()=>openView("records")}/>
+     <Metric label="Çalışma Alanları" value={focus.streams} description="Alanları incele"
+      open={()=>openView("workstreams")}/>
+     <Metric label="Fırsatlar" value={focus.opportunities} description="Fırsatları incele"
+      open={()=>openView("opportunities")}/>
+    </div>
+   </section>
+
+   <details className="cc-overview-details">
+    <summary>Durum dağılımları ve arşiv sayılarını göster</summary>
+    <div className="cc-overview-breakdowns">
+     <StatusBreakdown title="Görevler" counts={data.counts.tasks}
+      archived={data.counts.archivedTasks}/>
+     <StatusBreakdown title="Proje Kayıtları" counts={data.counts.records}
+      archived={data.counts.archivedRecords}/>
+     <StatusBreakdown title="Çalışma Alanları" counts={data.counts.workstreams}/>
+     <StatusBreakdown title="Fırsatlar" counts={data.counts.opportunities}
+      archived={data.counts.archivedOpportunities}/>
+    </div>
+   </details>
+
+   <footer className="cc-overview-footer">
+    <span>Yanıt zamanı: {new Date(data.asOf).toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"})}</span>
+    <span>Listeler sınırlı örnektir; tüm kayıtlar ilgili modüllerdedir. Kayıt bulunmaması, projenin tamamlandığı anlamına gelmez.</span>
+   </footer>
+  </>}
  </section>;
 }
