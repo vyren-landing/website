@@ -27,4 +27,4 @@ export function SignIn({name,googleEnabled=false,canonicalLoginUrl}:{name?:strin
   {error&&<p role="alert">{error}</p>}
  </div>;
 }
-export function SignOut(){return <button onClick={async()=>{await client.signOut();window.location.assign("/secure");}}>Çıkış Yap</button>;}
+export function SignOut({language="tr"}:{language?:"tr"|"en"}){return <button onClick={async()=>{await client.signOut();window.location.assign("/secure");}}>{language==="tr"?"Çıkış Yap":"Sign Out"}</button>;}
