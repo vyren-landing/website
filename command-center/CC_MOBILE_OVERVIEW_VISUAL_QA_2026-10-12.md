@@ -52,3 +52,14 @@ New Preview feature-branch-only UI change:
 - Code commits: `a85689b4dbdde7802f40a775f3a68a9aaf1a4f67`, `dbda94d355d81171b039827c9c5b96baaf9db956`.
 - **SOURCE_IMPLEMENTED; NEW_PREVIEW_BUILD_AND_POST_CHANGE_MOBILE_VISUAL_QA_PENDING.** The earlier user-observed navigation PASS was on the old flow layout, not proof of the new overlay implementation.
 - No database write, account/session mutation, production release or protocol/canonical decision change.
+
+
+## New overlay drawer mobile visual QA — 2026-10-14
+
+Founder provided two Android Chrome screenshots of the new mobile Command Center navigation after Preview deploy `cca217e83ad34788060dcd23f668fbc9730205d5` reached READY on the stable OAuth Preview alias.
+
+**Visual PASS, screenshot scope:** the Founder left-hand navigation now renders as a fixed overlay drawer rather than taking normal document space; background content stays behind the menu and is dimmed. The visible top portion includes `Menüyü Kapat`, brand and current `Genel Bakış` selection; the scrolled portion shows lower navigation categories, Founder profile and `Çıkış Yap`. Thus the drawer appears internally scrollable and the previous page-pushing UX problem is visually resolved.
+
+**Unverified interactions:** tapping the darkened background to close, explicit `Menüyü Kapat` activation, `Escape` keyboard close/focus trapping, navigating from the **new overlay implementation** to another tab with automatic closure. Earlier mobile task navigation test covered the preceding in-flow menu, not this implementation.
+
+No record, account, OAuth, DB, canonical scope, governance or permission change.
