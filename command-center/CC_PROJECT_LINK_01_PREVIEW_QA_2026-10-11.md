@@ -506,3 +506,14 @@ The Founder clarified the live authenticated Preview UI sequence, correcting amb
 
 **OPPORTUNITY_CREATE_FORM_OPEN_CANCEL_UI_PASS (Founder-reported).**
 The result verifies UI open/close and retention of the visible existing row, not database-level transaction absence, valid form submission, create, edit, or archive workflows. No test record or live data mutation is requested or performed in this documentation update.
+
+
+## Language rule — Founder Turkish, Contributor English (2026-10-14)
+
+Founder explicitly confirmed the controlling interface language preference: **Founder-facing screens are Turkish; Contributor and non-Founder user-facing screens are English.** The earlier suggestion to translate the Contributor task interface into Turkish was incorrect and is superseded.
+
+- Existing task-action locale selector `tr?Turkish:English` and Contributor raw status enum labels remain retained. No task-state keys, API operations, audit semantics, authentication controls or database records were modified.
+- Commit `b3a72aebcc97db4f6f8cfc2a7bd0d9c55f91bab1` localizes Contributor navigation, workspace header, operational boundary, mobile menu labels and task-view sections to English, keeping Founder Turkish.
+- Commit `ac7b06fa1182e0b001f508962fda4d2998ad4f04` adds optional UI language for Sign Out while preserving its existing Better Auth sign-out action.
+- **SOURCE_APPLIED, PREVIEW_BUILD / MANUAL VISUAL CHECK PENDING** for these changes. Contributor Preview `Test ve Tanı` security panel still has Turkish result/descriptive copy; a separate nonblocking UI-only localization follow-up is needed. Do not alter its security test's hard-coded expected Turkish API denial strings (those are server contracts).
+- User-provided screenshots of Contributor `/secure` and `?tab=qa` confirm only `Görevlerim` and separate Preview QA menus were visible, Founder modules were absent, and a Contributor-owned `CC-ISOLATION-001 Kopyala` task with `Accept` button was shown. Screenshot alone is not a permissions regression test.
