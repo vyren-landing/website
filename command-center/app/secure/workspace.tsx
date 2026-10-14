@@ -47,9 +47,9 @@ const founderNav:NavGroup[]=[
  {heading:"SİSTEM",items:[{id:"moduleHealth",label:"Modül Sağlığı",symbol:"⚙"}]}
 ];
 const contributorNav:NavGroup[]=[
- {heading:"ÇALIŞMA ALANI",items:[{id:"active",label:"Görevlerim",symbol:"✓"}]}
+ {heading:"WORKSPACE",items:[{id:"active",label:"My Tasks",symbol:"✓"}]}
 ];
-const qaNav:NavGroup={heading:"GELİŞTİRME / PREVIEW",items:[{id:"qa",label:"Test ve Tanı",symbol:"⌘"}]};
+const qaNav:NavGroup={heading:"DEVELOPMENT / PREVIEW",items:[{id:"qa",label:"Tests & Diagnostics",symbol:"⌘"}]};
 const defaultView=(founder:boolean):View=>founder?"overview":"active";
 
 export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;showQaTools?:boolean}){
@@ -96,7 +96,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
  const navGroups=tr?founderNav:showQaTools?[...contributorNav,qaNav]:contributorNav;
  const allowedViews=navGroups.flatMap(group=>group.items.map(item=>item.id));
  const currentItem=navGroups.flatMap(group=>group.items).find(item=>item.id===view);
- const viewTitle=currentItem?.label||(tr?"Genel Bakış":"Görevlerim");
+ const viewTitle=currentItem?.label||(tr?"Genel Bakış":"My Tasks");
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
  const [title,setTitle]=useState("");
@@ -164,16 +164,16 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
  };
  return <div className="shell cc-live-shell">
   {mobileMenuOpen&&<button type="button" className="cc-mobile-menu-backdrop" tabIndex={-1}
-   onClick={closeMobileMenu} aria-label="Mobil menüyü kapat"/>}
+   onClick={closeMobileMenu} aria-label={label("Close mobile menu","Mobil menüyü kapat")}/>}
   <aside className={"side cc-live-side"+(mobileMenuOpen?" is-open":"")} id="cc-live-nav"
    ref={mobileMenuPanelRef} role={mobileMenuOpen?"dialog":undefined}
    aria-modal={mobileMenuOpen?true:undefined}
-   aria-label={mobileMenuOpen?"Command Center mobil menüsü":undefined}>
+   aria-label={mobileMenuOpen?label("Command Center mobile menu","Command Center mobil menüsü"):undefined}>
    <button type="button" className="cc-live-mobile-close" ref={mobileMenuCloseRef}
-    onClick={closeMobileMenu} aria-label="Menüyü kapat">✕ <span>Menüyü Kapat</span></button>
+    onClick={closeMobileMenu} aria-label={label("Close menu","Menüyü kapat")}>✕ <span>{label("Close Menu","Menüyü Kapat")}</span></button>
    <div className="cc-live-brand">◈ VYREN</div>
    <p className="cc-live-brand-sub">COMMAND CENTER</p>
-   <nav className="cc-live-nav" aria-label={tr?"Kurucu navigasyonu":"Katkı sağlayan navigasyonu"}>
+   <nav className="cc-live-nav" aria-label={tr?"Kurucu navigasyonu":"Contributor navigation"}>
     {navGroups.map(group=><div className="cc-live-nav-group" key={group.heading}>
      <p className="cc-live-nav-heading">{group.heading}</p>
      {group.items.map(item=><button key={item.id} type="button"
@@ -188,30 +188,30 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
    </nav>
    <div className="cc-live-profile">
     <span className="cc-live-avatar" aria-hidden="true">{actor.name.trim().charAt(0).toLocaleUpperCase("tr-TR")||"V"}</span>
-    <div className="cc-live-profile-info"><b>{actor.name}</b><span>{tr?"Kurucu":"Katkı Sağlayan"}</span></div>
+    <div className="cc-live-profile-info"><b>{actor.name}</b><span>{tr?"Kurucu":"Contributor"}</span></div>
    </div>
-   <div className="cc-live-signout"><SignOut/></div>
+   <div className="cc-live-signout"><SignOut language={tr?"tr":"en"}/></div>
   </aside>
   <main className="main cc-live-main">
    <div className="cc-live-mobile-top">
     <b>◈ VYREN <span className="small muted">COMMAND CENTER</span></b>
     <button type="button" ref={mobileMenuTriggerRef} aria-controls="cc-live-nav" aria-expanded={mobileMenuOpen}
-      onClick={()=>setMobileMenuOpen(s=>!s)}>☰ Menü</button>
+      onClick={()=>setMobileMenuOpen(s=>!s)}>☰ {label("Menu","Menü")}</button>
    </div>
    <header className="cc-live-header">
-    <div><p className="cc-live-eyebrow">{tr?"KURUCU ÇALIŞMA ALANI":"KATKI SAĞLAYAN ÇALIŞMA ALANI"}</p>
+    <div><p className="cc-live-eyebrow">{tr?"KURUCU ÇALIŞMA ALANI":"CONTRIBUTOR WORKSPACE"}</p>
      <h1>{viewTitle}</h1>
-     <p className="muted small">Operasyonel çalışma alanı · Onaylı hesap erişimi</p>
+     <p className="muted small">{label("Operational workspace · Approved account access","Operasyonel çalışma alanı · Onaylı hesap erişimi")}</p>
     </div>
-    <span className="cc-live-scope">Operasyonel · Canonical yetki yok</span>
+    <span className="cc-live-scope">{label("Operational · No canonical authority","Operasyonel · Canonical yetki yok")}</span>
    </header>
    <div className="stack cc-live-content">
-    <p className="cc-live-disclaimer">Bu çalışma alanındaki işlemler VYREN protocol, ekonomi, FFA, governance veya lifecycle kararlarını değiştirmez.</p>
+    <p className="cc-live-disclaimer">{label("Actions in this workspace do not change VYREN protocol, economics, FFA, governance, or lifecycle decisions.","Bu çalışma alanındaki işlemler VYREN protocol, ekonomi, FFA, governance veya lifecycle kararlarını değiştirmez.")}</p>
     {error&&<div className="alert" role="alert">{error}</div>}
     {!tr&&showQaTools&&view==="qa"&&<SecurityPanel actorId={actor.id}/>}
 
   {view==="active"&&<div className="cc-list-toolbar">
-   <div><h2>{tr?"Görevler ve Teslimler":"Görevlerim"}</h2><p className="small muted">{tr?"Mevcut görevleri yönetin, teslimleri inceleyin ve gerektiğinde yeni görev atayın.":"Atanan işleri ve teslimlerinizi yönetin."}</p></div>
+   <div><h2>{tr?"Görevler ve Teslimler":"My Tasks"}</h2><p className="small muted">{tr?"Mevcut görevleri yönetin, teslimleri inceleyin ve gerektiğinde yeni görev atayın.":"Manage your assigned tasks and deliverables."}</p></div>
    <div className="row"><button disabled={busy} onClick={()=>void load()}>{label("Refresh","Yenile")}</button>
    {tr&&<button className="primary" disabled={busy} aria-expanded={showTaskForm} aria-controls="cc-task-editor" onClick={()=>setShowTaskForm(v=>!v)}>{showTaskForm?"Formu Kapat":"+ Yeni Görev"}</button>}</div>
   </div>}
@@ -237,7 +237,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
     <div className="row"><button className="primary" disabled={busy||!owner||title.trim().length<2||objective.trim().length<3} onClick={()=>void action("create",{title,objective,expectedOutput:output,ownerId:owner,projectId})}>Görev Oluştur</button><button disabled={busy} onClick={()=>setShowTaskForm(false)}>İptal</button></div>
     {!(data?.members||[]).some(m=>m.role==="Contributor")&&<p className="small muted">Test kullanıcısı henüz gerçek hesabıyla doğrulanmadı; şu anda kimseye gerçek görev atanamaz.</p>}
   </section>}
-  {view==="active"&&<section className="panel stack"><h2>{tr?"Mevcut Görevler":"Atanan Görevlerim"}</h2>
+  {view==="active"&&<section className="panel stack"><h2>{tr?"Mevcut Görevler":"My Assigned Tasks"}</h2>
     {!data&&<p>{label("Loading...","Yükleniyor...")}</p>}
     {data?.tasks.length===0&&<p>{label("No assigned tasks yet.","Henüz görev bulunmuyor.")}</p>}
     {data?.tasks.map(t=>{
@@ -255,7 +255,7 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
        <p className="small muted">{label("Owner","Sorumlu")}: {t.ownerName} · {label("Expected output","Beklenen çıktı")}: {t.expectedOutput}</p>
        <button onClick={()=>setOpen(expanded?null:t.id)}>{expanded?label("Close details","Ayrıntıları Gizle"):label("Open details","Ayrıntıları Aç")}</button>
        {expanded&&<div className="stack">
-        {latest&&<div className="panel stack"><b>{label("Submitted report","Teslim Edilen Rapor")}</b><p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{latest.body}</p>{latest.evidenceUrl&&<a href={latest.evidenceUrl} target="_blank" rel="noopener noreferrer" style={{overflowWrap:"anywhere"}}>Kanıt Bağlantısı</a>}</div>}
+        {latest&&<div className="panel stack"><b>{label("Submitted report","Teslim Edilen Rapor")}</b><p style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{latest.body}</p>{latest.evidenceUrl&&<a href={latest.evidenceUrl} target="_blank" rel="noopener noreferrer" style={{overflowWrap:"anywhere"}}>{label("Evidence Link","Kanıt Bağlantısı")}</a>}</div>}
         {revision&&<div className="alert"><b>{label("Last revision feedback","Son Revizyon Notu")}</b><p>{revision.reason}</p></div>}
         {own&&t.status==="BRIEFED"&&<button disabled={busy} onClick={()=>void action("accept",{id:t.id})}>{label("Accept","Kabul Et")}</button>}
         {own&&t.status==="ACCEPTED"&&<button disabled={busy} onClick={()=>void action("start",{id:t.id})}>{label("Start","Başlat")}</button>}
