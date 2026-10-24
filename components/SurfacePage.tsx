@@ -22,15 +22,15 @@ export default function SurfacePage({
       <div className="mx-auto max-w-[1200px]">
         <div className="max-w-3xl border-b border-zinc-900 pb-12">
           <div className="mb-5 flex flex-wrap items-center gap-3">
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/85">
               {eyebrow}
             </p>
             {state ? <StateBadge state={state} label={stateLabel} /> : null}
           </div>
-          <h1 className="text-4xl font-medium tracking-tight md:text-6xl">
+          <h1 className="text-4xl font-medium tracking-tight text-zinc-100 md:text-6xl">
             {title}
           </h1>
-          <p className="mt-6 max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">
+          <p className="mt-6 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base">
             {description}
           </p>
         </div>
