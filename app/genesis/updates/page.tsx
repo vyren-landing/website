@@ -5,7 +5,7 @@ import { publicPageMetadata } from "@/lib/site-metadata";
 export const metadata = publicPageMetadata({
   title: "Genesis Updates",
   description:
-    "Follow VYREN project and Genesis-status updates through the public channels. Participation remains closed.",
+    "Follow VYREN project and Genesis-status updates through the public channels. Genesis participation is not open.",
   path: "/genesis/updates",
 });
 
@@ -14,7 +14,7 @@ export default function GenesisUpdatesPage() {
     <SurfacePage
       eyebrow="Genesis / Updates"
       title="Follow VYREN through the public channels."
-      description="VYREN is PRE-GENESIS and participation is closed. Public progress, Genesis-status and participation-readiness updates are currently distributed through the website and official social channels without an email-list signup."
+      description="VYREN is PRE-GENESIS and Genesis participation is not open. Public progress, Genesis-status and participation-readiness updates are currently distributed through the website and official social channels without an email-list signup."
       state="PENDING"
       stateLabel="PUBLIC UPDATES"
     >
@@ -71,7 +71,7 @@ export default function GenesisUpdatesPage() {
         <aside className="rounded-2xl border border-zinc-900 p-6 md:p-8">
           <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">State boundary</p>
           <div className="mt-6 space-y-5 text-sm leading-7 text-zinc-500">
-            <p><span className="text-zinc-200">Participation:</span> CLOSED.</p>
+            <p><span className="text-zinc-200">Genesis participation:</span> NOT OPEN.</p>
             <p><span className="text-zinc-200">Payment intake:</span> unavailable.</p>
             <p><span className="text-zinc-200">Email signup:</span> not in use.</p>
             <p><span className="text-zinc-200">Allocation:</span> none created by following a channel.</p>
