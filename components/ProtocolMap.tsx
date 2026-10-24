@@ -40,7 +40,7 @@ export default function ProtocolMap() {
               Authority narrows toward the core. Evidence expands outward.
             </p>
           </div>
-          <span className="rounded-full border border-orange-900/60 bg-orange-950/20 px-3 py-1 text-[10px] tracking-[0.14em] text-orange-300">
+          <span className="rounded-full border border-orange-400/35 bg-orange-400/10 px-3 py-1 text-[10px] tracking-[0.14em] text-orange-400/85">
             REV4.6
           </span>
         </div>
@@ -52,7 +52,7 @@ export default function ProtocolMap() {
               className="group grid gap-3 rounded-2xl border border-zinc-800/90 bg-black/70 p-5 transition hover:border-zinc-700 md:grid-cols-[56px_220px_1fr]"
             >
               <span className="font-mono text-xs text-zinc-500">{layer.id}</span>
-              <h3 className={index === 0 ? "text-sm font-medium text-orange-300" : "text-sm font-medium text-zinc-200"}>
+              <h3 className={index === 0 ? "text-sm font-medium text-orange-400" : "text-sm font-medium text-zinc-200"}>
                 {layer.title}
               </h3>
               <p className="text-sm leading-6 text-zinc-300">{layer.text}</p>
