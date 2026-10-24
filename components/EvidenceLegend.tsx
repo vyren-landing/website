@@ -15,11 +15,11 @@ const states: ReadonlyArray<{
 
 export default function EvidenceLegend() {
   return (
-    <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-2">
+    <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:grid-cols-2">
       {states.map((item) => (
         <div key={item.state} className="bg-black p-5">
           <StateBadge state={item.state} />
-          <p className="mt-4 text-sm leading-6 text-zinc-500">{item.text}</p>
+          <p className="mt-4 text-sm leading-6 text-zinc-300">{item.text}</p>
         </div>
       ))}
     </div>
