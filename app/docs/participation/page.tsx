@@ -16,7 +16,7 @@ const locked = [
   ["Minimum", GENESIS_PROFILE.minimum],
   ["Cumulative maximum", GENESIS_PROFILE.cumulativeMaximum],
   ["Vesting", GENESIS_PROFILE.vesting],
-  ["Lifecycle", "PRE-GENESIS / participation closed"],
+  ["Lifecycle", "PRE-GENESIS / participation not open"],
 ] as const;
 
 const pending = [
@@ -73,7 +73,7 @@ export default function ParticipationPreparationPage() {
           <ul className="mt-6 divide-y divide-zinc-900 border-y border-zinc-900">
             {pending.map((item) => (
               <li key={item} className="flex gap-3 py-4 text-sm leading-6 text-zinc-500">
-                <span aria-hidden="true">—</span>
+                <span aria-hidden="true">•</span>
                 <span>{item}</span>
               </li>
             ))}
