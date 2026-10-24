@@ -1,7 +1,7 @@
 const anchors = [
   ["Total supply", "300M VYREN", "MF 30M · GP 90M · LHE 180M"],
-  ["Genesis reference", "USD 0.025 / VYREN", "Locked protocol anchor · participation closed"],
-  ["Participation bounds", "5,000 — 100,000 VYREN", "Minimum · cumulative maximum"],
+  ["Genesis reference", "USD 0.025 / VYREN", "Locked protocol anchor · Genesis participation not open"],
+  ["Participation bounds", "5,000 to 100,000 VYREN", "Minimum · cumulative maximum"],
   ["Vesting", "90-day cliff", "+ 12 calendar months linear"],
   ["Activation", "≥30 QAD", "+ ABF / clean-period rules"],
 ] as const;
