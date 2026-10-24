@@ -29,8 +29,8 @@ const steps: ReadonlyArray<{
   {
     index: "04",
     title: "Genesis",
-    state: "BLOCKED",
-    text: "Participation remains closed until the applicable G-GENESIS legal, safeguarding, settlement, security and public-surface conditions pass.",
+    state: "PENDING",
+    text: "Genesis participation is not open. G-GENESIS remains pending until the applicable legal, safeguarding, settlement, security and public-surface evidence is current.",
   },
   {
     index: "05",
