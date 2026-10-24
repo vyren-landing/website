@@ -33,7 +33,7 @@ export default function ProtocolMap() {
       <div className="relative">
         <div className="mb-8 flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">
               System map
             </p>
             <p className="mt-2 text-sm text-zinc-400">
@@ -55,7 +55,7 @@ export default function ProtocolMap() {
               <h3 className={index === 0 ? "text-sm font-medium text-orange-300" : "text-sm font-medium text-zinc-200"}>
                 {layer.title}
               </h3>
-              <p className="text-sm leading-6 text-zinc-500">{layer.text}</p>
+              <p className="text-sm leading-6 text-zinc-400">{layer.text}</p>
             </div>
           ))}
         </div>
