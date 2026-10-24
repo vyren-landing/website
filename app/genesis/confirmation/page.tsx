@@ -23,7 +23,7 @@ export default function ConfirmationPage() {
     <SurfacePage
       eyebrow="Genesis / Confirmation"
       title="Settlement evidence will live here."
-      description="A future participant confirmation is based on canonical settlement identity, technical finality, applicable legal finality and VYREN canonical state — not a provider success message alone."
+      description="A future participant confirmation is based on canonical settlement identity, technical finality, applicable legal finality and VYREN canonical state • not a provider success message alone."
       state="PENDING"
     >
       <BindingTable rows={rows} />
