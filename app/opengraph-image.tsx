@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "VYREN — Explicit rules. Bounded authority. Verifiable state.";
+export const alt = "VYREN: Explicit rules. Bounded authority. Verifiable state.";
 export const size = {
   width: 1200,
   height: 630,
