@@ -23,7 +23,8 @@ export default function ParticipatePage() {
       eyebrow="Genesis / Participate"
       title="Transaction surface disabled."
       description="The future participation screen is represented without wallet, approval, payment or contract-call code. It also reserves space for live Offeror, eligibility, safeguarding, withdrawal/refund and finality disclosures without inventing those facts now."
-      state="BLOCKED"
+      state="PENDING"
+      stateLabel="PARTICIPATION NOT OPEN"
     >
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
@@ -49,7 +50,7 @@ export default function ParticipatePage() {
             <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Future amount control</p>
             <div className="mt-4 rounded-xl border border-zinc-900 bg-black px-5 py-5">
               <p className="text-xs text-zinc-600">VYREN amount</p>
-              <p className="mt-2 text-2xl text-zinc-500">—</p>
+              <p className="mt-2 text-2xl text-zinc-500">Not available</p>
             </div>
             <p className="mt-4 text-xs leading-5 text-zinc-600">
               No quote, allowance, payment instruction or entitlement preview is
