@@ -49,7 +49,7 @@ export default function Home() {
               <span className="text-xs text-zinc-500">Genesis participation not open</span>
             </div>
 
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">VYREN · PRE-GENESIS</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">VYREN · PRE-GENESIS</p>
 
             <h1 className="mt-5 max-w-5xl text-5xl font-medium tracking-[-0.045em] md:text-7xl lg:text-8xl">
               BUILD THE RULES BEFORE THE MARKET TESTS THEM.
@@ -88,12 +88,12 @@ export default function Home() {
 
         <section className="mt-16 grid gap-8 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 lg:grid-cols-[0.8fr_1.2fr] md:p-10">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">The problem</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">The problem</p>
             <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
               The hardest rules are often discovered too late.
             </h2>
           </div>
-          <div className="space-y-4 text-sm leading-7 text-zinc-500">
+          <div className="space-y-4 text-sm leading-7 text-zinc-400">
             <p>
               Crypto systems can blur architecture, participation, activation and
               market access into one story.
@@ -111,11 +111,11 @@ export default function Home() {
 
         <section className="mt-16" id="c0-site-01-approach" data-content-id="C0-SITE-01-APPROACH">
           <div className="mb-8 max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Why it matters</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Why it matters</p>
             <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
               Define the rules. Bound the authority. Verify the state.
             </h2>
-            <p className="mt-4 text-sm leading-7 text-zinc-500">
+            <p className="mt-4 text-sm leading-7 text-zinc-400">
               The goal is not to eliminate real-world operations. The goal is to
               prevent an implementation, provider, interface or future capability
               from quietly becoming the source of protocol authority.
@@ -130,7 +130,7 @@ export default function Home() {
             ].map(([title, text]) => (
               <div key={title} className="bg-black p-7">
                 <h3 className="text-sm font-medium text-zinc-200">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-500">{text}</p>
+                <p className="mt-3 text-sm leading-6 text-zinc-400">{text}</p>
               </div>
             ))}
           </div>
@@ -142,11 +142,11 @@ export default function Home() {
           data-content-id="C0-SITE-01-ECOSYSTEM"
         >
           <div className="mb-8 max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Practical direction</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Practical direction</p>
             <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
               What can this architecture become useful for?
             </h2>
-            <p className="mt-4 text-sm leading-7 text-zinc-500">
+            <p className="mt-4 text-sm leading-7 text-zinc-400">
               VYREN is being designed as infrastructure that can support multiple
               economic capability layers. These directions are not presented as live products.
             </p>
@@ -156,7 +156,7 @@ export default function Home() {
             {utility.map((item) => (
               <div key={item.title} className="bg-black p-7">
                 <h3 className="text-sm font-medium text-zinc-200">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-500">{item.text}</p>
+                <p className="mt-3 text-sm leading-6 text-zinc-400">{item.text}</p>
                 <p className="mt-5 text-[10px] tracking-[0.12em] text-zinc-700">{item.state}</p>
               </div>
             ))}
@@ -174,11 +174,11 @@ export default function Home() {
 
         <section className="mt-24 grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Architecture</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Architecture</p>
             <h2 className="mt-4 max-w-md text-3xl font-medium tracking-tight md:text-4xl">
               Understanding the architecture through five responsibilities.
             </h2>
-            <p className="mt-5 max-w-md text-sm leading-7 text-zinc-500">
+            <p className="mt-5 max-w-md text-sm leading-7 text-zinc-400">
               This is a public communication map of responsibilities, not a new
               constitutional taxonomy. The website describes system state and
               boundaries without becoming protocol authority.
@@ -195,11 +195,11 @@ export default function Home() {
 
         <section className="mt-24" id="c0-site-01-proof" data-content-id="C0-SITE-01-PROOF">
           <div className="mb-8 max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Current proof and state</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Current proof and state</p>
             <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
               Built state should be visible. Pending state should remain pending.
             </h2>
-            <p className="mt-4 text-sm leading-7 text-zinc-500">
+            <p className="mt-4 text-sm leading-7 text-zinc-400">
               VYREN separates architecture, implementation, production deployment,
               Genesis, activation and market access so one state cannot be mistaken for another.
             </p>
@@ -219,19 +219,19 @@ export default function Home() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-2xl border border-zinc-900 bg-[#080808] p-6">
-              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Activation</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Activation</p>
               <p className="mt-3 text-sm text-zinc-300">NOT ASSERTED</p>
-              <p className="mt-3 text-sm leading-6 text-zinc-500">ACTIVE/TGE has not occurred.</p>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">ACTIVE/TGE has not occurred.</p>
             </div>
             <div className="rounded-2xl border border-zinc-900 bg-[#080808] p-6">
-              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Genesis participation</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Genesis participation</p>
               <p className="mt-3 text-sm text-zinc-300">NOT OPEN</p>
-              <p className="mt-3 text-sm leading-6 text-zinc-500">G-GENESIS remains evidence-pending.</p>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">G-GENESIS remains evidence-pending.</p>
             </div>
             <div className="rounded-2xl border border-zinc-900 bg-[#080808] p-6">
-              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Market access</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Market access</p>
               <p className="mt-3 text-sm text-zinc-300">NOT ASSERTED</p>
-              <p className="mt-3 text-sm leading-6 text-zinc-500">MARKET OPEN is a separate lifecycle state.</p>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">MARKET OPEN is a separate lifecycle state.</p>
             </div>
           </div>
 
@@ -258,12 +258,12 @@ export default function Home() {
         <section className="mt-24 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 md:p-10">
           <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">State discipline</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">State discipline</p>
               <h2 className="mt-4 text-3xl font-medium tracking-tight">
                 A completed design does not imply a live system.
               </h2>
             </div>
-            <div className="space-y-3 text-sm leading-7 text-zinc-500">
+            <div className="space-y-3 text-sm leading-7 text-zinc-400">
               <p>A future capability does not imply a current product.</p>
               <p>A public interface does not create protocol authority.</p>
               <p>ACTIVE/TGE does not automatically mean MARKET OPEN.</p>
@@ -272,7 +272,7 @@ export default function Home() {
         </section>
 
         <section className="mt-24">
-          <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Go deeper</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Go deeper</p>
           <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-2 lg:grid-cols-4">
             {surfaces.map((surface) => (
               <Link key={surface.href} href={surface.href} className="group bg-black p-7 transition hover:bg-zinc-950">
@@ -280,7 +280,7 @@ export default function Home() {
                   <h2 className="text-lg font-medium">{surface.title}</h2>
                   <span className="text-zinc-700 transition group-hover:text-zinc-400">↗</span>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-zinc-500">{surface.text}</p>
+                <p className="mt-3 text-sm leading-6 text-zinc-400">{surface.text}</p>
               </Link>
             ))}
           </div>
@@ -289,7 +289,7 @@ export default function Home() {
         <section className="mt-24 rounded-[28px] border border-zinc-900 bg-[#080808] p-7 md:p-10">
           <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Genesis</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Genesis</p>
               <h2 className="mt-4 text-3xl font-medium tracking-tight">
                 Prepared now. Opened only by state.
               </h2>
@@ -299,7 +299,7 @@ export default function Home() {
                 <p className="text-sm font-medium">Genesis Participation</p>
                 <StateBadge state="PENDING" label="NOT OPEN" />
               </div>
-              <p className="mt-4 text-sm leading-7 text-zinc-500">
+              <p className="mt-4 text-sm leading-7 text-zinc-400">
                 The participant surface is part of the final-form site architecture,
                 but transactional actions remain disabled until the applicable
                 legal, safeguarding, settlement, security and public-surface evidence is current.
