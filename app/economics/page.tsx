@@ -32,7 +32,7 @@ export default function EconomicsPage() {
         ))}
       </div>
 
-      <section className="mt-12 max-w-4xl rounded-2xl border border-orange-950/60 bg-orange-950/10 p-6 md:p-8">
+      <section className="mt-12 max-w-4xl rounded-2xl border border-zinc-800 bg-[#080808] p-6 md:p-8">
         <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Disclosure boundary</p>
         <p className="mt-4 text-sm leading-7 text-zinc-400">
           Full tokenomics and parameter instantiation tables remain

@@ -48,7 +48,7 @@ export default function DocsPage() {
             <ul className="mt-5 space-y-3 text-sm leading-6 text-zinc-500">
               {group.items.map((item) => (
                 <li key={item} className="flex gap-2">
-                  <span aria-hidden="true">—</span>
+                  <span aria-hidden="true">•</span>
                   <span>{item}</span>
                 </li>
               ))}

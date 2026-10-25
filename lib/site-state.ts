@@ -46,7 +46,7 @@ export const NETWORK_PROFILE = {
   chainId: 8453,
   state: "PENDING" as EvidenceState,
   productionVyrenAddress: null,
-  canonicalTime: "EVM block.timestamp → Unix UTC seconds",
+  canonicalTime: "EVM block.timestamp -> Unix UTC seconds",
   finalityRule: "Hard lifecycle evidence only after the containing Base L2 block is finalized.",
 } as const;
 
@@ -80,7 +80,7 @@ export const GENESIS_PROFILE = {
   cumulativeMaximum: "100,000 VYREN",
   vesting: "90-day cliff + 12 calendar months linear",
   settlementAsset: "Native USDC on Base Mainnet",
-  state: "BLOCKED" as EvidenceState,
+  state: "PENDING" as EvidenceState,
 } as const;
 
 export const protocolStateSummary = [
@@ -90,13 +90,13 @@ export const protocolStateSummary = [
     state: "CURRENT" as EvidenceState,
   },
   {
-    label: "Production deployment",
-    value: "Not started",
-    state: "PENDING" as EvidenceState,
+    label: "Canonical implementation",
+    value: "Reproducible build baseline established",
+    state: "CURRENT" as EvidenceState,
   },
   {
-    label: "Production profiles",
-    value: `${PROTOCOL_STATE.productionProfilesCurrent}/${PROTOCOL_STATE.productionProfilesTotal} CURRENT`,
+    label: "Production deployment",
+    value: "Not started",
     state: "PENDING" as EvidenceState,
   },
   {

@@ -26,10 +26,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/vyren-favicon.svg",
+        url: "/vyren-favicon-v2.svg",
         type: "image/svg+xml",
       },
     ],
+    shortcut: "/vyren-favicon-v2.svg",
   },
   alternates: {
     canonical: "/",

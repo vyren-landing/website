@@ -9,17 +9,17 @@ const states: ReadonlyArray<{
   { state: "DUE", text: "Refresh is due before the current window expires." },
   { state: "STALE", text: "Freshness window has expired." },
   { state: "INVALID", text: "Integrity, runtime or binding conditions failed." },
-  { state: "PENDING", text: "Required live evidence has not yet been established." },
-  { state: "BLOCKED", text: "A prerequisite prevents the assertion from progressing." },
+  { state: "PENDING", text: "Required live evidence has not yet been established or bound." },
+  { state: "BLOCKED", text: "An actual applicable legal, security or participant-protection failure prevents safe or lawful progression." },
 ];
 
 export default function EvidenceLegend() {
   return (
-    <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-2">
+    <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:grid-cols-2">
       {states.map((item) => (
         <div key={item.state} className="bg-black p-5">
           <StateBadge state={item.state} />
-          <p className="mt-4 text-sm leading-6 text-zinc-500">{item.text}</p>
+          <p className="mt-4 text-sm leading-6 text-zinc-300">{item.text}</p>
         </div>
       ))}
     </div>

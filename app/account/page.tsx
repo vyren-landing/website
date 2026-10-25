@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 };
 
 const cards = [
-  ["Genesis entitlement", "—", "NOT_ASSERTED" as const],
-  ["Locked balance", "—", "PENDING" as const],
-  ["Unlocked balance", "—", "PENDING" as const],
-  ["Next vesting event", "—", "PENDING" as const],
+  ["Genesis entitlement", "Not asserted", "NOT_ASSERTED" as const],
+  ["Locked balance", "Not available", "PENDING" as const],
+  ["Unlocked balance", "Not available", "PENDING" as const],
+  ["Next vesting event", "Not available", "PENDING" as const],
 ] as const;
 
 export default function AccountPage() {
@@ -21,7 +21,8 @@ export default function AccountPage() {
       eyebrow="Account"
       title="Participant dashboard reserved."
       description="The final-form account surface is present, but no wallet identity, entitlement, balance or vesting position is fabricated before live Genesis data exists."
-      state="BLOCKED"
+      state="PENDING"
+      stateLabel="NO LIVE PARTICIPANT STATE"
     >
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {cards.map(([label, value, state]) => (

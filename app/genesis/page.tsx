@@ -6,12 +6,12 @@ import { GENESIS_PROFILE, SETTLEMENT_PROFILE } from "@/lib/site-state";
 
 export const metadata = publicPageMetadata({
   title: "Genesis",
-  description: "Final-form Genesis information surface operating in PRE-GENESIS mode. Participation is closed.",
+  description: "Final-form Genesis information surface operating in PRE-GENESIS mode. Genesis participation is not open.",
   path: "/genesis",
 });
 
 const steps = [
-  { index: "01", title: "Eligibility", detail: "The actual jurisdiction, disclosure and eligibility scope must be current before intake.", state: "BLOCKED" as const },
+  { index: "01", title: "Eligibility", detail: "The actual jurisdiction, disclosure and eligibility scope must be current before intake.", state: "PENDING" as const },
   { index: "02", title: "Wallet", detail: "A participant wallet may connect only after the Genesis transaction surface is explicitly released.", state: "PENDING" as const },
   { index: "03", title: "Amount", detail: "Protocol minimum and cumulative maximum are checked before any payment instruction.", state: "PENDING" as const },
   { index: "04", title: "Safeguarded payment", detail: "Participant consideration follows the live approved safeguarding/payment path; provider receipt alone does not create entitlement.", state: "PENDING" as const },
@@ -35,8 +35,8 @@ export default function GenesisPage() {
       eyebrow="Genesis"
       title="Final-form interface. PRE-GENESIS state."
       description="The Genesis user journey is designed now so that the site does not need to be rebuilt later. Transactional functionality remains fail-closed until the applicable G-GENESIS, safeguarding, settlement, monitoring and public-disclosure conditions are current."
-      state="BLOCKED"
-      stateLabel="PARTICIPATION CLOSED"
+      state="PENDING"
+      stateLabel="PARTICIPATION NOT OPEN"
     >
       <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
         <BindingTable rows={rows} />

@@ -22,7 +22,7 @@ export default function GatedPanel({
         <ul className="mt-6 space-y-2 border-t border-zinc-900 pt-5 text-xs leading-5 text-zinc-500">
           {requirements.map((item) => (
             <li key={item} className="flex gap-2">
-              <span aria-hidden="true">—</span>
+              <span aria-hidden="true">•</span>
               <span>{item}</span>
             </li>
           ))}

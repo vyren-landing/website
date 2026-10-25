@@ -25,18 +25,18 @@ export default function ProtocolPage() {
       <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-4">
           {principles.map(([title, text]) => (
-            <section key={title} className="rounded-2xl border border-zinc-900 p-6">
+            <section key={title} className="rounded-2xl border border-zinc-800 p-6">
               <h2 className="text-sm font-medium text-zinc-200">{title}</h2>
-              <p className="mt-3 text-sm leading-6 text-zinc-500">{text}</p>
+              <p className="mt-3 text-sm leading-6 text-zinc-300">{text}</p>
             </section>
           ))}
         </div>
         <ProtocolMap />
       </div>
 
-      <section className="mt-14 max-w-4xl border-t border-zinc-900 pt-10">
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Public boundary</p>
-        <p className="mt-4 text-sm leading-7 text-zinc-500">
+      <section className="mt-14 max-w-4xl border-t border-zinc-800 pt-10">
+        <p className="text-xs uppercase tracking-[0.18em] text-orange-400/80">Public boundary</p>
+        <p className="mt-4 text-sm leading-7 text-zinc-300">
           The website is a disclosure and interface surface. It does not
           supersede canonical documentation, canonical implementation source,
           deployment evidence, legal eligibility, settlement evidence or live
