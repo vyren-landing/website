@@ -52,7 +52,7 @@ export default function SecurityPanel({actorId}:{actorId:string}){
      const passed=response.status===403&&data?.error===check.expected;
      collected.push({
       key:check.key,name:check.name,verdict:passed?"pass":"fail",
-      details:passed?"HTTP 403 - Server denied access as expected":`Unexpected response: HTTP ${response.status}, ${typeof data?.error==="string"?data.error:"Response could not be verified"}`
+      details:passed?"HTTP 403 - Server denied access as expected":`Unexpected response: HTTP ${response.status}, expected server denial did not match`
      });
     }catch(e){collected.push({key:check.key,name:check.name,verdict:"fail",details:e instanceof Error?e.message:"Request failed"});}
     setResults([...collected]);
@@ -84,7 +84,7 @@ export default function SecurityPanel({actorId}:{actorId:string}){
      collected.push({
       key:check.key,name:check.name,verdict:denied?"pass":"fail",
       details:denied?"HTTP 403 - Founder-only module denied access as expected":
-       `Unexpected response: HTTP ${response.status}, ${typeof body?.error==="string"?body.error:"Response could not be verified"}`
+       `Unexpected response: HTTP ${response.status}, expected server denial did not match`
      });
     }catch(e){
      collected.push({key:check.key,name:check.name,verdict:"fail",
@@ -119,7 +119,7 @@ export default function SecurityPanel({actorId}:{actorId:string}){
       verdict:denied?"pass":inconclusive?"inconclusive":"fail",
       details:denied?"HTTP 403 - Server ownership policy denied this action as expected":inconclusive?
        "No active CC-ISOLATION task owned by another Contributor":
-       `Unexpected response: HTTP ${response.status}, ${typeof body?.error==="string"?body.error:"Response could not be verified"}`
+       `Unexpected response: HTTP ${response.status}, expected server denial did not match`
      });
     }catch(e){
      collected.push({key:action.key,name:action.name,verdict:"fail",details:e instanceof Error?e.message:"Request failed"});
