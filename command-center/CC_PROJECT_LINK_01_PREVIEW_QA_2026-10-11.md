@@ -517,3 +517,12 @@ Founder explicitly confirmed the controlling interface language preference: **Fo
 - Commit `ac7b06fa1182e0b001f508962fda4d2998ad4f04` adds optional UI language for Sign Out while preserving its existing Better Auth sign-out action.
 - **SOURCE_APPLIED, PREVIEW_BUILD / MANUAL VISUAL CHECK PENDING** for these changes. Contributor Preview `Test ve Tanı` security panel still has Turkish result/descriptive copy; a separate nonblocking UI-only localization follow-up is needed. Do not alter its security test's hard-coded expected Turkish API denial strings (those are server contracts).
 - User-provided screenshots of Contributor `/secure` and `?tab=qa` confirm only `Görevlerim` and separate Preview QA menus were visible, Founder modules were absent, and a Contributor-owned `CC-ISOLATION-001 Kopyala` task with `Accept` button was shown. Screenshot alone is not a permissions regression test.
+
+
+## Contributor Tests & Diagnostics localization — 2026-10-31
+
+- The user supplied the live Contributor `Tests & Diagnostics` screen with mixed English shell and Turkish diagnostic copy, confirming the remaining presentation-language gap.
+- Commits `ca4c6775a6d58227faec58e6feb13af0dceee16b` and `bde21d6cffcc2078c1e50ca53a7deac1c324167a` update `app/secure/security-panel.tsx` to English for Contributor-facing diagnostic titles, instructions, button labels, check labels, counters, and result details. Unexpected server error text is summarized in English rather than exposing the Turkish API denial response in the interface.
+- Critical authorization contracts are intentionally unchanged: `403` checks, server error-string comparisons in Turkish, endpoint paths, the `ownership_security_test` operation, invalid-request safety payloads and all task ownership rules remain as before.
+- Founder Turkish / Contributor English is the controlling UX requirement. No Neon writes, authentication changes, migrations, production release, or token/lifecycle/FFA authority change.
+- **SOURCE_UPDATED; VERCEL READY / AUTHENTICATED VISUAL / FRESH SECURITY CHECK RESULTS NOT YET VERIFIED FOR THESE COMMITS.** This is a UI localization improvement, not a new authorization PASS.
