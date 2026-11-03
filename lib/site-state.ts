@@ -41,6 +41,24 @@ export const CANONICAL_IMPLEMENTATION = {
   artifactEquality: "82 / 82",
 } as const;
 
+export const WP14_RESEARCH_EVIDENCE = {
+  milestone: "WP14 R13",
+  asOf: "2026-11-02",
+  repository: "vyren-rev46-canonical",
+  sourceCommit: "64bff9f955d04e324656cb9c6a15651df26d296f",
+  researchBranch: "research-lc40-wp14-r13-beacon-bls-20261102",
+  researchRunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/41505374595",
+  coreCiRunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/41505374353",
+  scopedResult: "Research workflow PASS",
+  scope: "R13 real BLS/conditional checkpoint tests plus R12 SSZ and R11 Ethereum provenance regressions",
+  coreCiResult: "FAILED during pinned dependency snapshot restore; later static/build steps SKIPPED",
+  authenticatedBeaconFinality: "NOT VERIFIED",
+  realBaseStateProof: "NOT VERIFIED",
+  fullE5AndProductAcceptance: "PENDING",
+  migrationOrLaunchAuthority: "NONE",
+  r14IndependentResult: "NOT VERIFIED",
+} as const;
+
 export const NETWORK_PROFILE = {
   chain: "Base Mainnet",
   chainId: 8453,
@@ -91,7 +109,7 @@ export const protocolStateSummary = [
   },
   {
     label: "Canonical implementation",
-    value: "Reproducible build baseline established",
+    value: "Pinned build record; later WP14 evidence is scoped research",
     state: "CURRENT" as EvidenceState,
   },
   {

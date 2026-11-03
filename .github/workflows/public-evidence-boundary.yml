@@ -1,0 +1,25 @@
+name: Public Evidence Boundary (Scoped)
+on:
+  push:
+    branches: [website-evidence-boundary-wp14-r13-20261103]
+  pull_request:
+    paths:
+      - "app/evidence/**"
+      - "app/verification/**"
+      - "components/BuildProof.tsx"
+      - "components/ResearchEvidence.tsx"
+      - "lib/site-state.ts"
+      - "tests/public-evidence-boundary.test.mjs"
+      - ".github/workflows/public-evidence-boundary.yml"
+permissions:
+  contents: read
+jobs:
+  disclosure-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9fab
+        with:
+          persist-credentials: false
+      - name: Run static disclosure and no-authority checks
+        run: node --test tests/public-evidence-boundary.test.mjs
