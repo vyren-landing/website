@@ -14,14 +14,19 @@ test("pin exact historical reproducible-build source and tree", () => {
   assert.match(state, /53d31cb452ce944a3fa884cbcc70567a165cb283/);
   assert.match(build, /HISTORICAL \/ SOURCE-SCOPED/);
 });
-test("show R13 as a separate scoped research record", () => {
+test("show verified R14 research and preserve earlier R13 provenance", () => {
+  assert.match(state, /0633b90c973dc876d0ab116e4376f3ceb7a581fc/);
+  assert.match(state, /42382437854/);
+  assert.match(state, /62\/62 R14, 57\/57 R13, 61\/61 R12, 41\/41 R11/);
   assert.match(state, /64bff9f955d04e324656cb9c6a15651df26d296f/);
   assert.match(state, /41505374595/);
   assert.match(research, /NOT A RELEASE PASS/);
   assert.match(evidence, /<ResearchEvidence \/>/);
   assert.match(verification, /<ResearchEvidence \/>/);
 });
-test("do not grant finality, R14 acceptance or migration authority", () => {
+test("do not grant independent trust, finality or migration authority", () => {
+  assert.match(state, /9 material RED remain OPEN/);
+  assert.match(state, /untrusted checkpoint/);
   for (const p of ["authenticatedBeaconFinality", "realBaseStateProof", "r14IndependentResult"]) {
     assert.match(state, new RegExp(`${p}: "NOT VERIFIED"`));
   }
@@ -29,7 +34,7 @@ test("do not grant finality, R14 acceptance or migration authority", () => {
   assert.match(state, /fullE5AndProductAcceptance: "PENDING"/);
 });
 test("disclose general F2B CI failure accurately", () => {
-  assert.match(state, /41505374353/);
+  assert.match(state, /42382437838/);
   assert.match(state, /pinned dependency snapshot restore; later static\/build steps SKIPPED/);
 });
 test("public canonical status, economics and participation are unchanged", () => {
