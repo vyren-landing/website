@@ -111,7 +111,7 @@ export async function getActor(options?:{readOnly?:boolean}):Promise<Actor|null>
  if(!role)return null;
  const name=(googleTest&&!founder?"VYREN Test Contributor":(session.user.name||"Member")).slice(0,150);
  if(!readOnly)await database().query(
-  'INSERT INTO cc_members(auth_user_id,role,name,active) VALUES($1,$2,$3,TRUE) ON CONFLICT(auth_user_id) DO UPDATE SET role=EXCLUDED.role,name=EXCLUDED.name,updated_at=now()',
+  'INSERT INTO cc_members(auth_user_id,role,name,active) VALUES($1,$2,$3,TRUE) ON CONFLICT(auth_user_id) DO UPDATE SET name=EXCLUDED.name,updated_at=now() WHERE cc_members.role=EXCLUDED.role',
   [uid,role,name]);
  const member=await database().query<{active:boolean}>('SELECT active FROM cc_members WHERE auth_user_id=$1',[uid]);
  if(!member.rows[0]?.active)return null;
