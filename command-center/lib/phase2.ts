@@ -7,6 +7,8 @@ export type MemberRole = "Founder"|"Contributor";
 export type Actor = {id:string;name:string;role:MemberRole};
 let pool:Pool|undefined;
 
+export function communityEnabled(){return phase2Configured()&&process.env.CC_COMMUNITY_ENABLED==="true";}
+
 export function phase2Configured(){
  return process.env.CC_LIVE_ENABLED==="true" && !!(process.env.DATABASE_URL&&process.env.BETTER_AUTH_SECRET&&process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET&&process.env.FOUNDER_GITHUB_ACCOUNT_ID);
 }
@@ -94,6 +96,14 @@ export async function getActor(options?:{readOnly?:boolean}):Promise<Actor|null>
      role="Contributor";
    }
   }
+ }
+ // A Founder-owned explicit membership grant controls only newly registered community members.
+ // This table is accessed ONLY after the new additive schema has been applied and enabled.
+ // A revoked grant overrides any older invitation or test identity; it cannot revive itself.
+ if(!founder&&communityEnabled()){
+  const grant=await database().query<{active:boolean}>(
+   "SELECT active FROM cc_contributor_grants WHERE auth_user_id=$1",[uid]);
+  if(grant.rowCount)role=grant.rows[0].active?"Contributor":null;
  }
  if(!role)return null;
  const name=(googleTest&&!founder?"VYREN Test Contributor":(session.user.name||"Member")).slice(0,150);
