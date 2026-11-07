@@ -56,3 +56,14 @@ No public posts/comments, Team Space discussion records, LinkedIn production OAu
 
 ## Stop rules
 Stop if unexpected current Neon branch, migration mismatch, grant-versus-invite ambiguity, partial restore evidence, account collision, unauthorized private endpoint, or any Founder/FFA/GNR regression occurs. Do not fix with disabling existing members, deleting QA tasks, rewriting histories or overwriting main. Prefer a small forward corrective change.
+
+
+## 2026-11-07 continuation checkpoint — non-destructive
+- Preview alias confirmed READY at `dd12621a68ee9938d735a81fcb8f298ea9382546`. Subsequent security patches are committed, not yet all independently READY or E2E-verified.
+- `53d27b80`: revocation continues to work even if the target account's email verification state changes. Verification is required to grant, not to revoke.
+- `39a9a602`: operational session-resolution upsert no longer overwrites `cc_members.role` or reactivates an existing disabled member; user restoration is a separate Founder action.
+- `e19ca1f3`: legacy team enable/disable action cannot override an explicit community direct-grant row. Founder Community Members controls that access independently.
+- Vercel project env metadata (no secret values decrypted) confirms `DATABASE_URL` is defined for Preview, with a branch-specific `BETTER_AUTH_URL`; `CC_COMMUNITY_ENABLED` **was not listed**. This is not proof of which Neon branch the secret references. No target data was read and no migration was executed.
+- User connected Neon in this conversation, but the connected Neon execution tools were not exposed by the current tool registry. Proceed with direct read-only Neon verification once those tools become available; do not falsely claim completion.
+- **STOP:** Before executing migration 009, confirm live database identity + current backup checkpoint/isolated recovery + explicit target against actual Neon source. Keep feature disabled and do not touch existing sessions, grants or identities.
+- Latest verified stage at checkpoint: `SOURCE PREPARED / SELECTIVE BUILD PASS / DB UNCHANGED / NO LIVE E2E`.
