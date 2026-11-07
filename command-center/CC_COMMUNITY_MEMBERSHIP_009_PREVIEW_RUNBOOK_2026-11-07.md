@@ -145,3 +145,13 @@ Stop if unexpected current Neon branch, migration mismatch, grant-versus-invite 
 - Added four unit tests covering grant/revoke during enrollment closure, migration absence, and normal open enrollment. Test count grows from **28 to 32**. These are source assertions; wait for Vercel build before marking fresh count PASS.
 - Isolated QA `/api/qa/readiness` now reports **presence booleans only** for auth secret, Github OAuth, Founder test ID, Google OAuth, and fixed callback host, without returning any secret or account identifier. Protected QA project only.
 - No Community enrollment activation, no copied Founder credentials, no DB migration on main, no real OAuth signup and no live user grants. Real OAuth/HTTP E2E remains pending dedicated provider setup.
+
+
+## 2026-11-08 new-topic handoff — controlling operational checkpoint
+- Full new-topic handoff prepared at `command-center/CC_COMMUNITY_CONTINUATION_HANDOFF_2026-11-08.md` (GitHub branch `feature/command-center-phase2-auth-db-20261009`). Includes current task-state, tested/unverified boundaries, resource IDs, exact next action and copy-ready continuation prompt.
+- 2026-11-08 inspection: Vercel QA's latest three ERROR builds (`818ab796`, `520a033d`, `c3d0b9ac`) originated from **unrelated Git branch** `audit-wp14-r14-public-evidence-20261107` and failed because that branch lacks `command-center` root. Do not misclassify as the Community source build failing. Prior Community QA deployments still READY; GitHub branch HEAD and CI checks may change.
+- The quota-related Vercel create_deployment attempt returned `402 api-deployments-free-per-day`; it did **not** compile the new code. Avoid bypassing with a production deploy or billing changes without approval.
+- Added standalone non-deploying workflow `.github/workflows/cc-community-security-ci.yml` on Community feature branch, commit `b177c268`. It runs `node --test tests/*.test.mjs` without secrets or deployment. **The workflow outcome has not yet been observed**, so 32-case source test update is NOT independently CI PASS.
+- At handoff: main Neon 19 public tables/no Community tables; QA Neon two new Community tables remain empty. Original Founder Vercel app and live VYREN.IO unchanged.
+- GitHub check inspection on subsequent handoff commit `0b33f401` showed Vercel statuses **pending**. Do not state current code is READY until specific commit/deployment evidence exists.
+- Next execution: inspect Github workflow logs/checks; review project-specific Git auto-deployment triggers (wrong branch), then isolate dedicated QA OAuth config for eventual authenticated E2E. Keep `CC_LIVE_ENABLED=false`, `CC_COMMUNITY_ENABLED=false` until verified.
