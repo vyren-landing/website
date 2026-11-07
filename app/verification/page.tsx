@@ -1,6 +1,7 @@
 import { publicPageMetadata } from "@/lib/site-metadata";
 import BindingTable from "@/components/BindingTable";
 import BuildProof from "@/components/BuildProof";
+import ResearchEvidence from "@/components/ResearchEvidence";
 import SurfacePage from "@/components/SurfacePage";
 import { CANONICAL_IMPLEMENTATION, NETWORK_PROFILE, PROTOCOL_STATE } from "@/lib/site-state";
 
@@ -11,9 +12,9 @@ export const metadata = publicPageMetadata({
 });
 
 const rows = [
-  { label: "Canonical repository", value: CANONICAL_IMPLEMENTATION.repository },
-  { label: "Canonical commit", value: CANONICAL_IMPLEMENTATION.commit, mono: true, state: "CURRENT" as const },
-  { label: "Canonical tree", value: CANONICAL_IMPLEMENTATION.tree, mono: true, state: "CURRENT" as const },
+  { label: "Pinned build repository", value: CANONICAL_IMPLEMENTATION.repository },
+  { label: "Pinned build commit", value: CANONICAL_IMPLEMENTATION.commit, mono: true },
+  { label: "Pinned build tree", value: CANONICAL_IMPLEMENTATION.tree, mono: true },
   { label: "Production chain", value: `${NETWORK_PROFILE.chain} · ${NETWORK_PROFILE.chainId}`, state: NETWORK_PROFILE.state },
   { label: "Production VYREN address", value: "Pending deployment", state: "PENDING" as const },
   { label: "Runtime equality", value: "Not yet bound on mainnet", state: "PENDING" as const },
@@ -37,8 +38,12 @@ export default function VerificationPage() {
         <BindingTable rows={rows} />
       </div>
 
+      <div className="mt-8">
+        <ResearchEvidence />
+      </div>
+
       <p className="mt-8 max-w-4xl text-xs leading-6 text-zinc-600">
-        A successful source build is evidence of implementation integrity. It is
+        A successful source build is version-scoped evidence of implementation integrity. It is
         not a substitute for production deployment, runtime equality, live
         monitoring or legal readiness.
       </p>

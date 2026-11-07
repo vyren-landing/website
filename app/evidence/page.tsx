@@ -1,5 +1,6 @@
 import { publicPageMetadata } from "@/lib/site-metadata";
 import BuildProof from "@/components/BuildProof";
+import ResearchEvidence from "@/components/ResearchEvidence";
 import EvidenceLegend from "@/components/EvidenceLegend";
 import SurfacePage from "@/components/SurfacePage";
 
@@ -22,6 +23,10 @@ export default function EvidencePage() {
           <p className="mb-5 text-xs uppercase tracking-[0.18em] text-zinc-600">Evidence states</p>
           <EvidenceLegend />
         </div>
+      </div>
+
+      <div className="mt-8">
+        <ResearchEvidence />
       </div>
 
       <section className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900 md:grid-cols-3">
