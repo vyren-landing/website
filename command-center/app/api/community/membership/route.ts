@@ -24,7 +24,7 @@ export async function GET(){
   if(!user)return Response.json({signedIn:false,joined:false},{headers:noStore});
   const p=await database().query<{displayName:string;wantsToContribute:boolean}>(
    'SELECT display_name AS "displayName", wants_to_contribute AS "wantsToContribute" FROM cc_community_profiles WHERE auth_user_id=$1',[user.id]);
-  return Response.json({signedIn:true,joined:p.rowCount>0,profile:p.rows[0]||null},{headers:noStore});
+  return Response.json({signedIn:true,joined:(p.rowCount??0)>0,profile:p.rows[0]||null},{headers:noStore});
  }catch{return fail("Membership data is unavailable",503);}
 }
 export async function POST(request:NextRequest){
