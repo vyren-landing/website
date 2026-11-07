@@ -1,0 +1,10 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {qaReadinessAllowed,ISOLATED_QA_PROJECT_ID} from "../lib/qa-readiness.mjs";
+const qa={CC_QA_ISOLATED:"true",VERCEL_PROJECT_ID:ISOLATED_QA_PROJECT_ID,VERCEL_ENV:"preview"};
+test("QA diagnostic needs explicit isolation enablement",()=>assert.equal(qaReadinessAllowed({...qa,CC_QA_ISOLATED:"false"}),false));
+test("QA diagnostic denied in Founder Vercel project",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_PROJECT_ID:"prj_dKnuIt9cz0eRRKSS8kwW9mqMx8aY"}),false));
+test("QA diagnostic denied without verified project identity",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_PROJECT_ID:undefined}),false));
+test("QA diagnostic denied locally",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_ENV:"development"}),false));
+test("QA diagnostic available in isolated QA Preview",()=>assert.equal(qaReadinessAllowed(qa),true));
+test("QA diagnostic available in isolated QA project target",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_ENV:"production"}),true));
