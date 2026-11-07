@@ -1,5 +1,5 @@
 import {NextRequest} from "next/server";
-import {communityEnabled,database,getActor,phase2Configured} from "../../../../lib/phase2";
+import {directGrantSchemaReady,database,getActor,phase2Configured} from "../../../../lib/phase2";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
@@ -106,7 +106,7 @@ export async function POST(request:NextRequest){
     if(!result.rowCount)throw new ApiFailure("Contributor bulunamadı",404);
     // Direct-grant users are managed via the Founder Community Members control.
     // Keep legacy invitation toggles from bypassing an explicit direct revocation.
-    if(communityEnabled()){
+    if(await directGrantSchemaReady()){
      const grant=await client.query<{active:boolean}>(
       "SELECT active FROM cc_contributor_grants WHERE auth_user_id=$1",[id]);
      if((grant.rowCount??0)>0)throw new ApiFailure("Bu üyenin erişimini Topluluk Üyeleri bölümünden yönetin",409);
