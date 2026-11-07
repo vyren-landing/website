@@ -250,3 +250,6 @@ th{color:#566477}
  .cc-community-topic{min-height:0}
  .cc-community-brand strong{font-size:18px}
 }
+
+.cc-live-community-jump{display:inline-flex;align-items:center;padding:8px 12px;background:#fff;border:1px solid #cbdce9;border-radius:9px;color:#245478;text-decoration:none;font-size:12px;font-weight:700}
+.cc-live-community-jump:hover{background:#edf5fb}
