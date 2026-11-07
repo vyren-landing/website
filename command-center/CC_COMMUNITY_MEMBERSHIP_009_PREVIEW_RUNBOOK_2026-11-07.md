@@ -4,6 +4,17 @@
 **Status:** SOURCE PREPARED; MIGRATION 009 NOT EXECUTED; FEATURE DISABLED; REAL-USER E2E NOT VERIFIED.
 **Authority:** Operational membership and access only, not Rev4.6 canonical governance, Founder rights/FFA, GNR, Genesis or lifecycle approval.
 
+## User-confirmed operational participant status (2026-11-07 correction)
+**Founder is the only real operating user at this stage.** All other Contributor identities, invitation entries, team/task/person examples, QA accounts and draft records created so far are **test, mock, draft or validation fixtures**, not an active real contributor team or public membership. OAuth login may still have used a technically real identity; this does not make the person a real onboarded VYREN Contributor.
+
+Consequences for implementation and QA:
+- Do not describe the database as containing established real Contributor users, an operational real team, or real community members. Historical Founder/Contributor test outcomes remain valid **bounded QA evidence**, not actual-team activation.
+- The existing Google/GitHub test identities, invite fixtures, task/submission evidence and audit records can be exercised, reclassified, reset or retired **as test assets** where justified, after explicit scope identification, database backup/recovery and audit retention. They are not inherently protected as permanent real team membership.
+- **Do not change or accidentally lock the sole real Founder account**, its identity, active sessions, rights, security or operational access; do not broadly delete test data without a targeted cleanup/evidence plan.
+- Treat any future real Contributor/public community onboarding as a **new, deliberate activation**, with the Founder granting Contributor authority directly from the member list. No fabricated assumption that Josh or other names are already active real contributors.
+- The prior phrase `existing users' permissions were not changed` should be read only as a technical change-control observation about test accounts, **not** a claim that there are real non-Founder users needing continuity protection.
+- GNR/FFA Founder protections, data integrity, non-regression, anti-self-lock and recovery still apply. This correction narrows the *classification of people*, not the protective quality bar of the system.
+
 ## What is in source
 - `db/009_community_members_and_direct_grants.sql` introduces two additive tables. Existing `cc_members`, `cc_team_invites`, Better Auth user/session/account and task/project history schema are unchanged.
 - `CC_COMMUNITY_ENABLED` is **disabled by default**. No membership or direct grant route works until the operator explicitly enables it after migration and validation.
@@ -31,9 +42,9 @@
 ## Safe feature activation prerequisites
 - Verify privacy notice/community rules and reasonable moderation/abuse pathway for actual public membership. Avoid opening public registration to real users before policy and rate-limit review.
 - Inspect stable BETTER_AUTH_URL and Google OAuth callback; never use a one-off deployment URL for account activation.
-- Confirm no Google invitation, existing Contributor, or Founder OAuth regression. Keep current approved users working.
+- Confirm no regression in existing test Google invitation/Contributor flows and Founder OAuth. The Founder is the sole real operating user; test identities remain regression fixtures, not a live team.
 - Enable `CC_COMMUNITY_ENABLED=true` **only** in the intended Preview environment, after new tables and authorization checks are ready. Do not enable production.
-- The Founder **must** explicitly authorize any real person's Contributor promotion; tests must not change existing users, including currently invited Contributors.
+- The Founder **must** explicitly authorize any future real person's Contributor promotion. Tests may operate on controlled, clearly classified fixtures with evidence and recovery, but must not affect the Founder identity, sessions or access.
 
 ## QA matrix (test identities only when available)
 | Test | Expected |
@@ -55,7 +66,7 @@ These are **planned QA assertions, NOT passed tests**.
 No public posts/comments, Team Space discussion records, LinkedIn production OAuth, external account permissions, community governance vote, token allocation, payment, actual production user onboarding, DNS or public website change.
 
 ## Stop rules
-Stop if unexpected current Neon branch, migration mismatch, grant-versus-invite ambiguity, partial restore evidence, account collision, unauthorized private endpoint, or any Founder/FFA/GNR regression occurs. Do not fix with disabling existing members, deleting QA tasks, rewriting histories or overwriting main. Prefer a small forward corrective change.
+Stop if unexpected current Neon branch, migration mismatch, grant-versus-invite ambiguity, partial restore evidence, account collision, unauthorized private endpoint, or any Founder/FFA/GNR regression occurs. Do not fix by affecting the sole real Founder account, indiscriminately deleting QA/evidence records, rewriting histories or overwriting main. Scoped test-fixture cleanup is permissible only with recorded classification and recovery. Prefer a small forward corrective change.
 
 
 ## 2026-11-07 continuation checkpoint — non-destructive
