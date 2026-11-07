@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useState} from "react";
 
 type Member={
- id:string;name:string;joinedAt:string;wantsToContribute:boolean;
+ id:string;name:string;email:string;joinedAt:string;wantsToContribute:boolean;
  directGrantActive:boolean|null;existingRole:string|null;existingActive:boolean|null
 };
 export default function CommunityMembersPanel(){
@@ -58,6 +58,7 @@ export default function CommunityMembersPanel(){
     <div className="row between"><b>{member.name}</b>
      <span className="badge">{legacy?"Mevcut Contributor":active?"Contributor":revoked?"Yetki kapalı":"Topluluk Üyesi"}</span>
     </div>
+    <p className="small muted">{member.email}</p>
     <p className="small muted">{member.wantsToContribute?"Gönüllü katkıya açık":"Katkı tercihi belirtilmedi"} · Üyelik: {new Date(member.joinedAt).toLocaleDateString("tr-TR")}</p>
     {!legacy&&<div><button className={active?"":"primary"} disabled={!!busy}
       onClick={()=>void change(member,active?"revoke":"grant")}>{active?"Contributor Yetkisini Kaldır":"Contributor Yetkisi Ver"}</button></div>}
