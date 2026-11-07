@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
 import Link from "next/link";
+import {communityEnabled} from "../../lib/phase2";
 
 export const metadata:Metadata={
  title:"VYREN Community | Preview",
@@ -21,7 +22,9 @@ const resources=[
  {title:"Check project status",href:"https://vyren.io/status",detail:"See the current published project state and what remains pending."}
 ] as const;
 
+export const dynamic="force-dynamic";
 export default function CommunityPage(){
+ const membershipOpen=communityEnabled();
  return <main className="cc-community" id="top">
   <header className="cc-community-header">
    <Link className="cc-community-brand" href="/community" aria-label="VYREN Community home"><strong>VYREN</strong><span>Community</span></Link>
@@ -46,7 +49,8 @@ export default function CommunityPage(){
     <aside className="cc-community-notice" aria-label="Preview availability">
      <p className="cc-community-notice-label">EARLY PREVIEW</p>
      <h2>Community space in preparation</h2>
-     <p>Topics and verified learning links are available to explore. Public registration, LinkedIn sign-in, posts and comments are not active yet.</p>
+     <p>{membershipOpen?"Community membership is available in this Preview using Google sign-in. LinkedIn, posts and comments are not active yet.":"Topics and verified learning links are available to explore. Public registration, LinkedIn sign-in, posts and comments are not active yet."}</p>
+     {membershipOpen&&<Link className="cc-community-action cc-community-join-link" href="/community/join">Join Community →</Link>}
      <p className="cc-community-notice-foot">The existing approved team workspace remains separate and protected.</p>
     </aside>
    </section>
