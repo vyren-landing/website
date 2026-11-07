@@ -1,5 +1,6 @@
 import {NextRequest} from "next/server";
 import {communityEnabled,database,getActor} from "../../../../lib/phase2";
+import {directGrantRejection} from "../../../../lib/contributor-access.mjs";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
@@ -54,14 +55,23 @@ export async function POST(request:NextRequest){
      WHERE p.auth_user_id=$1 FOR UPDATE OF p`,[input.id]);
    if(!target.rowCount)throw new Failure("Topluluk üyesi bulunamadı",404);
    const t=target.rows[0];
-   if(t.id===actor.id||t.memberRole==="Founder")throw new Failure("Kurucu yetkisi bu işlemle değiştirilemez",403);
-   // Loss of verification must never block Founder revocation or safe recovery.
-   if(input.operation==="grant"&&t.verified!==true)throw new Failure("Doğrulanmamış hesaba Contributor yetkisi verilemez",403);
-   // Do not create an alternative authority path around legacy invited/test Contributor grants.
-   if(t.memberRole==="Contributor"&&!t.hasGrant)
-    throw new Failure("Bu hesap zaten mevcut Contributor sistemiyle yönetiliyor",409);
+   const rejection=directGrantRejection({
+    operation:input.operation,actorIsTarget:t.id===actor.id,
+    targetIsFounder:t.memberRole==="Founder",verified:t.verified===true,
+    legacyContributor:t.memberRole==="Contributor",hasDirectGrant:t.hasGrant,
+    directGrantActive:t.grantActive===true
+   });
+   if(rejection){
+    const messages={
+     founder:["Kurucu yetkisi bu işlemle değiştirilemez",403],
+     legacy:["Bu hesap mevcut Contributor sistemiyle yönetiliyor",409],
+     unverified:["Doğrulanmamış hesaba Contributor yetkisi verilemez",403],
+     already_active:["Yetki zaten açık",409],
+     not_active:["Açık doğrudan yetki bulunamadı",409]
+    } as const;
+    throw new Failure(messages[rejection][0],messages[rejection][1]);
+   }
    if(input.operation==="grant"){
-    if(t.grantActive===true)throw new Failure("Yetki zaten açık",409);
     await client.query(
      `INSERT INTO cc_contributor_grants(auth_user_id,active,granted_by,granted_at,revoked_by,revoked_at)
       VALUES($1,TRUE,$2,now(),NULL,NULL)
@@ -73,7 +83,6 @@ export async function POST(request:NextRequest){
       ON CONFLICT(auth_user_id) DO UPDATE SET name=EXCLUDED.name,active=TRUE,updated_at=now()
       WHERE cc_members.role='Contributor'`,[t.id,t.name]);
    }else{
-    if(!t.hasGrant||t.grantActive!==true)throw new Failure("Açık doğrudan yetki bulunamadı",409);
     await client.query(
      "UPDATE cc_contributor_grants SET active=FALSE,revoked_by=$2,revoked_at=now(),updated_at=now() WHERE auth_user_id=$1",
      [t.id,actor.id]);
