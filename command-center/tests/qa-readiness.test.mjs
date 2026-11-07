@@ -8,3 +8,5 @@ test("QA diagnostic denied without verified project identity",()=>assert.equal(q
 test("QA diagnostic denied locally",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_ENV:"development"}),false));
 test("QA diagnostic available in isolated QA Preview",()=>assert.equal(qaReadinessAllowed(qa),true));
 test("QA diagnostic available in isolated QA project target",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_ENV:"production"}),true));
+test("QA diagnostic accepts explicit project-bound fallback on isolated deployment",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_PROJECT_ID:undefined,CC_QA_PROJECT_ID:ISOLATED_QA_PROJECT_ID}),true));
+test("QA diagnostic rejects unrelated fallback project IDs",()=>assert.equal(qaReadinessAllowed({...qa,VERCEL_PROJECT_ID:undefined,CC_QA_PROJECT_ID:"other-project"}),false));
