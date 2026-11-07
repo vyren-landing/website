@@ -1,6 +1,6 @@
 import {NextRequest} from "next/server";
-import {communityEnabled,database,getActor} from "../../../../lib/phase2";
-import {directGrantRejection} from "../../../../lib/contributor-access.mjs";
+import {communityEnabled,directGrantSchemaReady,database,getActor,phase2Configured} from "../../../../lib/phase2";
+import {directGrantRejection,directGrantOperationAllowed} from "../../../../lib/contributor-access.mjs";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
@@ -12,10 +12,11 @@ async function founder(){
  return actor?.role==="Founder"?actor:null;
 }
 export async function GET(){
- if(!communityEnabled())return deny("Topluluk yetki yönetimi etkin değil",503);
+ if(!phase2Configured())return deny("Kurulum tamamlanmadı",503);
  try{
   const actor=await founder();
   if(!actor)return deny("Yalnızca Kurucu erişebilir",403);
+  if(!await directGrantSchemaReady())return deny("Topluluk tabloları hazır değil",503);
   const profiles=await database().query(`
    SELECT p.auth_user_id AS id,p.display_name AS name,u.email AS email,p.wants_to_contribute AS "wantsToContribute",
       p.created_at AS "joinedAt",g.active AS "directGrantActive",
@@ -29,7 +30,7 @@ export async function GET(){
  }catch{return deny("Üye kayıtlarına erişilemedi",503);}
 }
 export async function POST(request:NextRequest){
- if(!communityEnabled())return deny("Topluluk yetki yönetimi etkin değil",503);
+ if(!phase2Configured())return deny("Kurulum tamamlanmadı",503);
  if(request.headers.get("origin")!==new URL(request.url).origin)return deny("Geçersiz Origin",403);
  if((request.headers.get("content-type")||"").split(";")[0]!=="application/json")return deny("JSON gerekli",415);
  const raw=await request.text();
@@ -41,6 +42,8 @@ export async function POST(request:NextRequest){
  try{
   const actor=await founder();
   if(!actor)return deny("Yalnızca Kurucu işlem yapabilir",403);
+  if(!directGrantOperationAllowed({tablesReady:await directGrantSchemaReady(),enrollmentOpen:communityEnabled(),operation:input.operation}))
+   return deny("Topluluk kayıtları kapalı veya tablolar hazır değil",503);
   const db=database(),client=await db.connect();
   try{
    await client.query("BEGIN");
