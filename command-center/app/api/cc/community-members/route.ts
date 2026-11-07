@@ -55,7 +55,8 @@ export async function POST(request:NextRequest){
    if(!target.rowCount)throw new Failure("Topluluk üyesi bulunamadı",404);
    const t=target.rows[0];
    if(t.id===actor.id||t.memberRole==="Founder")throw new Failure("Kurucu yetkisi bu işlemle değiştirilemez",403);
-   if(t.verified!==true)throw new Failure("Doğrulanmamış hesaba Contributor yetkisi verilemez",403);
+   // Loss of verification must never block Founder revocation or safe recovery.
+   if(input.operation==="grant"&&t.verified!==true)throw new Failure("Doğrulanmamış hesaba Contributor yetkisi verilemez",403);
    // Do not create an alternative authority path around legacy invited/test Contributor grants.
    if(t.memberRole==="Contributor"&&!t.hasGrant)
     throw new Failure("Bu hesap zaten mevcut Contributor sistemiyle yönetiliyor",409);
