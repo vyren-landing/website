@@ -16,10 +16,11 @@ export async function GET(){
   const actor=await founder();
   if(!actor)return deny("Yalnızca Kurucu erişebilir",403);
   const profiles=await database().query(`
-   SELECT p.auth_user_id AS id,p.display_name AS name,p.wants_to_contribute AS "wantsToContribute",
+   SELECT p.auth_user_id AS id,p.display_name AS name,u.email AS email,p.wants_to_contribute AS "wantsToContribute",
       p.created_at AS "joinedAt",g.active AS "directGrantActive",
       m.role AS "existingRole",m.active AS "existingActive"
    FROM cc_community_profiles p
+   JOIN "user" u ON u.id=p.auth_user_id
    LEFT JOIN cc_contributor_grants g ON g.auth_user_id=p.auth_user_id
    LEFT JOIN cc_members m ON m.auth_user_id=p.auth_user_id
    ORDER BY p.created_at DESC LIMIT 200`);
@@ -42,17 +43,19 @@ export async function POST(request:NextRequest){
   const db=database(),client=await db.connect();
   try{
    await client.query("BEGIN");
-   const target=await client.query<{id:string;name:string;memberRole:string|null;memberActive:boolean|null;grantActive:boolean|null;hasGrant:boolean}>(
-    `SELECT p.auth_user_id AS id,p.display_name AS name,
+   const target=await client.query<{id:string;name:string;verified:boolean;memberRole:string|null;memberActive:boolean|null;grantActive:boolean|null;hasGrant:boolean}>(
+    `SELECT p.auth_user_id AS id,p.display_name AS name,u."emailVerified" AS verified,
        m.role AS "memberRole",m.active AS "memberActive",
        g.active AS "grantActive",(g.auth_user_id IS NOT NULL) AS "hasGrant"
      FROM cc_community_profiles p
+     JOIN "user" u ON u.id=p.auth_user_id
      LEFT JOIN cc_members m ON m.auth_user_id=p.auth_user_id
      LEFT JOIN cc_contributor_grants g ON g.auth_user_id=p.auth_user_id
      WHERE p.auth_user_id=$1 FOR UPDATE OF p`,[input.id]);
    if(!target.rowCount)throw new Failure("Topluluk üyesi bulunamadı",404);
    const t=target.rows[0];
    if(t.id===actor.id||t.memberRole==="Founder")throw new Failure("Kurucu yetkisi bu işlemle değiştirilemez",403);
+   if(t.verified!==true)throw new Failure("Doğrulanmamış hesaba Contributor yetkisi verilemez",403);
    // Do not create an alternative authority path around legacy invited/test Contributor grants.
    if(t.memberRole==="Contributor"&&!t.hasGrant)
     throw new Failure("Bu hesap zaten mevcut Contributor sistemiyle yönetiliyor",409);
