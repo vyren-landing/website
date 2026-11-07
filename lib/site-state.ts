@@ -42,21 +42,25 @@ export const CANONICAL_IMPLEMENTATION = {
 } as const;
 
 export const WP14_RESEARCH_EVIDENCE = {
-  milestone: "WP14 R13",
-  asOf: "2026-11-02",
+  milestone: "WP14 R14",
+  asOf: "2026-11-07",
   repository: "vyren-rev46-canonical",
-  sourceCommit: "64bff9f955d04e324656cb9c6a15651df26d296f",
-  researchBranch: "research-lc40-wp14-r13-beacon-bls-20261102",
-  researchRunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/41505374595",
-  coreCiRunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/41505374353",
-  scopedResult: "Research workflow PASS",
-  scope: "R13 real BLS/conditional checkpoint tests plus R12 SSZ and R11 Ethereum provenance regressions",
+  sourceCommit: "0633b90c973dc876d0ab116e4376f3ceb7a581fc",
+  researchBranch: "research-lc40-wp14-r14-witness-rotation-20261102",
+  researchRunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/42382437854",
+  coreCiRunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/42382437838",
+  priorR13Commit: "64bff9f955d04e324656cb9c6a15651df26d296f",
+  priorR13RunUrl: "https://github.com/vyren-landing/vyren-rev46-canonical/actions/runs/41505374595",
+  scopedResult: "R14 research CI PASS: 62/62 R14, 57/57 R13, 61/61 R12, 41/41 R11 across separate jobs",
+  scope: "R14 BLS/Ed25519 witness rotation and public-checkpoint probe; R13/R12/R11 regression suites",
   coreCiResult: "FAILED during pinned dependency snapshot restore; later static/build steps SKIPPED",
   authenticatedBeaconFinality: "NOT VERIFIED",
   realBaseStateProof: "NOT VERIFIED",
   fullE5AndProductAcceptance: "PENDING",
   migrationOrLaunchAuthority: "NONE",
   r14IndependentResult: "NOT VERIFIED",
+  r14PublicProbeResult: "SSZ/BLS verified only relative to a public untrusted checkpoint; no vetted trust anchor",
+  materialE5Open: "9 material RED remain OPEN",
 } as const;
 
 export const NETWORK_PROFILE = {
