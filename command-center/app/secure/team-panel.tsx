@@ -1,6 +1,7 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
 import StatusPill from "./status-pill";
+import CommunityMembersPanel from "./community-members-panel";
 
 type Member={id:string;name:string;role:string;active:boolean;createdAt:string;positionTitle:string|null};
 type Invite={id:string;email:string;status:"PENDING"|"ACTIVE"|"REVOKED";memberId:string|null;createdAt:string;updatedAt:string};
@@ -47,6 +48,7 @@ export default function TeamPanel({onChange}:{onChange:()=>void}){
   {error&&<div className="alert" role="alert">{error}</div>}
   {message&&<div className="alert" role="status">{message}</div>}
   <button disabled={loading||busy} onClick={()=>void load()}>Ekip Listesini Yenile</button>
+  <CommunityMembersPanel/>
   <div className="cc-list-toolbar"><div><h3>Mevcut Ekip</h3><p className="small muted">Onaylı hesaplar, pozisyonlar ve erişim durumu.</p></div><button className="primary" disabled={busy||loading} aria-expanded={showInviteForm} aria-controls="cc-invite-editor" onClick={()=>setShowInviteForm(x=>!x)}>{showInviteForm?"Formu Kapat":"+ Davet Kaydı"}</button></div>
   {showInviteForm&&<div className="card stack cc-editor" id="cc-invite-editor">
    <h3>Google Contributor İçin Davet Kaydı</h3>
