@@ -36,7 +36,7 @@ export default function JoinClient(){
   {loading?<p>Checking your membership…</p>:
    status?.joined?<><h2>You're part of the community.</h2>
     <p>Your membership is active. Public discussions and contribution features are being prepared. Community membership does not grant access to private team work.</p>
-    <Link className="cc-community-action" href="/community">Back to Community →</Link>
+    <div className="row"><Link className="cc-community-action" href="/community">Back to Community →</Link><button disabled={busy} onClick={async()=>{setBusy(true);try{await authClient.signOut();window.location.assign("/community");}catch{setError("Sign-out is unavailable right now");setBusy(false);}}}>Sign out</button></div>
    </>:status?.signedIn?<><h2>Join the VYREN Community</h2>
     <p>Connect with people interested in VYREN, Web3 and technology. Taking on team tasks is entirely optional.</p>
     <label className="cc-community-check"><input type="checkbox" checked={volunteer} onChange={e=>setVolunteer(e.target.checked)}/> I'm interested in contributing voluntarily.</label>
