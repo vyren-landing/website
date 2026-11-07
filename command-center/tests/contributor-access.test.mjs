@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {resolveOperationalRole,hasActiveWorkspaceRole,directGrantRejection} from '../lib/contributor-access.mjs';
+import {resolveOperationalRole,hasActiveWorkspaceRole,directGrantRejection,directGrantOperationAllowed} from '../lib/contributor-access.mjs';
 const defaultState={founder:false,legacyApproved:false,invitationActive:false,directGrant:null};
 const baseline={operation:'grant',actorIsTarget:false,targetIsFounder:false,verified:true,legacyContributor:false,hasDirectGrant:false,directGrantActive:false};
 test('Founder identity remains Founder even when direct-grant state is false',()=>assert.equal(resolveOperationalRole({...defaultState,founder:true,directGrant:false}),'Founder'));
@@ -23,3 +23,8 @@ test('duplicate active grants reject',()=>assert.equal(directGrantRejection({...
 test('revocation succeeds even after email verification was lost',()=>assert.equal(directGrantRejection({...baseline,operation:'revoke',verified:false,hasDirectGrant:true,directGrantActive:true}),null));
 test('revocation of a non-active grant is rejected',()=>assert.equal(directGrantRejection({...baseline,operation:'revoke',hasDirectGrant:true,directGrantActive:false}),'not_active'));
 test('revocation without a direct grant is rejected',()=>assert.equal(directGrantRejection({...baseline,operation:'revoke'}),'not_active'));
+
+test('revoke remains allowed when enrollment closed and schema exists',()=>assert.equal(directGrantOperationAllowed({tablesReady:true,enrollmentOpen:false,operation:'revoke'}),true));
+test('grant rejected when enrollment closed',()=>assert.equal(directGrantOperationAllowed({tablesReady:true,enrollmentOpen:false,operation:'grant'}),false));
+test('grant accepted when enrollment open and schema exists',()=>assert.equal(directGrantOperationAllowed({tablesReady:true,enrollmentOpen:true,operation:'grant'}),true));
+test('no grant or revoke when schema missing',()=>{assert.equal(directGrantOperationAllowed({tablesReady:false,enrollmentOpen:true,operation:'grant'}),false);assert.equal(directGrantOperationAllowed({tablesReady:false,enrollmentOpen:false,operation:'revoke'}),false);});
