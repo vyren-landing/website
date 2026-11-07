@@ -87,3 +87,13 @@ Stop if unexpected current Neon branch, migration mismatch, grant-versus-invite 
 - A new snapshot of source main was attempted but Neon returned **HTTP 422 snapshots limit exceeded**. Existing 2026-10-10 snapshot was not deleted. A separate QA branch was created instead. No migration or application data mutation was performed on main.
 - Vercel feature-branch deployment `7ab7323245c9` reached READY after source hardening and Founder-only-user status correction, but is **not** a real account-role functional test. Branch-changing Vercel envs, `CC_COMMUNITY_ENABLED`, published website and live identity records were not modified.
 - **NEXT:** test roles/route denial against controlled QA account identities after isolating auth host and Preview database target. Do not flip CC_COMMUNITY_ENABLED or run migration 009 on main merely on the strength of schema QA.
+
+
+## 2026-11-07 operational role policy unit QA checkpoint
+- The Founder has clarified that **Founder is the only real user**; others are QA/test/draft. No live team onboarding is being claimed.
+- Added source-controlled `lib/contributor-access.mjs`: centralized operational authority decision for Founder, legacy test/invite identity, active Founder direct grant, revoked direct grant, and `cc_members` active/role match. The source policy is used by the real `getActor()` role path and the Founder direct-grant API.
+- Added `tests/contributor-access.test.mjs`; `npm test` uses Node's built-in test runner. Local isolated runner reports **20/20 unit tests PASS** including revoked-grant override, incorrect role/inactive account denial, Founder self-modification denial, unverified account rejection, and revocation despite lost email verification.
+- UNIT PASS does not equal authenticated live OAuth E2E. No real session, sign-in, task ownership, API status-code E2E, or role swap was performed.
+- The distinct Neon QA branch `br-frosty-moon-b2pnll1d` has schema 009; the main branch is untouched. **No Community feature flags or Vercel DATABASE_URL variables were changed.**
+- GitHub runtime-integrating commits: `eaf171ef`, `b2a92dfb`; `6db86046` registers the test script. Await current Vercel build and authenticated QA before enabling feature.
+- **Open prerequisite:** actual QA OAuth host + independently isolated Vercel Preview pointing at QA Neon branch; do not redirect existing Founder Preview to QA without a tested preservation/rollback path.
