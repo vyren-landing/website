@@ -37,3 +37,14 @@ export function directGrantRejection(input) {
   }
   return input.hasDirectGrant && input.directGrantActive ? null : 'not_active';
 }
+
+/**
+ * Closing public enrollment must not suspend existing revocations or lock the
+ * Founder out of emergency revocation. New grants still require enrollment
+ * to be explicitly enabled. The route must separately authenticate Founder.
+ * @param {{tablesReady:boolean, enrollmentOpen:boolean, operation:'grant'|'revoke'}} state
+ */
+export function directGrantOperationAllowed(state) {
+  if (!state.tablesReady) return false;
+  return state.enrollmentOpen === true || state.operation === "revoke";
+}
