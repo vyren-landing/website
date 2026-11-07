@@ -203,7 +203,8 @@ export default function SecureWorkspace({actor,showQaTools=false}:{actor:Actor;s
      <h1>{viewTitle}</h1>
      <p className="muted small">{label("Operational workspace · Approved account access","Operasyonel çalışma alanı · Onaylı hesap erişimi")}</p>
     </div>
-    <span className="cc-live-scope">{label("Operational · No canonical authority","Operasyonel · Canonical yetki yok")}</span>
+    <div className="row"><a className="cc-live-community-jump" href="/community">{label("Community","Topluluk")}</a>
+    <span className="cc-live-scope">{label("Operational · No canonical authority","Operasyonel · Canonical yetki yok")}</span></div>
    </header>
    <div className="stack cc-live-content">
     <p className="cc-live-disclaimer">{label("Actions in this workspace do not change VYREN protocol, economics, FFA, governance, or lifecycle decisions.","Bu çalışma alanındaki işlemler VYREN protocol, ekonomi, FFA, governance veya lifecycle kararlarını değiştirmez.")}</p>
