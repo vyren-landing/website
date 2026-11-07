@@ -9,6 +9,14 @@ export type Actor = {id:string;name:string;role:MemberRole};
 let pool:Pool|undefined;
 
 export function communityEnabled(){return phase2Configured()&&process.env.CC_COMMUNITY_ENABLED==="true";}
+/** Existing direct grants survive temporary enrollment closure. */
+export async function directGrantSchemaReady(){
+ if(!phase2Configured())return false;
+ const result=await database().query<{ready:boolean}>(
+  "SELECT to_regclass('public.cc_contributor_grants') IS NOT NULL AND to_regclass('public.cc_community_profiles') IS NOT NULL AS ready"
+ );
+ return result.rows[0]?.ready===true;
+}
 
 export function phase2Configured(){
  return process.env.CC_LIVE_ENABLED==="true" && !!(process.env.DATABASE_URL&&process.env.BETTER_AUTH_SECRET&&process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET&&process.env.FOUNDER_GITHUB_ACCOUNT_ID);
@@ -77,7 +85,7 @@ export async function getActor(options?:{readOnly?:boolean}):Promise<Actor|null>
  // Provider identity is not a role. A revoked direct grant overrides legacy access.
  const legacyApproved=githubTest||googleTest;
  let directGrant:boolean|null=null;
- if(!founder&&communityEnabled()){
+ if(!founder&&await directGrantSchemaReady()){
   const direct=await database().query<{active:boolean}>(
    "SELECT active FROM cc_contributor_grants WHERE auth_user_id=$1",[uid]);
   if(direct.rows.length)directGrant=direct.rows[0].active===true;
