@@ -1,0 +1,38 @@
+name: VYREN Command Center - Community Authorization QA
+on:
+  push:
+    branches:
+      - feature/command-center-phase2-auth-db-20261009
+    paths:
+      - 'command-center/lib/**'
+      - 'command-center/app/api/**'
+      - 'command-center/tests/**'
+      - '.github/workflows/cc-community-security-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cc-community-auth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy-tests:
+    name: Authorization policy unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout source only
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Confirm Node.js runtime
+        run: node --version
+      - name: Run permission and QA isolation tests
+        working-directory: command-center
+        run: node --test tests/*.test.mjs
+      - name: Explain scope
+        run: |
+          echo "This workflow runs dependency-free policy unit tests only."
+          echo "It does not authorize deployment or prove Better Auth OAuth/HTTP E2E."
