@@ -74,10 +74,21 @@ export async function getActor(options?:{readOnly?:boolean}):Promise<Actor|null>
   session.user.email.toLowerCase()===approvedGoogleEmail&&
   (!process.env.TEST_GOOGLE_ACCOUNT_ID||googleId===process.env.TEST_GOOGLE_ACCOUNT_ID);
  let role:MemberRole|null=founder?"Founder":(githubTest||googleTest?"Contributor":null);
+ // Explicit direct grants take precedence over the invitation/test path, including revocation.
+ // This avoids claiming a pending Google invite for a previously revoked direct-grant identity.
+ let hasDirectGrant=false;
+ if(!founder&&communityEnabled()){
+  const direct=await database().query<{active:boolean}>(
+   "SELECT active FROM cc_contributor_grants WHERE auth_user_id=$1",[uid]);
+  if(direct.rowCount){
+   hasDirectGrant=true;
+   role=direct.rows[0].active?"Contributor":null;
+  }
+ }
  // Only an explicitly invited, verified Google identity may become a new Contributor.
  // The first verified login pins the grant to Google's provider account ID and Better Auth user.
  // Revoked grants cannot silently re-bind to a different identity at the same address.
- if(!role&&googleId&&session.user.emailVerified===true){
+ if(!role&&!hasDirectGrant&&googleId&&session.user.emailVerified===true){
   const email=(session.user.email||"").trim().toLowerCase();
   if(email){
    const db=database();
@@ -96,14 +107,6 @@ export async function getActor(options?:{readOnly?:boolean}):Promise<Actor|null>
      role="Contributor";
    }
   }
- }
- // A Founder-owned explicit membership grant controls only newly registered community members.
- // This table is accessed ONLY after the new additive schema has been applied and enabled.
- // A revoked grant overrides any older invitation or test identity; it cannot revive itself.
- if(!founder&&communityEnabled()){
-  const grant=await database().query<{active:boolean}>(
-   "SELECT active FROM cc_contributor_grants WHERE auth_user_id=$1",[uid]);
-  if(grant.rowCount)role=grant.rows[0].active?"Contributor":null;
  }
  if(!role)return null;
  const name=(googleTest&&!founder?"VYREN Test Contributor":(session.user.name||"Member")).slice(0,150);
