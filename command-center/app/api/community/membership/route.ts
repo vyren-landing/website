@@ -15,7 +15,7 @@ async function currentUser(){
 async function approvedSocial(userId:string){
  const r=await database().query<{accountId:string}>(
   'SELECT "accountId" FROM account WHERE "userId"=$1 AND "providerId"=$2 LIMIT 1',[userId,"google"]);
- return r.rowCount>0;
+ return (r.rowCount??0)>0;
 }
 export async function GET(){
  if(!communityEnabled())return fail("Community membership is not yet available",503);
