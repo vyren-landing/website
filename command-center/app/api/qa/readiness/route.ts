@@ -26,6 +26,13 @@ export async function GET(){
    communityEnabled:process.env.CC_COMMUNITY_ENABLED==="true",
    commandCenterEnabled:process.env.CC_LIVE_ENABLED==="true",
    noRealUsersProvisioned:check.rows[0]?.profileRows===0&&check.rows[0]?.grantRows===0,
+   authPrerequisites:{
+    signingSecret:!!process.env.BETTER_AUTH_SECRET,
+    githubOAuth:!!(process.env.GITHUB_CLIENT_ID&&process.env.GITHUB_CLIENT_SECRET),
+    founderTestId:!!process.env.FOUNDER_GITHUB_ACCOUNT_ID,
+    googleOAuth:!!(process.env.GOOGLE_CLIENT_ID&&process.env.GOOGLE_CLIENT_SECRET),
+    fixedCallbackHost:!!process.env.BETTER_AUTH_URL
+   },
   },{status:ready?200:503,headers:noStore});
  }catch{
   return Response.json({error:"QA database readiness check unavailable"},{status:503,headers:noStore});
