@@ -34,16 +34,17 @@ One shared content/threads engine with categories and `PUBLIC | TEAM` visibility
 ## 4. Roles and trust boundaries
 - **Guest:** Read published/approved public content and verified public FAQ only; cannot post, view private Team Space, use CC tasks or see internal member records.
 - **Community member:** LinkedIn or Google OAuth sign-in; own display profile, public posts, comments, suggestions and volunteer expression; no `cc_members` role or task API permissions implied.
-- **Approved Contributor:** Existing `cc_members` invitation/active rules, own tasks and private Team Space; community features too. A linked LinkedIn identity does not automatically upgrade an account to Contributor.
+- **Approved Contributor:** Founder may select an already signed-in, identity-verified Community member from **Üyeler** and directly grant/revoke the operational Contributor role. No emailed invitation or new login is required. Existing invited Contributors and `cc_team_invites` bindings remain valid as a legacy/optional path. Contributors see only their tasks and private Team Space; a LinkedIn identity alone never grants Contributor authority.
 - **Founder:** Existing Founder identity/rights and permission logic intact; separate operational content moderation / volunteer triage privileges; no protocol-governance change.
 - **Coordinator (later):** Only if approved by Founder and accepted by individual; narrow team coordination permissions, revocable/replaceable, never independent governance, compensation commitment or privileged social/infrastructure access.
 - **No vote-to-govern:** community endorsements / proposals never directly alter economics, FFA, lifecycle, funding, employment, public promises or canonical work acceptance.
 
-**Critical identity constraint:** Existing Better Auth `accountLinking.disableImplicitLinking=true` remains. Matching LinkedIn/Google email is not evidence of the same person and must not automatically merge users or migrate `cc_members`/invitation authority. Any account link must be authenticated, explicit, verified and fail-closed. Preserve existing Google invitation binding and Founder GitHub recognition.
+**Critical identity constraint:** Existing Better Auth `accountLinking.disableImplicitLinking=true` remains. Matching LinkedIn/Google email is not evidence of the same person and must not automatically merge users or migrate `cc_members`/invitation authority. Any account link must be authenticated, explicit, verified and fail-closed. Preserve existing Google invitation binding and Founder GitHub recognition. **Current `getActor()` does NOT accept an ordinary `cc_members` role grant by itself; it derives Contributor status from test identities or active Google invitation. Therefore implement a narrow authenticated, server-side Founder grant/revoke resolution in `getActor()` (or a shared authorization resolver) before the direct-role UI is considered functional. Preserve read-only/no-side-effect access checks, existing invitation flows and deny-on-revoke behavior.**
 
 ## 5. Minimal database/domain design (proposal only)
 Add new tables in a separate reviewed non-destructive migration, **without changing `cc_members.role` or rewriting existing `user/session/account` rows**:
 - `cc_community_profiles`: auth user reference, display name, optional areas of interest / willingness to contribute, visibility/consent and timestamps.
+- **Operational role grants:** use existing `cc_members` where appropriate or a minimal explicit grant registry (decide during schema review). Must bind to the authenticated Better Auth **user ID/provider identity**, never merely a LinkedIn display name or matching email. Record grant/revoke actor, time and scope. Only Founder can grant Contributor access; coordinator-specific permissions, if needed later, stay distinct.
 - `cc_community_posts`: author, topic/category, title/body, `visibility=PUBLIC|TEAM`, optional `related_work` reference if authorized, moderation status, edit history/timestamps.
 - `cc_community_comments`: parent post, author, body, moderation state/timestamps.
 - `cc_community_reports`: reporting actor, target, reason, disposition, timestamps. Founder-only review initially.
@@ -66,12 +67,21 @@ Private Team Space is API-row-scoped by an active approved `cc_members` membersh
 - Initial moderation by Founder is a *practical pilot*, not a permanent mandatory approval bottleneck: scoped later delegation/recovery permitted without granting canonical authority.
 - Published public content and team records remain operational/social, never authoritative Rev4.6/VDCP canonical evidence or Founder/FOW rights.
 
+## Founder direct access management — minimal UX decision (2026-11-07 clarification)
+**Selected operating path:** `Community Member → Founder selects member → Grant Contributor Access → Workspace appears`. Founder screen is in Turkish: `Üyeler`, `Contributor Yetkisi Ver`, `Yetkiyi Kaldır`. Member/Contributor UI remains English.
+- Founder selects an existing authenticated Community account (person's user identity is fixed by OAuth). A single explicit confirm suffices; no invitation e-mail or manual address entry is required.
+- Revocation immediately denies future private-team/task access at API layer; existing assignments/history must be preserved and reassignment handled separately rather than deleting work.
+- Existing Google invited Contributor accounts keep working; their `ACTIVE`/revoked semantics cannot be bypassed by stale grants or implicit social linking. Define explicit precedence and test it.
+- Community membership alone is never a `Founder` role, payroll, settlement entitlement, token allocation, protocol voting right or official communication/publishing privilege.
+- The Founder may later delegate carefully bounded coordination/moderation duties, but initial MVP does not need a broad role-permission editor or multiple approval chains.
+- Record grants, revocations and reasons in append-only audit evidence; protect API routes server-side. No direct role edits based only on front-end checkboxes.
+
 ## 8. Staged implementation, small batches
 | Phase | Work | Evidence needed | Non-goals |
 |---|---|---|---|
 | 0 | Freeze source inventory/branch and produce UI/page map + migration safety plan | Existing roles/API/restore baseline captured | No production change |
 | 1 | Public read-only Community + Learn VYREN shell and safe feed model in Preview; new tables via reviewed additive migration | Anonymous sees only public approved content, Founder/Contributor old views intact | No public launch yet |
-| 2 | Google-enabled public member registration and separate community identity authorization; LinkedIn OIDC configured/tested when credentials/product ready | Normal member cannot reach any `/secure` task or Founder API; no accidental account linking | LinkedIn provider readiness does NOT block UI/data development |
+| 2 | Google-enabled public member registration, LinkedIn OIDC when configured, and **Founder direct Contributor grant/revoke** from the authenticated member list | Normal member denied private APIs before grant; granted member can enter Workspace; revoked member denied without history deletion; legacy invited users still work | LinkedIn provider readiness does NOT block UI/data development |
 | 3 | Authenticated simple post/comment/ideas + voluntary interest + report/moderation | Create/read/update visibility, report, abuse rate limit, API guards, privacy UX and data recovery | No chat, DMs, automated assignment |
 | 4 | Private Contributor Team Space on same thread engine + optional links to existing tasks | Two-role private-read denial, existing own-task tests, role revoke test, audit | No new governance or auto-approval |
 | 5 | Public website `Community` entry and stable URL after explicit release approval | Mobile/desktop nav, fixed OAuth origin and actual public readiness checks | Never alter public site prematurely |
@@ -81,7 +91,7 @@ Phases can be combined when evidence and implementation cost justify it; no inde
 ## 9. QA acceptance: one concise set
 1. Founder existing tasks/projects/team/permissions and Turkish UX unchanged.
 2. Approved Contributor own-task flow remains English; private team access works; no Founder rights.
-3. Registered public member can post/comment only in public space and cannot access `/secure`, team posts or operational APIs.
+3. Registered public member can post/comment only in public space and cannot access `/secure`, team posts or operational APIs **unless Founder explicitly grants Contributor authority through server-backed identity-bound access control**.
 4. Anonymous sees only explicitly public content.
 5. Existing GitHub Founder and Google Contributor OAuth still work; LinkedIn sign-in works only if product/callback credentials are actually available; no implicit account promotion/merging.
 6. Content reports/moderation, basic rate limits and official-vs-community distinction work.
@@ -91,6 +101,6 @@ Phases can be combined when evidence and implementation cost justify it; no inde
 ## 10. Status / next action
 `DESIGN_PLAN_READY / NEW COMMUNITY MODULES_NOT_IMPLEMENTED / LINKEDIN_OIDC_NOT_CONFIGURED / PRODUCTION_SITE_UNCHANGED`.
 
-**Next implementation point:** draft the additive schema and route-level authorization matrix in feature branch; implement a tiny read-only Community + Learn VYREN Preview shell using one thread model. Leave live `main` data and public `main` website untouched until separately authorized.
+**Next implementation point:** draft the additive schema and route-level authorization matrix in feature branch, including Founder direct grant/revoke and the existing invited-user precedence; implement a tiny read-only Community + Learn VYREN Preview shell using one thread model. Leave live `main` data and public `main` website untouched until separately authorized.
 
 **No-loss and GNR:** This plan does not supersede 2026-11-07 accepted Contributor Hub product direction, 2026-10-31 Command Center QA/recovery records or existing Founder–VYREN/FFA/Rev4.6 constraints. Omission is not supersession. GNR No-Self-Lock, Solution Duty, affirmative rights/security and replaceability control every material implementation.
