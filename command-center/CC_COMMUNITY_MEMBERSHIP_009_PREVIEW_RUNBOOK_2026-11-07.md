@@ -26,7 +26,7 @@ Consequences for implementation and QA:
 
 ## Required before migration execution
 1. Verify project/team and **actual Vercel Preview DATABASE_URL target branch** through platform UI, no secret values in chat.
-2. Confirm current schema and row inventory; record 18-table baseline on the exact connected Neon branch.
+2. Confirm current schema and row inventory; record 19-table baseline on the exact connected Neon branch.
 3. Preserve a recoverable checkpoint and independently retained encrypted PostgreSQL backup. Existing historical 2026-10-11 backup equality is not a current November 7 checkpoint.
 4. Inspect exact SQL; confirm only CREATE TABLE/INDEX and no backfill or changes to existing rows.
 5. Run migration only once, in a transaction, on the specifically authorized Preview database. Never run it merely by a Git push.
@@ -78,3 +78,12 @@ Stop if unexpected current Neon branch, migration mismatch, grant-versus-invite 
 - User connected Neon in this conversation, but the connected Neon execution tools were not exposed by the current tool registry. Proceed with direct read-only Neon verification once those tools become available; do not falsely claim completion.
 - **STOP:** Before executing migration 009, confirm live database identity + current backup checkpoint/isolated recovery + explicit target against actual Neon source. Keep feature disabled and do not touch existing sessions, grants or identities.
 - Latest verified stage at checkpoint: `SOURCE PREPARED / SELECTIVE BUILD PASS / DB UNCHANGED / NO LIVE E2E`.
+
+## 2026-11-07 Neon QA-branch evidence checkpoint
+- Connected Neon project: `vyren-command-center-db` (`misty-cherry-51586446`); source/default branch `main` (`br-wild-haze-b2j7fsqi`); separate QA branch `cc-community-009-qa-20261107` (`br-frosty-moon-b2pnll1d`) created from parent LSN `0/2443B18`. QA is a copy, **not** an assertion that it is Vercel's currently selected database branch.
+- **Real baseline correction:** `main` has 19 public base tables, of which 14 start `cc_`; `cc_community_profiles` and `cc_contributor_grants` absent before migration. The earlier reference to 18 existing tables was outdated.
+- `db/009_community_members_and_direct_grants.sql` was applied as the three CREATE statements in one Neon transaction **ONLY ON THE QA BRANCH**; result success. On QA, 21 total tables, exactly one each profile/grant table, both new tables initially contain 0 rows. At verification `cc_members=3`, `cc_team_invites=1` on the QA copy, without treating those as real contributors.
+- FK, primary key, required columns and `active -> granted_by/granted_at` CHECK were independently inspected on QA using database schema metadata. This is **SCHEMA QA PASS ONLY**. Real OAuth, Founder grant/revoke, session denial, backup restore and role regression are NOT E2E PASS.
+- A new snapshot of source main was attempted but Neon returned **HTTP 422 snapshots limit exceeded**. Existing 2026-10-10 snapshot was not deleted. A separate QA branch was created instead. No migration or application data mutation was performed on main.
+- Vercel feature-branch deployment `7ab7323245c9` reached READY after source hardening and Founder-only-user status correction, but is **not** a real account-role functional test. Branch-changing Vercel envs, `CC_COMMUNITY_ENABLED`, published website and live identity records were not modified.
+- **NEXT:** test roles/route denial against controlled QA account identities after isolating auth host and Preview database target. Do not flip CC_COMMUNITY_ENABLED or run migration 009 on main merely on the strength of schema QA.
