@@ -1,5 +1,5 @@
 import {NextRequest} from "next/server";
-import {database,getActor,phase2Configured} from "../../../../lib/phase2";
+import {communityEnabled,database,getActor,phase2Configured} from "../../../../lib/phase2";
 
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
@@ -104,6 +104,13 @@ export async function POST(request:NextRequest){
     const result=await client.query<{id:string;active:boolean}>(
      'SELECT auth_user_id AS id,active FROM cc_members WHERE auth_user_id=$1 AND role=$2 FOR UPDATE',[id,"Contributor"]);
     if(!result.rowCount)throw new ApiFailure("Contributor bulunamadı",404);
+    // Direct-grant users are managed via the Founder Community Members control.
+    // Keep legacy invitation toggles from bypassing an explicit direct revocation.
+    if(communityEnabled()){
+     const grant=await client.query<{active:boolean}>(
+      "SELECT active FROM cc_contributor_grants WHERE auth_user_id=$1",[id]);
+     if((grant.rowCount??0)>0)throw new ApiFailure("Bu üyenin erişimini Topluluk Üyeleri bölümünden yönetin",409);
+    }
     const desired=operation==="enable_member";
     if(result.rows[0].active===desired)throw new ApiFailure(desired?"Erişim zaten açık":"Erişim zaten kapalı",409);
     await client.query("UPDATE cc_members SET active=$2,updated_at=now() WHERE auth_user_id=$1",[id,desired]);
