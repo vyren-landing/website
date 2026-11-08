@@ -4,6 +4,42 @@
 **Scope:** Community, contributor access, Command Center operational tooling, and isolated QA only.
 **Use:** Start a new chat without restarting the project. Verify live resources rather than trusting this snapshot blindly.
 
+## 0 — Product purpose, system boundaries, and what we are building
+
+### Why this work exists
+VYREN needs more than a public landing page and more than an internal task tracker. The intention is a **simple, sustainable operational and participation ecosystem** that starts with **one real Founder** but remains capable of serving an expanding community and approved contributors without having to rebuild its foundations.
+
+The main user journey is:
+`Discover VYREN → Learn / Ask / Discuss → Suggest an idea or volunteer → Founder selects a willing, verified member (if appropriate) → Contributor collaborates on assigned work → Founder reviews progress and deliverables`.
+This is not a compulsory recruitment funnel: an ordinary member may simply learn, discuss, or contribute ideas without ever joining the team.
+
+### Three related but distinct surfaces
+**A. VYREN public website (`vyren.io`)**: official public identity, verified protocol explanations, published project status and discovery. It is the source of *official* public statements. The main website's Community entry/navigation is not yet live; its later activation is a separate release decision.
+
+**B. Community Center / Contributor Hub (public-facing participation layer)**: approachable **white-background, minimal, English-first** area for general discussion, questions, Web3/crypto/technology exchange, learning VYREN, sharing ideas, and optional volunteer interest. Proposed minimal navigation: `Community | Learn VYREN | Contribute`. Initially there is a read-only Preview shell with topic categories `General`, `Technology & Web3`, `Crypto & Ecosystem`, `VYREN Q&A`, `Ideas & Contributions`. General Community membership, posting, commenting, moderation/reporting, and later a private `Team Space` are planned/partially prepared, **not open to real users yet**. One small categorized threads/posts engine with `PUBLIC | TEAM` visibility is preferred over multiple discussion/chat products. No fabricated posts, users, metrics, or instant pseudo-community.
+
+**C. Command Center (private operational work management)**: existing Founder-facing management tool, not a protocol governance console. It handles real future work through **projects, workstreams, tasks/assignments, opportunities, team/member administration, Founder reviews, delivery/progress tracking and audit/evidence/QA controls**. Existing Next.js / Better Auth / Neon implementation was previously developed and exercised with **test/draft data**. Founder may use Turkish; Contributor Workspace remains English with restricted access to own tasks, deliverables, approved projects, and later team discussion. Existing working controls should be extended rather than replaced.
+
+### How the layers connect
+- **Guest**: can view approved public Community and official learning content; never private tasks or member data.
+- **Community Member**: voluntary identity-verified signup, participate in public discussions and share suggestions/interest (after release). Being a member does **not** create operational authority or employment/token/financial rights.
+- **Contributor**: a Community Member whom **Founder explicitly selects** and directly grants operational Contributor access. No forced email invitation, additional account, or complex role workflow. Private Workspace and `TEAM` discussions are restricted at the API/DB level, not merely hidden in UI. Revocation must remain effective, including while new Community registration is paused.
+- **Founder**: sole existing real operator, with Turkish management UI, member access grant/revoke, task assignment, progress/deliverable reviews, and initial practical content moderation. Future narrow moderation/coordination delegation is possible without conceding Founder rights or creating canonical governance.
+- The existing legacy invitation/test Contributor path may remain technically supported for continuity; it should **not** dictate the new onboarding experience or be misreported as a live real team.
+- **Community discussion, polls, suggestions or operational tracking do not alter Rev4.6 protocol economics, FFA rights, canonical state, launch lifecycle or governance.** There is no protocol governance vote or override authority here.
+
+### Workstream outcome / what completion should look like
+A visitor finds VYREN, reads official info, joins a thoughtful community, asks questions and proposes ideas. Founder can review genuine interest and elevate a selected verified person to Contributor with one clear action. That person obtains a restricted working area, participates in assigned work and later private Team Space. Founder can assign, coordinate, review, archive evidence, and revoke access without vendor lock-in or deleting historical work. The UI remains **small, clean, light/white, mobile-usable, credible and low-friction**; avoid complex recruitment CRM, DMs/real-time chat, governance voting, artificial engagement, unnecessary providers or duplicate task systems.
+
+### Previously built vs being built vs not launched
+- **Previously built:** private Command Center work management; auth and role logic; Founder/Contributor test workflows; projects/tasks/workstreams/opportunities/team/review/evidence and recovery QA. Their previous populated non-Founder records are *test/draft fixtures*, not real participants.
+- **Currently built/prepared:** read-only Community Preview page and light theme; Google community join UI/API behind disabled feature flag; Founder direct grant/revoke interface/API; additive Community membership + access-grant schema on **separate Neon QA branch**; isolated SSO-protected Vercel QA project; role-policy unit tests, synthetic SQL tests, fail-closed HTTP checks and CI preparation.
+- **Current work point:** verify current changes with standalone CI / safe feature-branch build and then establish QA-only OAuth callback/secret/provider identities for actual authenticated HTTP E2E. Vercel quota and unrelated audit-branch auto-deploy errors are operational obstacles, not permission to weaken isolation.
+- **Still future:** live/public registration, actual new team members, public posts and comments, idea/report/moderation flows, private Team Space discussion, LinkedIn login, final public website Community link. Build in small verified stages; don't claim them done.
+- **Success criteria:** Founder remains free/secure and continuously operational; public users never access private data; no access bypass on revocation; no fake community; future growth does not require reconstructing the system.
+
+**Product architecture controlling reference:** `command-center/CC_COMMUNITY_CONTRIBUTOR_HUB_MINIMAL_DESIGN_PLAN_2026-11-07.md`. It is a working product-design source, not a Rev4.6 canonical protocol override; interpret its older implementation-status section historically and prefer newer runbook/handoff evidence for current progress.
+
 ## 1 — Governing constraints and user corrections
 1. The **only real operating user is Founder**. All earlier Contributor accounts/invitations, named people, tasks, test runs and simulated users are **QA, mock or draft**, not a currently onboarded real team. Do not describe them as actual Contributors.
 2. Founder wants **simple direct permission management**, not invitation-driven onboarding: Community Member signs in voluntarily → Founder selects verified member → **Contributor Yetkisi Ver** or **Yetkiyi Kaldır**. Tie permission to authenticated Better Auth user/provider identity, never name or raw email alone.
