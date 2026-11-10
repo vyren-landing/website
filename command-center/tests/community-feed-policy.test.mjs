@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {publicFeedEnabled,parsePublicFeedQuery,visibleToPublic,PUBLIC_TOPICS} from '../lib/community-feed-policy.mjs';
+test('feed disabled without independent explicit flag',()=>assert.equal(publicFeedEnabled({CC_COMMUNITY_ENABLED:'true'}),false));
+test('feed enabled with explicit flag',()=>assert.equal(publicFeedEnabled({CC_COMMUNITY_FEED_ENABLED:'true'}),true));
+test('default feed query is bounded',()=>assert.deepEqual(parsePublicFeedQuery(null,null),{topic:null,page:0,limit:15,offset:0}));
+test('allowed topic with pagination',()=>assert.deepEqual(parsePublicFeedQuery('IDEAS','2'),{topic:'IDEAS',page:2,limit:15,offset:30}));
+test('reject bad topic',()=>assert.equal(parsePublicFeedQuery('TEAM','0'),null));
+test('reject negative page',()=>assert.equal(parsePublicFeedQuery(null,'-1'),null));
+test('reject large page',()=>assert.equal(parsePublicFeedQuery(null,'11'),null));
+test('reject nonnumeric page',()=>assert.equal(parsePublicFeedQuery(null,'1;DROP'),null));
+test('all public categories are recognized',()=>assert.equal(PUBLIC_TOPICS.length,5));
+test('unreviewed public post is not visible',()=>assert.equal(visibleToPublic({visibility:'PUBLIC',moderation_status:'PENDING'}),false));
+test('hidden public post is not visible',()=>assert.equal(visibleToPublic({visibility:'PUBLIC',moderation_status:'HIDDEN',approved_at:'2026-11-08'}),false));
+test('TEAM post is never public even after approval',()=>assert.equal(visibleToPublic({visibility:'TEAM',moderation_status:'APPROVED',approved_at:'2026-11-08'}),false));
+test('APPROVED public without reviewer timestamp not public',()=>assert.equal(visibleToPublic({visibility:'PUBLIC',moderation_status:'APPROVED',approved_at:null}),false));
+test('fully approved PUBLIC post visible',()=>assert.equal(visibleToPublic({visibility:'PUBLIC',moderation_status:'APPROVED',approved_at:'2026-11-08'}),true));
